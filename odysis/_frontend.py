@@ -8,5 +8,7 @@
 Information about the frontend package of the widgets.
 """
 
-module_name = "odysis"
-module_version = "^0.1.0"
+from ._version import __version__
+
+module_name = 'odysis'
+module_version = '^{}'.format(__version__)
