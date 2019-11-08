@@ -81,10 +81,9 @@ class Mesh(_OdysisWidgetBase):
     _model_name = Unicode('MeshModel').tag(sync=True)
 
     vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
-    triangles = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
-    tetrahedrons = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
-    data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
-    bounding_box = List().tag(sync=True)
+    triangle_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
+    tetrahedron_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
+    # data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
 
     @staticmethod
     def from_vtk(path):
@@ -105,15 +104,11 @@ class Mesh(_OdysisWidgetBase):
         else:
             raise TypeError("Only unstructured grids supported at this time.")
 
-        grid.ComputeBounds()
-        bounding_box = grid.GetBounds()
-
         return Mesh(
             vertices=get_ugrid_vertices(grid),
-            triangles=get_ugrid_triangles(grid),
-            tetrahedrons=get_ugrid_tetrahedrons(grid),
-            data=_grid_data_to_data_widget(get_ugrid_data(grid)),
-            bounding_box=bounding_box
+            triangle_indices=get_ugrid_triangles(grid),
+            tetrahedron_indices=get_ugrid_tetrahedrons(grid),
+            # data=_grid_data_to_data_widget(get_ugrid_data(grid))
         )
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True, reload_tetrahedrons=False):
@@ -124,9 +119,9 @@ class Mesh(_OdysisWidgetBase):
             if reload_vertices:
                 self.vertices = get_ugrid_vertices(grid)
             if reload_triangles:
-                self.triangles = get_ugrid_triangles(grid)
+                self.triangle_indices = get_ugrid_triangles(grid)
             if reload_tetrahedrons:
-                self.tetrahedrons = get_ugrid_tetrahedrons(grid)
+                self.tetrahedron_indices = get_ugrid_tetrahedrons(grid)
             if reload_data:
                 self.data = _grid_data_to_data_widget(get_ugrid_data(grid))
 

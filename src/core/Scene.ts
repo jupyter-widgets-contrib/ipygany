@@ -1,5 +1,13 @@
 import * as THREE from 'three';
-import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls';
+
+import {
+  TrackballControls
+} from 'three/examples/jsm/controls/TrackballControls';
+
+import {
+  Mesh
+} from './Mesh';
+
 
 /**
  * 3-D Scene class
@@ -9,7 +17,9 @@ class Scene {
 
   constructor (el: HTMLElement) {
     this.el = el;
+  }
 
+  initialize () {
     const { width, height } = this.el.getBoundingClientRect();
 
     this.camera = new THREE.PerspectiveCamera(
@@ -18,17 +28,22 @@ class Scene {
       0.001,
       999999999
     );
-    this.camera.position.z = 0.2;
+    this.camera.position.z = 2;
 
     this.scene = new THREE.Scene();
     this.scene.add(this.camera);
 
     // light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.6);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     this.scene.add(ambientLight);
 
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    directionalLight.position.set(-1, 1.75, 1);
+    this.scene.add(directionalLight);
+
     // Renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setClearAlpha(0.);
 
     this.renderer.setSize(width, height);
     this.renderer.localClippingEnabled = true;
@@ -70,6 +85,15 @@ class Scene {
   }
 
   /**
+   * Add an Odysis mesh to the scene
+   */
+  addMesh (mesh: Mesh) : Promise<void> {
+    this.meshes.push(mesh);
+
+    return mesh.addToScene(this.scene);
+  }
+
+  /**
    * Animation
    */
   private animate () {
@@ -86,6 +110,8 @@ class Scene {
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
   controls: TrackballControls;
+
+  private meshes: Mesh[] = [];
 
   animationID: number;
 }
