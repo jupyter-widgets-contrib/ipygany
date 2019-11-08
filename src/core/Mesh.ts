@@ -65,12 +65,14 @@ class Mesh {
    * Update vertices buffers
    */
   updateVertices (vertices: Float32Array) {
-    this.vertexBuffer.set(vertices);
-    this.vertexBuffer.needsUpdate = true;
+    return this.initialize().then(() => {
+      this.vertexBuffer.set(vertices);
+      this.vertexBuffer.needsUpdate = true;
 
-    this.geometry.center();
+      this.geometry.center();
 
-    // TODO: Update effects geometries
+      // TODO: Update effects geometries
+    });
   }
 
   /**

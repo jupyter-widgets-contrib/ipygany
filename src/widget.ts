@@ -86,6 +86,8 @@ class MeshModel extends _OdysisWidgetModel {
       this.get('vertices'), this.get('triangle_indices'),
       this.get('tetrahedron_indices'), this.get('data')
     );
+
+    this.on('change:vertices', () => { this.mesh.updateVertices(this.get('vertices')); })
   }
 
   mesh: Mesh;

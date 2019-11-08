@@ -122,8 +122,8 @@ class Mesh(_OdysisWidgetBase):
                 self.triangle_indices = get_ugrid_triangles(grid)
             if reload_tetrahedrons:
                 self.tetrahedron_indices = get_ugrid_tetrahedrons(grid)
-            if reload_data:
-                self.data = _grid_data_to_data_widget(get_ugrid_data(grid))
+            # if reload_data:
+            #     self.data = _grid_data_to_data_widget(get_ugrid_data(grid))
 
 
 class Scene(_OdysisDOMWidgetBase):
