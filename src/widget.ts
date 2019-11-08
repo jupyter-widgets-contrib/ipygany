@@ -6,6 +6,10 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
+  Message
+} from '@phosphor/messaging';
+
+import {
   MODULE_NAME, MODULE_VERSION
 } from './version';
 
@@ -60,6 +64,23 @@ class SceneView extends DOMWidgetView {
     this.el.classList.add('odysis-scene');
 
     this.scene = new Scene(this.el);
+
+    this.displayed.then(this.resize.bind(this));
+    window.addEventListener('resize', this.resize.bind(this), false);
+  }
+
+  processPhosphorMessage (msg: Message) {
+    super.processPhosphorMessage(msg);
+    switch (msg.type) {
+      case 'resize':
+      case 'after-show':
+        this.resize();
+        break;
+    }
+  }
+
+  private resize () {
+    this.scene.resize();
   }
 
   scene: Scene;
