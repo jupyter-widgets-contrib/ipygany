@@ -46,8 +46,10 @@ class Component(_OdysisWidgetBase):
     name = Unicode().tag(sync=True)
     array = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
 
-    min = Float(allow_none=True, default_value=None).tag(sync=True)
-    max = Float(allow_none=True, default_value=None).tag(sync=True)
+    min = Float(allow_none=True, default_value=None)
+    max = Float(allow_none=True, default_value=None)
+
+    # TODO Compute min and max in the constructor?
 
 
 class Data(_OdysisWidgetBase):
@@ -66,7 +68,7 @@ def _grid_data_to_data_widget(grid_data):
         d = Data(
             name=key,
             components=[
-                Component(name=comp_name, array=comp['array'], min=comp['min'], max=comp['max'])
+                Component(name=comp_name, array=comp['array'])
                 for comp_name, comp in value.items()
             ]
         )
@@ -115,7 +117,7 @@ class PolyMesh(Mesh):
         return PolyMesh(
             vertices=get_ugrid_vertices(grid),
             triangle_indices=get_ugrid_triangles(grid),
-            # data=_grid_data_to_data_widget(get_ugrid_data(grid))
+            data=_grid_data_to_data_widget(get_ugrid_data(grid))
         )
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True):
@@ -161,7 +163,7 @@ class TetraMesh(PolyMesh):
             vertices=get_ugrid_vertices(grid),
             triangle_indices=get_ugrid_triangles(grid),
             tetrahedron_indices=get_ugrid_tetrahedrons(grid),
-            # data=_grid_data_to_data_widget(get_ugrid_data(grid))
+            data=_grid_data_to_data_widget(get_ugrid_data(grid))
         )
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True, reload_tetrahedrons=False):

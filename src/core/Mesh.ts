@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
+  Data
+} from './Data';
+
+import {
   Effect
 } from './Effect';
 
@@ -11,9 +15,8 @@ import {
 export
 abstract class Mesh {
 
-  constructor (data: any) {
+  constructor (data: Data[]) {
     this.data = data;
-    // TODO: initialize Buffer Attributes Nodes from data
   }
 
   /**
@@ -23,7 +26,7 @@ abstract class Mesh {
 
   abstract set scale (scale: THREE.Vector3);
 
-  data: any;
+  data: Data[];
 
   effects: Effect[];
 
@@ -36,7 +39,7 @@ abstract class Mesh {
 export
 class PolyMesh extends Mesh {
 
-  constructor (vertices: Float32Array, triangleIndices: Uint32Array, data: any, defaultColor: string) {
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, data: Data[], defaultColor: string) {
     super(data);
 
     this.vertices = vertices;
@@ -57,7 +60,7 @@ class PolyMesh extends Mesh {
 
     this.mesh = new THREE.Mesh(this.geometry, this.material);
 
-    // Scale up or down the geometry
+    // Scale up or down the geometry (This should be removed, the scale should be global to the scene)
     this.geometry.computeBoundingSphere();
     const { radius } = this.geometry.boundingSphere;
     this.mesh.scale.set(1 / radius, 1 / radius, 1 / radius);
@@ -134,7 +137,7 @@ class PolyMesh extends Mesh {
 export
 class TetraMesh extends PolyMesh {
 
-  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: any, defaultColor: string) {
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: Data[], defaultColor: string) {
     super(vertices, triangleIndices, data, defaultColor);
 
     this.tetrahedronIndices = tetrahedronIndices;

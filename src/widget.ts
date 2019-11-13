@@ -21,6 +21,10 @@ import {
 } from './core/Scene';
 
 import {
+  Data, Component
+} from './core/Data';
+
+import {
   Mesh, PolyMesh, TetraMesh
 } from './core/Mesh';
 
@@ -67,6 +71,66 @@ abstract class _OdysisDOMWidgetModel extends DOMWidgetModel {
 }
 
 
+export
+class ComponentModel extends _OdysisWidgetModel {
+  defaults() {
+    return {...super.defaults(),
+      _model_name: ComponentModel.model_name,
+      name: '',
+      array: []
+    };
+  }
+
+  initialize (attributes: any, options: any) {
+    super.initialize(attributes, options);
+
+    this.component = new Component(this.get('name'), this.get('array'));
+
+    // this.on('change:array', () => {  });
+  }
+
+  component: Component;
+
+  static serializers: ISerializers = {
+    ..._OdysisWidgetModel.serializers,
+    array: { deserialize: deserialize_float32array },
+  }
+
+  static model_name = 'ComponentModel';
+}
+
+
+export
+class DataModel extends _OdysisWidgetModel {
+  defaults() {
+    return {...super.defaults(),
+      _model_name: DataModel.model_name,
+      name: '',
+      components: []
+    };
+  }
+
+  initialize (attributes: any, options: any) {
+    super.initialize(attributes, options);
+
+    const components: Component[] = this.get('components').map((componentModel: ComponentModel) => {
+      return componentModel.component;
+    });
+
+    this.data = new Data(this.get('name'), components);
+  }
+
+  data: Data;
+
+  static serializers: ISerializers = {
+    ..._OdysisWidgetModel.serializers,
+    components: { deserialize: (unpack_models as any) },
+  }
+
+  static model_name = 'DataModel';
+}
+
+
 abstract class MeshModel extends _OdysisWidgetModel {
   defaults() {
     return {...super.defaults(),
@@ -80,8 +144,6 @@ abstract class MeshModel extends _OdysisWidgetModel {
 
     this.mesh = this.createMesh();
     this.initEventListeners();
-
-    // this.on('change:data', () => {  });
   }
 
   abstract createMesh() : Mesh;
@@ -91,7 +153,7 @@ abstract class MeshModel extends _OdysisWidgetModel {
 
   static serializers: ISerializers = {
     ..._OdysisWidgetModel.serializers,
-    // data: { deserialize: (unpack_models as any) },
+    data: { deserialize: (unpack_models as any) },
   }
 
   static model_name = 'MeshModel';
