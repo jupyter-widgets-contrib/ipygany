@@ -87,10 +87,10 @@ class Scene {
   /**
    * Add an Odysis mesh to the scene
    */
-  addMesh (mesh: Mesh) : Promise<void> {
+  addMesh (mesh: Mesh) {
     this.meshes.push(mesh);
 
-    return mesh.addToScene(this.scene);
+    mesh.addToScene(this.scene);
   }
 
   /**

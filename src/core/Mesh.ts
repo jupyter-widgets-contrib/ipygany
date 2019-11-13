@@ -9,45 +9,58 @@ import {
  * Mesh class
  */
 export
-class Mesh {
+abstract class Mesh {
 
-  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: any, defaultColor: string) {
-    this.vertices = vertices;
-    this.triangleIndices = triangleIndices;
-    this.tetrahedronIndices = tetrahedronIndices;
+  constructor (data: any) {
     this.data = data;
-    this._defaultColor = defaultColor;
+    // TODO: initialize Buffer Attributes Nodes from data
   }
 
-  initialize () : Promise<void> {
-    if (this.initialized) {
-      return Promise.resolve();
-    }
+  /**
+   * Add the mesh to a given scene
+   */
+  abstract addToScene (scene: THREE.Scene) : void;
 
-    return new Promise((resolve) => {
-      this.geometry = new THREE.BufferGeometry();
-      this.initializeBufferGeometry();
+  abstract set scale (scale: THREE.Vector3);
 
-      this.material = new Nodes.StandardNodeMaterial();
-      this.material.flatShading = true;
-      this.material.side = THREE.DoubleSide;
+  data: any;
 
-      // @ts-ignore
-      this.material.color = new Nodes.ColorNode(this.defaultColor);
+  effects: Effect[];
 
-      this.material.build();
+}
 
-      this.mesh = new THREE.Mesh(this.geometry, this.material);
 
-      // Scale up or down the geometry
-      this.geometry.computeBoundingSphere();
-      const { radius } = this.geometry.boundingSphere;
-      this.mesh.scale.set(1 / radius, 1 / radius, 1 / radius);
+/**
+ * PolyMesh class
+ */
+export
+class PolyMesh extends Mesh {
 
-      this.initialized = true;
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, data: any, defaultColor: string) {
+    super(data);
 
-      resolve();
-    });
+    this.vertices = vertices;
+    this.triangleIndices = triangleIndices;
+    this._defaultColor = defaultColor;
+
+    this.geometry = new THREE.BufferGeometry();
+    this.initializeBufferGeometry();
+
+    this.material = new Nodes.StandardNodeMaterial();
+    this.material.flatShading = true;
+    this.material.side = THREE.DoubleSide;
+
+    // @ts-ignore
+    this.material.color = new Nodes.ColorNode(this.defaultColor);
+
+    this.material.build();
+
+    this.mesh = new THREE.Mesh(this.geometry, this.material);
+
+    // Scale up or down the geometry
+    this.geometry.computeBoundingSphere();
+    const { radius } = this.geometry.boundingSphere;
+    this.mesh.scale.set(1 / radius, 1 / radius, 1 / radius);
   }
 
   /**
@@ -66,14 +79,12 @@ class Mesh {
    * Update vertices buffers
    */
   updateVertices (vertices: Float32Array) {
-    return this.initialize().then(() => {
-      this.vertexBuffer.set(vertices);
-      this.vertexBuffer.needsUpdate = true;
+    this.vertexBuffer.set(vertices);
+    this.vertexBuffer.needsUpdate = true;
 
-      this.geometry.center();
+    this.geometry.center();
 
-      // TODO: Update effects geometries
-    });
+    // TODO: Update effects geometries
   }
 
   set defaultColor (defaultColor: string) {
@@ -93,9 +104,7 @@ class Mesh {
    * Add the mesh to a given scene
    */
   addToScene (scene: THREE.Scene) {
-    return this.initialize().then(() => {
-      scene.add(this.mesh);
-    });
+    scene.add(this.mesh);
   }
 
   set scale(scale: THREE.Vector3) {
@@ -104,8 +113,7 @@ class Mesh {
 
   vertices: Float32Array;
   triangleIndices: Uint32Array;
-  tetrahedronIndices: Uint32Array;
-  data: any;
+
   private _defaultColor: string;
 
   geometry: THREE.BufferGeometry;
@@ -116,8 +124,22 @@ class Mesh {
 
   private mesh: THREE.Mesh;
 
-  effects: Effect[];
+}
 
-  private initialized: boolean = false;
+
+
+/**
+ * TetraMesh class
+ */
+export
+class TetraMesh extends PolyMesh {
+
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: any, defaultColor: string) {
+    super(vertices, triangleIndices, data, defaultColor);
+
+    this.tetrahedronIndices = tetrahedronIndices;
+  }
+
+  tetrahedronIndices: Uint32Array;
 
 }
