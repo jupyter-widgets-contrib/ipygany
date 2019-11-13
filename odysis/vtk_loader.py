@@ -150,7 +150,7 @@ def load_vtk(filepath):
             return reader.GetUnstructuredGridOutput()
 
         elif reader.GetPolyDataOutput() is not None:
-            raise RuntimeError('PolyData not supported (yet?)')
+            return reader.GetPolyDataOutput()
 
         elif reader.GetStructuredPointsOutput() is not None:
             raise RuntimeError('StructuredPoints not supported (yet?)')
