@@ -2,6 +2,8 @@
 
 from array import array
 
+import numpy as np
+
 from traitlets import (
     Unicode, List, Instance, Float
 )
@@ -95,6 +97,24 @@ class PolyMesh(Mesh):
 
     default_color = Color('#6395b0').tag(sync=True)
 
+    def __init__(self, vertices=[], triangle_indices=[], data=[], **kwargs):
+        """Construct a PolyMesh.
+
+        A PolyMesh is a triangle-based mesh. ``vertices`` is the array of points, ``triangle_indices`` is the array of triangle
+        indices.
+        """
+        vertices = np.asarray(vertices).flatten()
+        triangle_indices = np.asarray(triangle_indices).flatten()
+
+        # If there are no triangle indices, assume vertices are given in the right order for constructing the triangles.
+        if triangle_indices.size == 0:
+            triangle_indices = np.arange(vertices.size, dtype=np.UINT32)
+
+        super(PolyMesh, self).__init__(
+            vertices=vertices, triangle_indices=triangle_indices,
+            data=data, **kwargs
+        )
+
     @staticmethod
     def from_vtk(path):
         """Pass a path to a VTK Unstructured Grid file (``.vtu``) or pass a ``vtkUnstructuredGrid`` object to use.
@@ -139,6 +159,42 @@ class TetraMesh(PolyMesh):
     _model_name = Unicode('TetraMeshModel').tag(sync=True)
 
     tetrahedron_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
+
+    def __init__(self, vertices=[], triangle_indices=[], tetrahedron_indices=[], data=[], **kwargs):
+        """Construct a TetraMesh.
+
+        A TetraMesh is a tetrahedron-based mesh. ``vertices`` is the array of points, ``triangle_indices`` is the array of
+        triangle indices defining the mesh "skin", and ``tetrahedron_indices`` are the indices for constructing the tetrahedrons.
+        """
+        triangle_indices = np.asarray(triangle_indices).flatten()
+        tetrahedron_indices = np.asarray(tetrahedron_indices)
+
+        # If the skin is not provided, we compute it
+        if triangle_indices.size == 0:
+            if tetrahedron_indices.ndim != 2:
+                tetrahedron_indices.reshape(int(tetrahedron_indices.size / 4), 4)
+
+            # Extract all the triangle indices
+            faces = np.concatenate([
+                tetrahedron_indices[:, [0, 1, 2]],
+                tetrahedron_indices[:, [0, 2, 3]],
+                tetrahedron_indices[:, [1, 2, 3]],
+                tetrahedron_indices[:, [0, 1, 3]]
+            ])
+
+            # Sort triangles indices so that we can compare them and find duplicates
+            faces = np.sort(faces, axis=1)
+
+            # Get unique triangle indices and the number of times they appear
+            faces, counts = np.unique(faces, return_counts=True, axis=0)
+
+            # Extract triangles that appear exactly once
+            triangle_indices = faces[counts == 1]
+
+        super(TetraMesh, self).__init__(
+            vertices=vertices, triangle_indices=triangle_indices,
+            tetrahedron_indices=tetrahedron_indices.flatten(), data=data, **kwargs
+        )
 
     @staticmethod
     def from_vtk(path):
