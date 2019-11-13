@@ -11,11 +11,12 @@ import {
 export
 class Mesh {
 
-  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: any) {
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: any, defaultColor: string) {
     this.vertices = vertices;
     this.triangleIndices = triangleIndices;
     this.tetrahedronIndices = tetrahedronIndices;
     this.data = data;
+    this._defaultColor = defaultColor;
   }
 
   initialize () : Promise<void> {
@@ -32,7 +33,7 @@ class Mesh {
       this.material.side = THREE.DoubleSide;
 
       // @ts-ignore
-      this.material.color = new Nodes.ColorNode('#a3a3a3');
+      this.material.color = new Nodes.ColorNode(this.defaultColor);
 
       this.material.build();
 
@@ -75,6 +76,19 @@ class Mesh {
     });
   }
 
+  set defaultColor (defaultColor: string) {
+    this._defaultColor = defaultColor;
+
+    // @ts-ignore
+    this.material.color = new Nodes.ColorNode(this.defaultColor);
+
+    this.material.build();
+  }
+
+  get defaultColor () : string {
+    return this._defaultColor;
+  }
+
   /**
    * Add the mesh to a given scene
    */
@@ -92,6 +106,7 @@ class Mesh {
   triangleIndices: Uint32Array;
   tetrahedronIndices: Uint32Array;
   data: any;
+  private _defaultColor: string;
 
   geometry: THREE.BufferGeometry;
   private vertexBuffer: THREE.BufferAttribute;

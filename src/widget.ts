@@ -76,6 +76,7 @@ class MeshModel extends _OdysisWidgetModel {
       triangle_indices: [],
       tetrahedron_indices: [],
       data: [],
+      default_color: '#6395b0',
     };
   }
 
@@ -84,10 +85,12 @@ class MeshModel extends _OdysisWidgetModel {
 
     this.mesh = new Mesh(
       this.get('vertices'), this.get('triangle_indices'),
-      this.get('tetrahedron_indices'), this.get('data')
+      this.get('tetrahedron_indices'), this.get('data'),
+      this.get('default_color')
     );
 
-    this.on('change:vertices', () => { this.mesh.updateVertices(this.get('vertices')); })
+    this.on('change:vertices', () => { this.mesh.updateVertices(this.get('vertices')); });
+    this.on('change:default_color', () => { this.mesh.defaultColor = this.get('default_color'); });
   }
 
   mesh: Mesh;

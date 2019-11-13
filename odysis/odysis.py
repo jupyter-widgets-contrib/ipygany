@@ -84,6 +84,7 @@ class Mesh(_OdysisWidgetBase):
     triangle_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
     tetrahedron_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
     # data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
+    default_color = Color('#6395b0').tag(sync=True)
 
     @staticmethod
     def from_vtk(path):
