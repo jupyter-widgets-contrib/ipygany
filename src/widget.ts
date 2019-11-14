@@ -2,7 +2,7 @@
 // Distributed under the terms of the Modified BSD License.
 
 import {
-  WidgetModel, DOMWidgetModel, DOMWidgetView, ISerializers, unpack_models
+  WidgetModel, WidgetView, DOMWidgetModel, DOMWidgetView, ISerializers, ViewList, unpack_models
 } from '@jupyter-widgets/base';
 
 import {
@@ -139,28 +139,12 @@ abstract class BlockModel extends _OdysisWidgetModel {
   defaults() {
     return {...super.defaults(),
       _model_name: BlockModel.model_name,
+      _view_name: BlockModel.view_name,
       vertices: [],
       data: [],
       default_color: '#6395b0',
     };
   }
-
-  initialize (attributes: any, options: any) {
-    super.initialize(attributes, options);
-
-    this.block = this.createBlock();
-    this.block.defaultColor = this.get('default_color');
-
-    this.initEventListeners();
-  }
-
-  initEventListeners() : void {
-    this.on('change:default_color', () => { this.block.defaultColor = this.get('default_color'); });
-  }
-
-  abstract createBlock() : Block;
-
-  block: Block;
 
   static serializers: ISerializers = {
     ..._OdysisWidgetModel.serializers,
@@ -169,6 +153,37 @@ abstract class BlockModel extends _OdysisWidgetModel {
   }
 
   static model_name = 'BlockModel';
+  static view_name = 'BlockView';
+}
+
+
+abstract class BlockView extends WidgetView {
+  render() {
+    this.block = this.createBlock();
+    this.block.defaultColor = this.defaultColor;
+
+    this.initEventListeners();
+  }
+
+  get vertices () : Float32Array {
+    return this.model.get('vertices');
+  }
+
+  get data () : DataModel[] {
+    return this.model.get('data');
+  }
+
+  get defaultColor () : string {
+    return this.model.get('default_color');
+  }
+
+  initEventListeners() : void {
+    this.model.on('change:default_color', () => { this.block.defaultColor = this.defaultColor; });
+  }
+
+  abstract createBlock() : Block;
+
+  block: Block;
 }
 
 
@@ -177,21 +192,10 @@ class PolyMeshModel extends BlockModel {
   defaults() {
     return {...super.defaults(),
       _model_name: PolyMeshModel.model_name,
+      _view_name: PolyMeshModel.view_name,
       triangle_indices: [],
     };
   }
-
-  createBlock () {
-    return new PolyMesh(this.get('vertices'), this.get('triangle_indices'), this.get('data'));
-  }
-
-  initEventListeners () {
-    super.initEventListeners();
-
-    this.on('change:vertices', () => { this.block.updateVertices(this.get('vertices')); });
-  }
-
-  block: PolyMesh;
 
   static serializers: ISerializers = {
     ...BlockModel.serializers,
@@ -199,6 +203,27 @@ class PolyMeshModel extends BlockModel {
   }
 
   static model_name = 'PolyMeshModel';
+  static view_name = 'PolyMeshView';
+}
+
+
+export
+class PolyMeshView extends BlockView {
+  createBlock () {
+    return new PolyMesh(this.vertices, this.triangleIndices, []);
+  }
+
+  get triangleIndices () : Uint32Array {
+    return this.model.get('triangle_indices');
+  }
+
+  initEventListeners () {
+    super.initEventListeners();
+
+    this.model.on('change:vertices', () => { this.block.updateVertices(this.vertices); });
+  }
+
+  block: PolyMesh;
 }
 
 
@@ -207,18 +232,10 @@ class TetraMeshModel extends PolyMeshModel {
   defaults() {
     return {...super.defaults(),
       _model_name: TetraMeshModel.model_name,
+      _view_name: TetraMeshModel.view_name,
       tetrahedron_indices: [],
     };
   }
-
-  createBlock () {
-    return new TetraMesh(
-      this.get('vertices'), this.get('triangle_indices'),
-      this.get('tetrahedron_indices'), this.get('data')
-    );
-  }
-
-  block: TetraMesh;
 
   static serializers: ISerializers = {
     ...PolyMeshModel.serializers,
@@ -226,6 +243,24 @@ class TetraMeshModel extends PolyMeshModel {
   }
 
   static model_name = 'TetraMeshModel';
+  static view_name = 'TetraMeshView';
+}
+
+
+export
+class TetraMeshView extends PolyMeshView {
+  createBlock () {
+    return new TetraMesh(
+      this.vertices, this.triangleIndices,
+      this.tetrahedronIndices, []
+    );
+  }
+
+  get tetrahedronIndices () {
+    return this.model.get('tetrahedron_indices');
+  }
+
+  block: TetraMesh;
 }
 
 
@@ -257,23 +292,41 @@ class SceneView extends DOMWidgetView {
 
     this.scene = new Scene(this.el);
 
+    this.blockViews = new ViewList<BlockView>(this.createBlockView, this.removeBlockView, this);
+
     this.displayed.then(() => {
       this.scene.initialize();
       this.scene.backgroundColor = this.model.get('background_color');
 
-      const blockModels: BlockModel[] = this.model.get('children');
-      for (const blockModel of blockModels) {
-        this.scene.addChild(blockModel.block);
-      }
-    });
+      this.updateBlocksViews();
 
-    this.initEventListeners();
+      this.initEventListeners();
+    });
   }
 
   initEventListeners () {
     window.addEventListener('resize', this.resize.bind(this), false);
 
-    this.model.on('change:background_color', () => { this.scene.backgroundColor = this.model.get('background_color'); })
+    this.model.on('change:background_color', () => { this.scene.backgroundColor = this.model.get('background_color'); });
+    this.model.on('change:children', () => { this.updateBlocksViews(); });
+  }
+
+  private updateBlocksViews() {
+    this.blockViews.update(this.model.get('children'));
+  }
+
+  private createBlockView (blockModel: BlockModel) {
+    // The following ts-ignore is needed due to ipywidgets's implementation
+    // @ts-ignore
+    return this.create_child_view(blockModel).then((blockView: BlockView) => {
+      this.scene.addChild(blockView.block);
+
+      return blockView;
+    });
+  }
+
+  private removeBlockView (blockView: BlockView) {
+    // this.scene.removeChild(blockView.block);
   }
 
   processPhosphorMessage (msg: Message) {
@@ -291,4 +344,5 @@ class SceneView extends DOMWidgetView {
   }
 
   scene: Scene;
+  blockViews: ViewList<BlockView>;
 }
