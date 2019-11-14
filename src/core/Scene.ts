@@ -5,8 +5,8 @@ import {
 } from 'three/examples/jsm/controls/TrackballControls';
 
 import {
-  Mesh
-} from './Mesh';
+  Block
+} from './Block';
 
 
 /**
@@ -85,12 +85,12 @@ class Scene {
   }
 
   /**
-   * Add an Odysis mesh to the scene
+   * Add an Odysis block to the scene
    */
-  addMesh (mesh: Mesh) {
-    this.meshes.push(mesh);
+  addChild (block: Block) {
+    this.children.push(block);
 
-    mesh.addToScene(this.scene);
+    block.addToScene(this.scene);
   }
 
   /**
@@ -111,7 +111,7 @@ class Scene {
   renderer: THREE.WebGLRenderer;
   controls: TrackballControls;
 
-  private meshes: Mesh[] = [];
+  private children: Block[] = [];
 
   animationID: number;
 }

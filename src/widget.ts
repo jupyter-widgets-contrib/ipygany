@@ -25,8 +25,12 @@ import {
 } from './core/Data';
 
 import {
-  Mesh, PolyMesh, TetraMesh
-} from './core/Mesh';
+  Block
+} from './core/Block';
+
+import {
+  PolyMesh, TetraMesh
+} from './core/MeshBlock';
 
 function deserialize_float32array(data: any, manager: any) {
     return new Float32Array(data.data.buffer);
@@ -131,63 +135,67 @@ class DataModel extends _OdysisWidgetModel {
 }
 
 
-abstract class MeshModel extends _OdysisWidgetModel {
+abstract class BlockModel extends _OdysisWidgetModel {
   defaults() {
     return {...super.defaults(),
-      _model_name: MeshModel.model_name,
+      _model_name: BlockModel.model_name,
+      vertices: [],
       data: [],
+      default_color: '#6395b0',
     };
   }
 
   initialize (attributes: any, options: any) {
     super.initialize(attributes, options);
 
-    this.mesh = this.createMesh();
+    this.block = this.createBlock();
+    this.block.defaultColor = this.get('default_color');
+
     this.initEventListeners();
   }
 
-  abstract createMesh() : Mesh;
-  abstract initEventListeners() : void;
+  initEventListeners() : void {
+    this.on('change:default_color', () => { this.block.defaultColor = this.get('default_color'); });
+  }
 
-  mesh: Mesh;
+  abstract createBlock() : Block;
+
+  block: Block;
 
   static serializers: ISerializers = {
     ..._OdysisWidgetModel.serializers,
+    vertices: { deserialize: deserialize_float32array },
     data: { deserialize: (unpack_models as any) },
   }
 
-  static model_name = 'MeshModel';
+  static model_name = 'BlockModel';
 }
 
 
 export
-class PolyMeshModel extends MeshModel {
+class PolyMeshModel extends BlockModel {
   defaults() {
     return {...super.defaults(),
       _model_name: PolyMeshModel.model_name,
-      vertices: [],
       triangle_indices: [],
-      default_color: '#6395b0',
     };
   }
 
-  createMesh () {
+  createBlock () {
     return new PolyMesh(
       this.get('vertices'), this.get('triangle_indices'),
-      this.get('data'), this.get('default_color')
+      this.get('data')
     );
   }
 
   initEventListeners () {
-    this.on('change:vertices', () => { this.mesh.updateVertices(this.get('vertices')); });
-    this.on('change:default_color', () => { this.mesh.defaultColor = this.get('default_color'); });
+    this.on('change:vertices', () => { this.block.updateVertices(this.get('vertices')); });
   }
 
-  mesh: PolyMesh;
+  block: PolyMesh;
 
   static serializers: ISerializers = {
-    ...MeshModel.serializers,
-    vertices: { deserialize: deserialize_float32array },
+    ...BlockModel.serializers,
     triangle_indices: { deserialize: deserialize_uint32array },
   }
 
@@ -204,15 +212,14 @@ class TetraMeshModel extends PolyMeshModel {
     };
   }
 
-  createMesh () {
+  createBlock () {
     return new TetraMesh(
       this.get('vertices'), this.get('triangle_indices'),
-      this.get('tetrahedron_indices'), this.get('data'),
-      this.get('default_color')
+      this.get('tetrahedron_indices'), this.get('data')
     );
   }
 
-  mesh: TetraMesh;
+  block: TetraMesh;
 
   static serializers: ISerializers = {
     ...PolyMeshModel.serializers,
@@ -229,13 +236,13 @@ class SceneModel extends _OdysisDOMWidgetModel {
     return {...super.defaults(),
       _model_name: SceneModel.model_name,
       _view_name: SceneModel.view_name,
-      meshes: []
+      children: []
     };
   }
 
   static serializers: ISerializers = {
     ..._OdysisDOMWidgetModel.serializers,
-    meshes: { deserialize: (unpack_models as any) },
+    children: { deserialize: (unpack_models as any) },
   }
 
   static model_name = 'SceneModel';
@@ -253,9 +260,9 @@ class SceneView extends DOMWidgetView {
     this.displayed.then(() => {
       this.scene.initialize();
 
-      const meshModels: MeshModel[] = this.model.get('meshes');
-      for (const meshModel of meshModels) {
-        this.scene.addMesh(meshModel.mesh);
+      const blockModels: BlockModel[] = this.model.get('children');
+      for (const blockModel of blockModels) {
+        this.scene.addChild(blockModel.block);
       }
     });
 

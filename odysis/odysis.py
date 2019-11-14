@@ -79,23 +79,27 @@ def _grid_data_to_data_widget(grid_data):
     return data
 
 
-class Mesh(_OdysisWidgetBase):
-    """A 3-D Mesh widget."""
+class Block(_OdysisWidgetBase):
+    """A 3-D element widget.
 
-    _model_name = Unicode('MeshModel').tag(sync=True)
+    This class is not intended to be instantiated directly.
+    """
+
+    _model_name = Unicode('BlockModel').tag(sync=True)
+
+    vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
+
+    default_color = Color('#6395b0').tag(sync=True)
 
     # data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
 
 
-class PolyMesh(Mesh):
+class PolyMesh(Block):
     """A polygon-based 3-D Mesh widget."""
 
     _model_name = Unicode('PolyMeshModel').tag(sync=True)
 
-    vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
     triangle_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
-
-    default_color = Color('#6395b0').tag(sync=True)
 
     def __init__(self, vertices=[], triangle_indices=[], data=[], **kwargs):
         """Construct a PolyMesh.
@@ -243,6 +247,10 @@ class Scene(_OdysisDOMWidgetBase):
     _view_name = Unicode('SceneView').tag(sync=True)
     _model_name = Unicode('SceneModel').tag(sync=True)
 
-    meshes = List(Instance(Mesh)).tag(sync=True, **widget_serialization)
+    children = List(Instance(Block)).tag(sync=True, **widget_serialization)
 
     background_color = Color('#fff').tag(sync=True)
+
+    def __init__(self, children=[], **kwargs):
+        """Construct a Scene."""
+        super(Scene, self).__init__(children=children, **kwargs)
