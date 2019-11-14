@@ -182,13 +182,12 @@ class PolyMeshModel extends BlockModel {
   }
 
   createBlock () {
-    return new PolyMesh(
-      this.get('vertices'), this.get('triangle_indices'),
-      this.get('data')
-    );
+    return new PolyMesh(this.get('vertices'), this.get('triangle_indices'), this.get('data'));
   }
 
   initEventListeners () {
+    super.initEventListeners();
+
     this.on('change:vertices', () => { this.block.updateVertices(this.get('vertices')); });
   }
 
@@ -236,7 +235,8 @@ class SceneModel extends _OdysisDOMWidgetModel {
     return {...super.defaults(),
       _model_name: SceneModel.model_name,
       _view_name: SceneModel.view_name,
-      children: []
+      background_color: '#fff',
+      children: [],
     };
   }
 
@@ -259,6 +259,7 @@ class SceneView extends DOMWidgetView {
 
     this.displayed.then(() => {
       this.scene.initialize();
+      this.scene.backgroundColor = this.model.get('background_color');
 
       const blockModels: BlockModel[] = this.model.get('children');
       for (const blockModel of blockModels) {
@@ -266,7 +267,13 @@ class SceneView extends DOMWidgetView {
       }
     });
 
+    this.initEventListeners();
+  }
+
+  initEventListeners () {
     window.addEventListener('resize', this.resize.bind(this), false);
+
+    this.model.on('change:background_color', () => { this.scene.backgroundColor = this.model.get('background_color'); })
   }
 
   processPhosphorMessage (msg: Message) {

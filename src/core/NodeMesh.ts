@@ -65,12 +65,15 @@ class NodeMesh {
     this.geometry = geometry;
     this.material = new Nodes.StandardNodeMaterial();
     this.mesh = new T(geometry, this.material);
+
+    this._defaultColor = '#6395b0';
+    this.defaultColorNode = new Nodes.ColorNode(this._defaultColor);
   }
 
   buildMaterial () {
     let position = new Nodes.PositionNode();
     let alpha = new Nodes.FloatNode(1.0);
-    let color: NodeOperationResult<Nodes.ColorNode> = new Nodes.ColorNode(this._defaultColor);
+    let color: NodeOperationResult<Nodes.ColorNode> = this.defaultColorNode;
 
     for (const colorOperator of this.colorOperators) {
       color = colorOperator.operate(color);
@@ -114,7 +117,7 @@ class NodeMesh {
   set defaultColor (defaultColor: string) {
     this._defaultColor = defaultColor;
 
-    this.buildMaterial();
+    this.defaultColorNode.value = new THREE.Color(this._defaultColor);
   }
 
   get defaultColor () {
@@ -132,6 +135,7 @@ class NodeMesh {
   private colorOperators: NodeOperator<Nodes.ColorNode>[] = [];
 
   private _defaultColor: string;
+  private defaultColorNode: Nodes.ColorNode;
   private _scale: THREE.Vector3;
 
 }

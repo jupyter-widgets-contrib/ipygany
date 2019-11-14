@@ -93,6 +93,10 @@ class Scene {
     block.addToScene(this.scene);
   }
 
+  set backgroundColor(color: string) {
+    this.renderer.setClearColor(new THREE.Color(color));
+  }
+
   /**
    * Animation
    */
