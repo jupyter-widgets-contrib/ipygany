@@ -124,6 +124,11 @@ class NodeMesh {
     return this._defaultColor;
   }
 
+  dispose () {
+    this.geometry.dispose();
+    this.material.dispose();
+  }
+
   geometry: THREE.BufferGeometry;
   material: Nodes.StandardNodeMaterial;
   mesh: THREE.Mesh;

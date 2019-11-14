@@ -64,6 +64,12 @@ abstract class Block {
     return this.tetrahedronIndices != null;
   }
 
+  dispose () {
+    for (const nodeMesh of this.meshes) {
+      nodeMesh.dispose();
+    }
+  }
+
   vertices: Float32Array;
   data: Data[];
 

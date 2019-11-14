@@ -339,6 +339,12 @@ class SceneView extends DOMWidgetView {
     }
   }
 
+  remove () {
+    this.scene.dispose();
+
+    return super.remove();
+  }
+
   private resize () {
     this.scene.resize();
   }

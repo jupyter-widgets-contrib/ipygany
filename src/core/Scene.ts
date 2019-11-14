@@ -101,11 +101,24 @@ class Scene {
    * Animation
    */
   private animate () {
-    this.animationID = requestAnimationFrame(this.animate.bind(this));
+    this.animationID = window.requestAnimationFrame(this.animate.bind(this));
 
     this.renderer.render(this.scene, this.camera);
 
     this.controls.update();
+  }
+
+  dispose () {
+    window.cancelAnimationFrame(this.animationID);
+
+    for (const child of this.children) {
+      child.dispose();
+    }
+
+    this.controls.dispose();
+    this.scene.dispose();
+
+    this.renderer.dispose();
   }
 
   el: HTMLElement;
