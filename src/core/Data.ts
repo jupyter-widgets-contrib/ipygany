@@ -26,7 +26,9 @@ class Component {
    * Add this component to a given geometry
    */
   addToGeometry (geometry: THREE.BufferGeometry) {
-    geometry.addAttribute(this.shaderName, this.bufferAttribute);
+    if (geometry.getAttribute(this.shaderName) === undefined) {
+      geometry.addAttribute(this.shaderName, this.bufferAttribute);
+    }
     // TODO: Remember this geometry so that we can update it when the buffer changes?
   }
 
@@ -39,6 +41,7 @@ class Component {
   private shaderName: string;
 
 }
+
 
 export
 class Data {
@@ -63,15 +66,6 @@ class Data {
     }
 
     throw `${name} is not a valid component name for ${this.name}`;
-  }
-
-  /**
-   * Add data to a given geometry
-   */
-  addToGeometry (geometry: THREE.BufferGeometry) {
-    for (const component of this.components) {
-      component.addToGeometry(geometry);
-    }
   }
 
   components: Component[];
