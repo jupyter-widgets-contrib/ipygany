@@ -25,10 +25,8 @@ from ._frontend import module_version, module_name
 
 
 class _OdysisWidgetBase(Widget):
-    _view_module = Unicode(module_name).tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
 
-    _view_module_version = Unicode(module_version).tag(sync=True)
     _model_module_version = Unicode(module_version).tag(sync=True)
 
 
@@ -86,7 +84,6 @@ class Block(_OdysisWidgetBase):
     """
 
     _model_name = Unicode('BlockModel').tag(sync=True)
-    _view_name = Unicode('BlockView').tag(sync=True)
 
     vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
 
@@ -99,7 +96,6 @@ class PolyMesh(Block):
     """A polygon-based 3-D Mesh widget."""
 
     _model_name = Unicode('PolyMeshModel').tag(sync=True)
-    _view_name = Unicode('PolyMeshView').tag(sync=True)
 
     triangle_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
 
@@ -163,7 +159,6 @@ class TetraMesh(PolyMesh):
     """A tetrahedron-based 3-D Mesh widget."""
 
     _model_name = Unicode('TetraMeshModel').tag(sync=True)
-    _view_name = Unicode('TetraMeshView').tag(sync=True)
 
     tetrahedron_indices = Array(default_value=array(UINT32)).tag(sync=True, **array_serialization)
 
