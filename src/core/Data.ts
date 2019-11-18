@@ -48,17 +48,21 @@ class Data {
     this.components = components;
   }
 
+  get dimension () {
+    return this.components.length;
+  }
+
   /**
    * Get a data Component by name
    */
-  getComponent (name: string) : Component | null {
+  getComponent (name: string) : Component {
     for (const component of this.components) {
       if (component.name == name) {
         return component;
       }
     }
 
-    return null;
+    throw `${name} is not a valid component name for ${this.name}`;
   }
 
   /**
