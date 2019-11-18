@@ -32,17 +32,18 @@ import {
   PolyMesh, TetraMesh
 } from './core/MeshBlock';
 
-function deserialize_float32array(data: any, manager: any) {
+function deserialize_float32array (data: any, manager: any) {
     return new Float32Array(data.data.buffer);
 }
 
-function deserialize_uint32array(data: any, manager: any) {
+function deserialize_uint32array (data: any, manager: any) {
     return new Uint32Array(data.data.buffer);
 }
 
 
 abstract class _OdysisWidgetModel extends WidgetModel {
-  defaults() {
+
+  defaults () {
     return {...super.defaults(),
       _model_module: _OdysisWidgetModel.model_module,
       _model_module_version: _OdysisWidgetModel.model_module_version,
@@ -51,11 +52,13 @@ abstract class _OdysisWidgetModel extends WidgetModel {
 
   static model_module = MODULE_NAME;
   static model_module_version = MODULE_VERSION;
+
 }
 
 
 abstract class _OdysisDOMWidgetModel extends DOMWidgetModel {
-  defaults() {
+
+  defaults () {
     return {...super.defaults(),
       _model_module: _OdysisDOMWidgetModel.model_module,
       _model_module_version: _OdysisDOMWidgetModel.model_module_version,
@@ -68,12 +71,14 @@ abstract class _OdysisDOMWidgetModel extends DOMWidgetModel {
   static model_module_version = MODULE_VERSION;
   static view_module = MODULE_NAME;
   static view_module_version = MODULE_VERSION;
+
 }
 
 
 export
 class ComponentModel extends _OdysisWidgetModel {
-  defaults() {
+
+  defaults () {
     return {...super.defaults(),
       _model_name: ComponentModel.model_name,
       name: '',
@@ -97,11 +102,13 @@ class ComponentModel extends _OdysisWidgetModel {
   }
 
   static model_name = 'ComponentModel';
+
 }
 
 
 export
 class DataModel extends _OdysisWidgetModel {
+
   defaults() {
     return {...super.defaults(),
       _model_name: DataModel.model_name,
@@ -128,10 +135,12 @@ class DataModel extends _OdysisWidgetModel {
   }
 
   static model_name = 'DataModel';
+
 }
 
 
 abstract class BlockModel extends _OdysisWidgetModel {
+
   defaults() {
     return {...super.defaults(),
       _model_name: BlockModel.model_name,
@@ -177,11 +186,13 @@ abstract class BlockModel extends _OdysisWidgetModel {
   }
 
   static model_name = 'BlockModel';
+
 }
 
 
 export
 class PolyMeshModel extends BlockModel {
+
   defaults() {
     return {...super.defaults(),
       _model_name: PolyMeshModel.model_name,
@@ -211,12 +222,14 @@ class PolyMeshModel extends BlockModel {
   }
 
   static model_name = 'PolyMeshModel';
+
 }
 
 
 export
 class TetraMeshModel extends PolyMeshModel {
-  defaults() {
+
+  defaults () {
     return {...super.defaults(),
       _model_name: TetraMeshModel.model_name,
       tetrahedron_indices: [],
@@ -242,11 +255,13 @@ class TetraMeshModel extends PolyMeshModel {
   }
 
   static model_name = 'TetraMeshModel';
+
 }
 
 
 export
 class SceneModel extends _OdysisDOMWidgetModel {
+
   defaults() {
     return {...super.defaults(),
       _model_name: SceneModel.model_name,
@@ -256,7 +271,7 @@ class SceneModel extends _OdysisDOMWidgetModel {
     };
   }
 
-  initialize(attributes: any, options: any) {
+  initialize (attributes: any, options: any) {
     super.initialize(attributes, options);
 
     this.scene = new Scene();
@@ -282,12 +297,14 @@ class SceneModel extends _OdysisDOMWidgetModel {
 
   static model_name = 'SceneModel';
   static view_name = 'SceneView';
+
 }
 
 
 export
 class SceneView extends DOMWidgetView {
-  render() {
+
+  render () {
     this.el.classList.add('odysis-scene');
 
     this.renderer = new Renderer(this.el, this.model.scene);
