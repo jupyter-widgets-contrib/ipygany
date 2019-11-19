@@ -309,6 +309,21 @@ class IsoColor(Effect):
         return self.data[0].name
 
 
+class Threshold(Effect):
+    """An Threshold effect to another block."""
+
+    _model_name = Unicode('ThresholdModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+
+    min = CFloat(0.).tag(sync=True)
+    max = CFloat(0.).tag(sync=True)
+
+    @default('input')
+    def _default_input(self):
+        return self.data[0].name
+
+
 class Scene(_OdysisDOMWidgetBase):
     """A 3-D Scene widget."""
 

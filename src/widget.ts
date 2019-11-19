@@ -37,8 +37,8 @@ import {
 } from './core/MeshBlock';
 
 import {
-  IsoColor
-} from './core/Effects/IsoColor';
+  IsoColor, Threshold
+} from './core/Effects/effects';
 
 
 function deserialize_float32array (data: any, manager: any) {
@@ -282,11 +282,16 @@ abstract class EffectModel extends BlockModel {
     return {...super.defaults(),
       _model_name: EffectModel.model_name,
       parent: null,
+      input: null,
     };
   }
 
   get parent () : BlockModel {
     return this.get('parent');
+  }
+
+  get input () {
+    return this.get('input');
   }
 
   block: Effect;
@@ -307,14 +312,9 @@ class IsoColorModel extends EffectModel {
   defaults() {
     return {...super.defaults(),
       _model_name: IsoColorModel.model_name,
-      input: null,
       min: null,
       max: null,
     };
-  }
-
-  get input () {
-    return this.get('input');
   }
 
   get min () {
@@ -339,6 +339,43 @@ class IsoColorModel extends EffectModel {
   block: IsoColor;
 
   static model_name = 'IsoColorModel';
+
+}
+
+
+export
+class ThresholdModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: ThresholdModel.model_name,
+      min: null,
+      max: null,
+    };
+  }
+
+  get min () {
+    return this.get('min');
+  }
+
+  get max () {
+    return this.get('max');
+  }
+
+  createBlock () {
+    return new Threshold(this.parent.block, this.input, this.min, this.max);
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:min', () => { this.block.min = this.min });
+    this.on('change:max', () => { this.block.max = this.max });
+  }
+
+  block: Threshold;
+
+  static model_name = 'ThresholdModel';
 
 }
 
