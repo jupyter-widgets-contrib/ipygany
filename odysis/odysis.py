@@ -288,6 +288,10 @@ class Effect(Block):
 
     parent = Instance(Block).tag(sync=True, **widget_serialization)
 
+    def __init__(self, parent, **kwargs):
+        """Create an Effect on the given Mesh or Effect output."""
+        super(Effect, self).__init__(parent=parent, **kwargs)
+
 
 class IsoColor(Effect):
     """An IsoColor effect to another block."""
