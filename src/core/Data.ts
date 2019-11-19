@@ -27,7 +27,7 @@ class Component {
    */
   addToGeometry (geometry: THREE.BufferGeometry) {
     if (geometry.getAttribute(this.shaderName) === undefined) {
-      geometry.addAttribute(this.shaderName, this.bufferAttribute);
+      geometry.setAttribute(this.shaderName, this.bufferAttribute);
     }
   }
 
