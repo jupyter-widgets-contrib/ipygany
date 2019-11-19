@@ -1,7 +1,7 @@
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
-  Effect, InputDimension
+  Effect, Input, InputDimension
 } from '../EffectBlock';
 
 import {
@@ -20,8 +20,8 @@ import {
 export
 class Threshold extends Effect {
 
-  constructor (parent: Block, input: string | [string, string], min: number, max: number) {
-    super(parent, typeof input == 'string' ? input : [input]);
+  constructor (parent: Block, input: Input, min: number, max: number) {
+    super(parent, input);
 
     // Create min and max float nodes
     this.minNode = new Nodes.FloatNode(min);
@@ -39,6 +39,17 @@ class Threshold extends Effect {
     this.addAlphaNode(NodeOperation.MUL, this.thresholdAlpha);
 
     this.buildMaterials();
+
+    this.initialized = true;
+  }
+
+  setInput(input?: Input) : void {
+    super.setInput(input);
+
+    if (this.initialized) {
+      this.isUnderMax.a = this.inputNode;
+      this.isOverMin.b = this.inputNode;
+    }
   }
 
   set min (value: number) {
@@ -60,6 +71,8 @@ class Threshold extends Effect {
   get inputDimension () : InputDimension {
     return 1;
   }
+
+  private initialized: boolean = false;
 
   private minNode: Nodes.FloatNode;
   private maxNode: Nodes.FloatNode;

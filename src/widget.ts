@@ -294,6 +294,18 @@ abstract class EffectModel extends BlockModel {
     return this.get('input');
   }
 
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:input', this.updateInput.bind(this));
+  }
+
+  updateInput () {
+    if (this.block.inputDimension != 0) {
+      this.block.setInput(this.input);
+    }
+  }
+
   block: Effect;
 
   static serializers: ISerializers = {
@@ -323,6 +335,12 @@ class IsoColorModel extends EffectModel {
 
   get max () {
     return this.get('max');
+  }
+
+  get input () {
+    const input = this.get('input');
+
+    return typeof input == 'string' ? input : [input];
   }
 
   createBlock () {
@@ -360,6 +378,12 @@ class ThresholdModel extends EffectModel {
 
   get max () {
     return this.get('max');
+  }
+
+  get input () {
+    const input = this.get('input');
+
+    return typeof input == 'string' ? input : [input];
   }
 
   createBlock () {

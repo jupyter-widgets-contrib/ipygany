@@ -101,6 +101,7 @@ class NodeMesh {
     this.material.color = color;
 
     this.material.build();
+    this.material.needsUpdate = true;
   }
 
   /**
