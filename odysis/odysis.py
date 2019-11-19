@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Unicode, List, Instance, Float, Tuple, Union
+    Unicode, List, Instance, Float, Tuple, Union, default
 )
 from traittypes import Array
 from ipywidgets import (
@@ -298,10 +298,14 @@ class IsoColor(Effect):
 
     _model_name = Unicode('IsoColorModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Float(0.))).tag(sync=True)
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), Float(0.))).tag(sync=True)
 
     min = Float(0.).tag(sync=True)
     max = Float(0.).tag(sync=True)
+
+    @default('input')
+    def _default_input(self):
+        return self.data[0].name
 
 
 class Scene(_OdysisDOMWidgetBase):

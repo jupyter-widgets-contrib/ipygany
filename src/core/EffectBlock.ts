@@ -26,6 +26,9 @@ import {
 export
 type InputDimension = 0 | 1 | 2 | 3 | 4;
 
+export
+type Input = string | ([string, string] | number)[];
+
 
 /**
  * Effect class
@@ -34,7 +37,7 @@ type InputDimension = 0 | 1 | 2 | 3 | 4;
 export
 class Effect extends Block {
 
-  constructor (parent: Block, inputComponents?: ([string, string] | number)[]) {
+  constructor (parent: Block, input?: Input) {
     super(parent.vertices, parent.data);
 
     this.parent = parent;
@@ -43,15 +46,18 @@ class Effect extends Block {
     this.tetrahedronIndices = parent.tetrahedronIndices;
 
     // Copy parent meshes, this does not copy geometries (data buffers are not copied)
-    this.meshes = parent.meshes.map((nodeMesh: NodeMesh) => nodeMesh.copy() );
+    this.meshes = parent.meshes.map((nodeMesh: NodeMesh) => nodeMesh.copy());
 
-    this.setInput(inputComponents);
+    this.setInput(input);
   }
 
   /**
     * Set the input data, if no arguments are provided a default input will be chosen.
+    * The input can be:
+    *   - a data name
+    *   - a list of (data name, component name) tuples and numbers
     */
- setInput (components?: ([string, string] | number)[]) : void {
+ setInput (input?: Input) : void {
     if (this.inputDimension == 0) {
       // Do nothing (Maybe throw?)
       return;
@@ -60,24 +66,31 @@ class Effect extends Block {
     let inputs: (Component | number)[];
 
     // Choose a default input if none is provided
-    if (components === undefined) {
+    if (input === undefined) {
       if (this.data.length == 0) {
         throw 'No data provided, put this effect needs at least ${this.inputDimension} component(s) as input';
       }
 
-      const inputData = this.data[0];
+      input = this.data[0].name;
+    }
+
+    // If a Data name is given, extract data components
+    if (typeof input == 'string') {
+      const inputData = this.getData(input);
 
       if (this.inputDimension > inputData.dimension) {
         inputs = inputData.components.concat(new Array(this.inputDimension - inputData.dimension).fill(0.));
       } else {
         inputs = inputData.components.slice(0, this.inputDimension);
       }
-    } else {
-      if (components.length != this.inputDimension) {
-        throw 'This effect needs ${this.inputDimension} component(s) as input, but ${components} was given';
+    }
+    // List of components is given, verify components length
+    else {
+      if (input.length != this.inputDimension) {
+        throw 'This effect needs ${this.inputDimension} component(s) as input, but ${input} was given';
       }
 
-      inputs = components.map(this.getInput.bind(this));
+      inputs = input.map(this.getInput.bind(this));
     }
 
     // Set the input node
