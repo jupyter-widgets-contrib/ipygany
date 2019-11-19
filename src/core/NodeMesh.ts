@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
+import {
+  Component
+} from './Data';
+
 
 export
 enum NodeOperation {
@@ -73,7 +77,7 @@ class NodeMesh {
   buildMaterial () {
     let position = new Nodes.PositionNode();
     let alpha = new Nodes.FloatNode(1.0);
-    let color: NodeOperationResult<Nodes.ColorNode> = this.defaultColorNode;
+    let color: NodeOperationResult<Nodes.Node> = this.defaultColorNode;
 
     for (const colorOperator of this.colorOperators) {
       color = colorOperator.operate(color);
@@ -91,6 +95,13 @@ class NodeMesh {
     this.material.color = color;
 
     this.material.build();
+  }
+
+  /**
+   * Add a component to this NodeMesh, so that it can be used in shaders.
+   */
+  addComponent (component: Component) {
+    component.addToGeometry(this.geometry);
   }
 
   copy () {
@@ -124,6 +135,10 @@ class NodeMesh {
     return this._defaultColor;
   }
 
+  addColorNode (operation: NodeOperation, colorNode: Nodes.Node) {
+    this.colorOperators.push(new NodeOperator<Nodes.Node>(operation, colorNode));
+  }
+
   dispose () {
     this.geometry.dispose();
     this.material.dispose();
@@ -137,7 +152,7 @@ class NodeMesh {
 
   // private transformOperators: NodeOperator<Nodes.TransformNode>[];
   // private alphaOperators: NodeOperator<Nodes.AlphaNode>[];
-  private colorOperators: NodeOperator<Nodes.ColorNode>[] = [];
+  private colorOperators: NodeOperator<Nodes.Node>[] = [];
 
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;

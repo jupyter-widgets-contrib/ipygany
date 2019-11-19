@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Unicode, List, Instance, Float
+    Unicode, List, Instance, Float, Tuple, Union
 )
 from traittypes import Array
 from ipywidgets import (
@@ -60,9 +60,22 @@ class Data(_OdysisWidgetBase):
     name = Unicode().tag(sync=True)
     components = List(Instance(Component)).tag(sync=True, **widget_serialization)
 
+    def __getitem__(self, key):
+        """Get a component by name or index."""
+        if isinstance(key, str):
+            for component in self.components:
+                if component.name == key:
+                    return component
+            raise KeyError('Component {} not found.'.format(key))
+
+        if isinstance(key, int):
+            return self.components[key]
+
+        raise KeyError('Invalid key {}.'.format(key))
+
 
 def _grid_data_to_data_widget(grid_data):
-    """Turn a vtk grid into a Data widget."""
+    """Turn a vtk grid into Data widgets."""
     data = []
     for key, value in grid_data.items():
         d = Data(
@@ -77,6 +90,14 @@ def _grid_data_to_data_widget(grid_data):
     return data
 
 
+def _update_data_widget(grid_data, block_widget):
+    """Update a given block widget with new grid data."""
+    for data_name, data in grid_data.items():
+        for component_name, component in data.items():
+            component_widget = block_widget[data_name, component_name]
+            component_widget.array = component['array']
+
+
 class Block(_OdysisWidgetBase):
     """A 3-D element widget.
 
@@ -89,7 +110,26 @@ class Block(_OdysisWidgetBase):
 
     default_color = Color('#6395b0').tag(sync=True)
 
-    # data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
+    data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
+
+    def __getitem__(self, key):
+        """Get a component by name or index."""
+        if not isinstance(key, tuple) or len(key) != 2:
+            raise KeyError('You can only access data by (data_name, component_name) tuple.')
+
+        data_name = key[0]
+        component_name = key[1]
+
+        if isinstance(data_name, str):
+            for data in self.data:
+                if data.name == data_name:
+                    return data[component_name]
+                raise KeyError('Data {} not found.'.format(key))
+
+        if isinstance(data_name, int):
+            return self.data[data_name][component_name]
+
+        raise KeyError('Invalid key {}.'.format(key))
 
 
 class PolyMesh(Block):
@@ -113,8 +153,7 @@ class PolyMesh(Block):
             triangle_indices = np.arange(vertices.size, dtype=np.UINT32)
 
         super(PolyMesh, self).__init__(
-            vertices=vertices, triangle_indices=triangle_indices,
-            data=data, **kwargs
+            vertices=vertices, triangle_indices=triangle_indices, data=data, **kwargs
         )
 
     @staticmethod
@@ -151,8 +190,8 @@ class PolyMesh(Block):
                 self.vertices = get_ugrid_vertices(grid)
             if reload_triangles:
                 self.triangle_indices = get_ugrid_triangles(grid)
-            # if reload_data:
-            #     self.data = _grid_data_to_data_widget(get_ugrid_data(grid))
+            if reload_data:
+                self.data = _update_data_widget(get_ugrid_data(grid), self)
 
 
 class TetraMesh(PolyMesh):
@@ -235,8 +274,30 @@ class TetraMesh(PolyMesh):
                 self.triangle_indices = get_ugrid_triangles(grid)
             if reload_tetrahedrons:
                 self.tetrahedron_indices = get_ugrid_tetrahedrons(grid)
-            # if reload_data:
-            #     self.data = _grid_data_to_data_widget(get_ugrid_data(grid))
+            if reload_data:
+                self.data = _update_data_widget(get_ugrid_data(grid), self)
+
+
+class Effect(Block):
+    """An effect applied to another block.
+
+    This class is not intended to be instantiated directly.
+    """
+
+    _model_name = Unicode('EffectModel').tag(sync=True)
+
+    parent = Instance(Block).tag(sync=True, **widget_serialization)
+
+
+class IsoColor(Effect):
+    """An IsoColor effect to another block."""
+
+    _model_name = Unicode('IsoColorModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Float(0.))).tag(sync=True)
+
+    min = Float(0.).tag(sync=True)
+    max = Float(0.).tag(sync=True)
 
 
 class Scene(_OdysisDOMWidgetBase):

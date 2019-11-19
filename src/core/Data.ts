@@ -3,7 +3,7 @@ import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
   uuid
-} from '@jupyter-widgets/base';
+} from './utils';
 
 
 type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Uint8ClampedArray | Float32Array | Float64Array;
@@ -23,13 +23,20 @@ class Component {
   }
 
   /**
-   * Add this component to a given geometry
+   * Add this component to a given geometry.
    */
   addToGeometry (geometry: THREE.BufferGeometry) {
     if (geometry.getAttribute(this.shaderName) === undefined) {
       geometry.addAttribute(this.shaderName, this.bufferAttribute);
     }
-    // TODO: Remember this geometry so that we can update it when the buffer changes?
+  }
+
+  /**
+   * Update the component array.
+   */
+  update (array: TypedArray) {
+    this.bufferAttribute.set(array);
+    this.bufferAttribute.needsUpdate = true;
   }
 
   name: string;

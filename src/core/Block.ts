@@ -5,7 +5,7 @@ import {
 } from './NodeMesh';
 
 import {
-  Data
+  Data, Component
 } from './Data';
 
 
@@ -42,6 +42,16 @@ abstract class Block {
   buildMaterials () {
     for (const nodeMesh of this.meshes) {
       nodeMesh.buildMaterial();
+    }
+  }
+
+  /**
+   * Add a component to the meshes, so that it can be used in shaders.
+   * This will send the entire component buffer to the GPU, so it should be used wisely.
+   */
+  addComponent (component: Component) {
+    for (const nodeMesh of this.meshes) {
+      nodeMesh.addComponent(component);
     }
   }
 

@@ -29,8 +29,17 @@ import {
 } from './core/Block';
 
 import {
+  Effect
+} from './core/EffectBlock';
+
+import {
   PolyMesh, TetraMesh
 } from './core/MeshBlock';
+
+import {
+  IsoColor
+} from './core/Effects/IsoColor';
+
 
 function deserialize_float32array (data: any, manager: any) {
     return new Float32Array(data.data.buffer);
@@ -91,7 +100,7 @@ class ComponentModel extends _OdysisWidgetModel {
 
     this.component = new Component(this.get('name'), this.get('array'));
 
-    // this.on('change:array', () => {  });
+    this.on('change:array', () => { this.component.update(this.get('array')) });
   }
 
   component: Component;
@@ -201,7 +210,8 @@ class PolyMeshModel extends BlockModel {
   }
 
   createBlock () {
-    return new PolyMesh(this.vertices, this.triangleIndices, []);
+    const data = this.data.map((dataModel: DataModel) => dataModel.data);
+    return new PolyMesh(this.vertices, this.triangleIndices, data);
   }
 
   get triangleIndices () : Uint32Array {
@@ -237,9 +247,10 @@ class TetraMeshModel extends PolyMeshModel {
   }
 
   createBlock () {
+    const data = this.data.map((dataModel: DataModel) => dataModel.data);
     return new TetraMesh(
       this.vertices, this.triangleIndices,
-      this.tetrahedronIndices, []
+      this.tetrahedronIndices, data
     );
   }
 
@@ -255,6 +266,73 @@ class TetraMeshModel extends PolyMeshModel {
   }
 
   static model_name = 'TetraMeshModel';
+
+}
+
+
+abstract class EffectModel extends BlockModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: EffectModel.model_name,
+      parent: null,
+    };
+  }
+
+  get parent () : BlockModel {
+    return this.get('parent');
+  }
+
+  block: Effect;
+
+  static serializers: ISerializers = {
+    ...BlockModel.serializers,
+    parent: { deserialize: (unpack_models as any) },
+  }
+
+  static model_name = 'EffectModel';
+
+}
+
+
+export
+class IsoColorModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: IsoColorModel.model_name,
+      input: null,
+      min: null,
+      max: null,
+    };
+  }
+
+  get input () {
+    return this.get('input');
+  }
+
+  get min () {
+    return this.get('min');
+  }
+
+  get max () {
+    return this.get('max');
+  }
+
+  createBlock () {
+    return new IsoColor(this.parent.block, this.input, this.min, this.max);
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:min', () => { this.block.min = this.min });
+    this.on('change:max', () => { this.block.max = this.max });
+  }
+
+  block: IsoColor;
+
+  static model_name = 'IsoColorModel';
 
 }
 

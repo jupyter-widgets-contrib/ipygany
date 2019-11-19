@@ -1,6 +1,10 @@
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
+  uuid
+} from './utils';
+
+import {
   NodeMesh
 } from './NodeMesh';
 
@@ -11,6 +15,16 @@ import {
 import {
   Data, Component
 } from './Data';
+
+import {
+  NodeOperation
+} from './NodeMesh';
+
+/**
+ * Effect InputDimension type, only float, vec2, vec3 and vec4 are supported in shaders.
+ */
+export
+type InputDimension = 0 | 1 | 2 | 3 | 4;
 
 
 /**
@@ -75,6 +89,28 @@ class Effect extends Block {
       // @ts-ignore: The error raise by TypeScript is not relevant here, as the length of inputs is already validated
       this.inputNode = new Nodes.JoinNode(...inputs.map(this.getInputNode.bind(this)));
     }
+
+    // Send component buffers to the GPU, if that's not done already.
+    for (const input of this.inputs) {
+      if (input instanceof Component) {
+        this.addComponent(input);
+      }
+    }
+  }
+
+  /**
+   * Add color node to materials
+   */
+  addColorNode (operation: NodeOperation, colorNode: Nodes.Node) {
+    for (const nodeMesh of this.meshes) {
+      nodeMesh.addColorNode(operation, colorNode);
+    }
+
+    this.buildMaterials();
+  }
+
+  get inputDimension () : InputDimension {
+    return 0;
   }
 
   /**
@@ -100,8 +136,9 @@ class Effect extends Block {
 
   parent: Block;
 
-  readonly inputDimension: 0 | 1 | 2 | 3 | 4 = 0;
   protected inputs: (Component | number)[] | null = null;
   protected inputNode: Nodes.Node | null = null;
+
+  protected id: string = uuid();
 
 }

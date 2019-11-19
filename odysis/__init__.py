@@ -4,7 +4,7 @@
 # Copyright (c) Martin Renou.
 # Distributed under the terms of the Modified BSD License.
 
-from .odysis import PolyMesh, TetraMesh, Scene, Data, Component
+from .odysis import PolyMesh, TetraMesh, Scene, Data, Component, IsoColor
 from ._version import __version__, version_info
 
 from .nbextension import _jupyter_nbextension_paths
