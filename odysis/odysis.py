@@ -306,7 +306,7 @@ class IsoColor(Effect):
 
     @default('input')
     def _default_input(self):
-        return self.data[0].name
+        return self.parent.data[0].name
 
 
 class Threshold(Effect):
@@ -321,7 +321,7 @@ class Threshold(Effect):
 
     @default('input')
     def _default_input(self):
-        return self.data[0].name
+        return self.parent.data[0].name
 
 
 class Scene(_OdysisDOMWidgetBase):
