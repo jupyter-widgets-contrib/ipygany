@@ -72,16 +72,22 @@ class NodeMesh {
 
     this._defaultColor = '#6395b0';
     this.defaultColorNode = new Nodes.ColorNode(this._defaultColor);
+    this.defaultAlphaNode = new Nodes.FloatNode(1.);
   }
 
   buildMaterial () {
     let position = new Nodes.PositionNode();
-    let alpha = new Nodes.FloatNode(1.0);
+    let alpha: NodeOperationResult<Nodes.Node> = this.defaultAlphaNode;
     let color: NodeOperationResult<Nodes.Node> = this.defaultColorNode;
 
     for (const colorOperator of this.colorOperators) {
       color = colorOperator.operate(color);
     }
+
+    for (const alphaOperator of this.alphaOperators) {
+      alpha = alphaOperator.operate(alpha);
+    }
+
     // TODO: Same for position Node, alpha Node and varyings
 
     this.material.flatShading = true;
@@ -135,8 +141,26 @@ class NodeMesh {
     return this._defaultColor;
   }
 
+  set defaultAlpha (defaultAlpha: number) {
+    this.defaultAlphaNode.value = defaultAlpha;
+  }
+
+  get defaultAlpha () {
+    return this.defaultAlphaNode.value;
+  }
+
+  /**
+   * Add a Color node to this mesh material
+   */
   addColorNode (operation: NodeOperation, colorNode: Nodes.Node) {
     this.colorOperators.push(new NodeOperator<Nodes.Node>(operation, colorNode));
+  }
+
+  /**
+   * Add an Alpha node to this mesh material
+   */
+  addAlphaNode (operation: NodeOperation, alphaNode: Nodes.Node) {
+    this.alphaOperators.push(new NodeOperator<Nodes.Node>(operation, alphaNode));
   }
 
   dispose () {
@@ -151,11 +175,13 @@ class NodeMesh {
   private meshCtor: MeshConstructor;
 
   // private transformOperators: NodeOperator<Nodes.TransformNode>[];
-  // private alphaOperators: NodeOperator<Nodes.AlphaNode>[];
+  private alphaOperators: NodeOperator<Nodes.Node>[] = [];
   private colorOperators: NodeOperator<Nodes.Node>[] = [];
 
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;
+  private defaultAlphaNode: Nodes.FloatNode;
+
   private _scale: THREE.Vector3;
 
 }

@@ -67,6 +67,12 @@ abstract class Block {
     }
   }
 
+  set defaultAlpha (defaultAlpha: number) {
+    for (const nodeMesh of this.meshes) {
+      nodeMesh.defaultAlpha = defaultAlpha;
+    }
+  }
+
   get hasTriangles () {
     return this.triangleIndices != null;
   }

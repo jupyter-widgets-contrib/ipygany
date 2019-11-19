@@ -156,6 +156,7 @@ abstract class BlockModel extends _OdysisWidgetModel {
       vertices: [],
       data: [],
       default_color: '#6395b0',
+      default_alpha: 1.0,
     };
   }
 
@@ -180,8 +181,13 @@ abstract class BlockModel extends _OdysisWidgetModel {
     return this.get('default_color');
   }
 
+  get defaultAlpha () : number {
+    return this.get('default_alpha');
+  }
+
   initEventListeners() : void {
     this.on('change:default_color', () => { this.block.defaultColor = this.defaultColor; });
+    this.on('change:default_alpha', () => { this.block.defaultAlpha = this.defaultAlpha; });
   }
 
   block: Block;

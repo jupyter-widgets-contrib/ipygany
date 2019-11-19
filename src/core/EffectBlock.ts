@@ -122,6 +122,17 @@ class Effect extends Block {
     this.buildMaterials();
   }
 
+  /**
+   * Add alpha node to materials
+   */
+  addAlphaNode (operation: NodeOperation, alphaNode: Nodes.Node) {
+    for (const nodeMesh of this.meshes) {
+      nodeMesh.addAlphaNode(operation, alphaNode);
+    }
+
+    this.buildMaterials();
+  }
+
   get inputDimension () : InputDimension {
     return 0;
   }

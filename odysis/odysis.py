@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Unicode, List, Instance, Float, Tuple, Union, default
+    Unicode, List, Instance, CFloat, Tuple, Union, default
 )
 from traittypes import Array
 from ipywidgets import (
@@ -46,8 +46,8 @@ class Component(_OdysisWidgetBase):
     name = Unicode().tag(sync=True)
     array = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
 
-    min = Float(allow_none=True, default_value=None)
-    max = Float(allow_none=True, default_value=None)
+    min = CFloat(allow_none=True, default_value=None)
+    max = CFloat(allow_none=True, default_value=None)
 
     # TODO Compute min and max in the constructor?
 
@@ -109,6 +109,7 @@ class Block(_OdysisWidgetBase):
     vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
 
     default_color = Color('#6395b0').tag(sync=True)
+    default_alpha = CFloat(1.0).tag(sync=True)
 
     data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
 
@@ -298,10 +299,10 @@ class IsoColor(Effect):
 
     _model_name = Unicode('IsoColorModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), Float(0.))).tag(sync=True)
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
 
-    min = Float(0.).tag(sync=True)
-    max = Float(0.).tag(sync=True)
+    min = CFloat(0.).tag(sync=True)
+    max = CFloat(0.).tag(sync=True)
 
     @default('input')
     def _default_input(self):
