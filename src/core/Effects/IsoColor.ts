@@ -51,12 +51,10 @@ class IsoColor extends Effect {
     super.setInput(input);
 
     if (this.initialized) {
-      console.log(this.inputNode);
       this.functionCallNode.inputs = [this.textureNode, this.minNode, this.maxNode, this.inputNode];
 
       // TODO: The sub effects needs to rebuild as well
       this.buildMaterials();
-      console.log(this.meshes[0].material);
     }
   }
 

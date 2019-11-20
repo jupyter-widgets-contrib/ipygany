@@ -68,6 +68,10 @@ class NodeMesh {
 
     this.geometry = geometry;
     this.material = new Nodes.StandardNodeMaterial();
+
+    // @ts-ignore: Monkey patching material, workaround for github.com/mrdoob/three.js/issues/12132
+    this.material.version = 0;
+
     this.mesh = new T(geometry, this.material);
 
     this._defaultColor = '#6395b0';
@@ -101,7 +105,9 @@ class NodeMesh {
     this.material.color = color;
 
     this.material.build();
-    this.material.needsUpdate = true;
+
+    // @ts-ignore
+    this.material.version++;
   }
 
   /**
