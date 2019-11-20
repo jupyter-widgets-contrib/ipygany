@@ -37,7 +37,7 @@ import {
 } from './core/MeshBlock';
 
 import {
-  IsoColor, Threshold
+  IsoColor, IsoSurface, Threshold
 } from './core/Effects/effects';
 
 
@@ -100,7 +100,7 @@ class ComponentModel extends _OdysisWidgetModel {
 
     this.component = new Component(this.get('name'), this.get('array'));
 
-    this.on('change:array', () => { this.component.update(this.get('array')) });
+    this.on('change:array', () => { this.component.array = this.get('array'); });
   }
 
   component: Component;
@@ -227,7 +227,7 @@ class PolyMeshModel extends BlockModel {
   initEventListeners () : void {
     super.initEventListeners();
 
-    this.on('change:vertices', () => { this.block.updateVertices(this.vertices); });
+    this.on('change:vertices', () => { this.block.vertices = this.vertices; });
   }
 
   block: PolyMesh;
@@ -324,8 +324,8 @@ class IsoColorModel extends EffectModel {
   defaults() {
     return {...super.defaults(),
       _model_name: IsoColorModel.model_name,
-      min: null,
-      max: null,
+      min: 0.,
+      max: 0.,
     };
   }
 
@@ -362,13 +362,50 @@ class IsoColorModel extends EffectModel {
 
 
 export
+class IsoSurfaceModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: IsoSurfaceModel.model_name,
+      value: 0.,
+    };
+  }
+
+  get value () {
+    return this.get('value');
+  }
+
+  get input () {
+    const input = this.get('input');
+
+    return typeof input == 'string' ? input : [input];
+  }
+
+  createBlock () {
+    return new IsoSurface(this.parent.block, this.input, this.value);
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:value', () => { this.block.value = this.value });
+  }
+
+  block: IsoSurface;
+
+  static model_name = 'IsoSurfaceModel';
+
+}
+
+
+export
 class ThresholdModel extends EffectModel {
 
   defaults() {
     return {...super.defaults(),
       _model_name: ThresholdModel.model_name,
-      min: null,
-      max: null,
+      min: 0.,
+      max: 0.,
     };
   }
 

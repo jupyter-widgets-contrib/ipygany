@@ -189,6 +189,6 @@ class NodeMesh {
   private defaultColorNode: Nodes.ColorNode;
   private defaultAlphaNode: Nodes.FloatNode;
 
-  private _scale: THREE.Vector3;
+  private _scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1);
 
 }

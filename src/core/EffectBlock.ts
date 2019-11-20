@@ -2,7 +2,7 @@ import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
   uuid
-} from './utils';
+} from './utils/uuid';
 
 import {
   NodeMesh

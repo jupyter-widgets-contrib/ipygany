@@ -30,11 +30,6 @@ class PolyMesh extends Block {
     this.mesh = new NodeMesh(THREE.Mesh, this.geometry);
     this.meshes.push(this.mesh);
 
-    // Scale up or down the geometry (This should be removed, the scale should be global to the scene)
-    this.geometry.computeBoundingSphere();
-    const { radius } = this.geometry.boundingSphere;
-    this.scale = new THREE.Vector3(1 / radius, 1 / radius, 1 / radius)
-
     this.buildMaterial();
   }
 
@@ -53,10 +48,10 @@ class PolyMesh extends Block {
   /**
    * Update vertices buffers
    */
-  updateVertices (vertices: Float32Array) {
-    super.updateVertices(vertices);
+  handleVerticesChange () {
+    super.handleVerticesChange();
 
-    this.vertexBuffer.set(vertices);
+    this.vertexBuffer.set(this.vertices);
     this.vertexBuffer.needsUpdate = true;
 
     this.geometry.center();
@@ -84,5 +79,7 @@ class TetraMesh extends PolyMesh {
 
     this.tetrahedronIndices = tetrahedronIndices;
   }
+
+  tetrahedronIndices: Uint32Array;
 
 }

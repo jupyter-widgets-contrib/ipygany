@@ -3,22 +3,28 @@ import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
   uuid
-} from './utils';
+} from './utils/uuid';
 
+import {
+  TypedArray
+} from './utils/types';
 
-type TypedArray = Int8Array | Uint8Array | Int16Array | Uint16Array | Int32Array | Uint32Array | Uint8ClampedArray | Float32Array | Float64Array;
+import {
+  Events
+} from './Events';
 
 
 export
-class Component {
+class Component extends Events {
 
-  constructor (name: string, array: TypedArray) {
+  constructor (name: string, array: TypedArray, shaderName: string = uuid()) {
+    super();
+
     this.name = name;
-    this.array = array;
+    this._array = array;
+    this.shaderName = shaderName;
 
-    this.shaderName = uuid();
-
-    this.bufferAttribute = new THREE.BufferAttribute(this.array, 1);
+    this.bufferAttribute = new THREE.BufferAttribute(this._array, 1);
     this.node = new Nodes.AttributeNode(this.shaderName, 'float');
   }
 
@@ -34,13 +40,28 @@ class Component {
   /**
    * Update the component array.
    */
-  update (array: TypedArray) {
+  set array (array: TypedArray) {
+    this._array = array;
+
     this.bufferAttribute.set(array);
     this.bufferAttribute.needsUpdate = true;
+
+    this.trigger('change:array');
+  }
+
+  get array () {
+    return this._array;
+  }
+
+  /**
+   * Returns a copy of this component
+   */
+  copy () {
+    return new Component(this.name, this.array, this.shaderName);
   }
 
   name: string;
-  array: TypedArray;
+  _array: TypedArray;
 
   bufferAttribute: THREE.BufferAttribute;
   node: Nodes.AttributeNode;
@@ -73,6 +94,15 @@ class Data {
     }
 
     throw `${name} is not a valid component name for ${this.name}`;
+  }
+
+  /**
+   * Returns a copy of this data
+   */
+  copy () {
+    const components = this.components.map((component: Component) => component.copy());
+
+    return new Data(this.name, components);
   }
 
   components: Component[];

@@ -309,6 +309,20 @@ class IsoColor(Effect):
         return self.parent.data[0].name
 
 
+class IsoSurface(Effect):
+    """An IsoSurface effect to another block."""
+
+    _model_name = Unicode('IsoSurfaceModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+
+    value = CFloat(0.).tag(sync=True)
+
+    @default('input')
+    def _default_input(self):
+        return self.parent.data[0].name
+
+
 class Threshold(Effect):
     """An Threshold effect to another block."""
 

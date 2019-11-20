@@ -22,15 +22,31 @@ abstract class Block extends Events {
   constructor (vertices: Float32Array, data: Data[]) {
     super();
 
-    this.vertices = vertices;
-    this.data = data;
+    this._vertices = vertices;
+    this._data = data;
   }
 
   /**
-   * Update vertices buffers
+   * Set vertices buffers
    */
-  updateVertices (vertices: Float32Array) {
-    this.trigger('change:vertices');
+  set vertices (vertices: Float32Array) {
+    this._vertices = vertices;
+
+    this.handleVerticesChange();
+  }
+
+  /**
+   * Get vertices buffer
+   */
+  get vertices () {
+    return this._vertices;
+  }
+
+  /**
+   * Get data list
+   */
+  get data () {
+    return this._data;
   }
 
   /**
@@ -81,12 +97,8 @@ abstract class Block extends Events {
     }
   }
 
-  get hasTriangles () {
-    return this.triangleIndices != null;
-  }
-
-  get hasTetrahedrons () {
-    return this.tetrahedronIndices != null;
+  handleVerticesChange () {
+    this.trigger('change:vertices');
   }
 
   dispose () {
@@ -95,8 +107,8 @@ abstract class Block extends Events {
     }
   }
 
-  vertices: Float32Array;
-  data: Data[];
+  private _vertices: Float32Array;
+  private _data: Data[];
 
   triangleIndices: null | Uint32Array = null;
   tetrahedronIndices: null | Uint32Array = null;
