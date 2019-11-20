@@ -98,8 +98,8 @@ abstract class Block extends Events {
   vertices: Float32Array;
   data: Data[];
 
-  triangleIndices: null | Uint32Array;
-  tetrahedronIndices: null | Uint32Array;
+  triangleIndices: null | Uint32Array = null;
+  tetrahedronIndices: null | Uint32Array = null;
 
   meshes: NodeMesh[] = [];
 
