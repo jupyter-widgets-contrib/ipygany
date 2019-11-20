@@ -49,6 +49,9 @@ class Threshold extends Effect {
     if (this.initialized) {
       this.isUnderMax.a = this.inputNode;
       this.isOverMin.b = this.inputNode;
+
+      // TODO: The sub effects needs to rebuild as well
+      this.buildMaterials();
     }
   }
 
