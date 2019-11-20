@@ -49,15 +49,17 @@ class Effect extends Block {
     this.meshes = parent.meshes.map((nodeMesh: NodeMesh) => nodeMesh.copy());
 
     this.setInput(input);
+
+    this.parent.on('change:material', this.buildMaterial.bind(this));
   }
 
   /**
-    * Set the input data, if no arguments are provided a default input will be chosen.
-    * The input can be:
-    *   - a data name
-    *   - a list of (data name, component name) tuples and numbers
-    */
- setInput (input?: Input) : void {
+   * Set the input data, if no arguments are provided a default input will be chosen.
+   * The input can be:
+   *   - a data name
+   *   - a list of (data name, component name) tuples and numbers
+   */
+  setInput (input?: Input) : void {
     if (this.inputDimension == 0) {
       // Do nothing (Maybe throw?)
       return;
@@ -119,7 +121,7 @@ class Effect extends Block {
       nodeMesh.addColorNode(operation, colorNode);
     }
 
-    this.buildMaterials();
+    this.buildMaterial();
   }
 
   /**
@@ -130,7 +132,7 @@ class Effect extends Block {
       nodeMesh.addAlphaNode(operation, alphaNode);
     }
 
-    this.buildMaterials();
+    this.buildMaterial();
   }
 
   get inputDimension () : InputDimension {

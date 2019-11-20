@@ -38,7 +38,7 @@ class Threshold extends Effect {
 
     this.addAlphaNode(NodeOperation.MUL, this.thresholdAlpha);
 
-    this.buildMaterials();
+    this.buildMaterial();
 
     this.initialized = true;
   }
@@ -50,8 +50,7 @@ class Threshold extends Effect {
       this.isUnderMax.a = this.inputNode;
       this.isOverMin.b = this.inputNode;
 
-      // TODO: The sub effects needs to rebuild as well
-      this.buildMaterials();
+      this.buildMaterial();
     }
   }
 

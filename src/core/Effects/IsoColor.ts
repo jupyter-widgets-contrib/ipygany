@@ -42,7 +42,7 @@ class IsoColor extends Effect {
 
     this.addColorNode(NodeOperation.ASSIGN, this.functionCallNode);
 
-    this.buildMaterials();
+    this.buildMaterial();
 
     this.initialized = true;
   }
@@ -53,8 +53,7 @@ class IsoColor extends Effect {
     if (this.initialized) {
       this.functionCallNode.inputs = [this.textureNode, this.minNode, this.maxNode, this.inputNode];
 
-      // TODO: The sub effects needs to rebuild as well
-      this.buildMaterials();
+      this.buildMaterial();
     }
   }
 

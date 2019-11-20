@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 
 import {
+  Events
+} from './Events';
+
+import {
   NodeMesh
 } from './NodeMesh';
 
@@ -13,9 +17,11 @@ import {
  * Base class for all the Mesh and Effect classes
  */
 export
-abstract class Block {
+abstract class Block extends Events {
 
   constructor (vertices: Float32Array, data: Data[]) {
+    super();
+
     this.vertices = vertices;
     this.data = data;
   }
@@ -24,7 +30,7 @@ abstract class Block {
    * Update vertices buffers
    */
   updateVertices (vertices: Float32Array) {
-    // TODO: Trigger event so that children can update their geometries?
+    this.trigger('change:vertices');
   }
 
   /**
@@ -39,10 +45,12 @@ abstract class Block {
   /**
    * Compile shaders
    */
-  buildMaterials () {
+  buildMaterial () {
     for (const nodeMesh of this.meshes) {
       nodeMesh.buildMaterial();
     }
+
+    this.trigger('change:material');
   }
 
   /**

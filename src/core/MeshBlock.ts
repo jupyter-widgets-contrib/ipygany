@@ -35,7 +35,7 @@ class PolyMesh extends Block {
     const { radius } = this.geometry.boundingSphere;
     this.scale = new THREE.Vector3(1 / radius, 1 / radius, 1 / radius)
 
-    this.buildMaterials();
+    this.buildMaterial();
   }
 
   /**
