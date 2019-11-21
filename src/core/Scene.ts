@@ -32,8 +32,6 @@ class Scene {
    * Add an Odysis block to the scene
    */
   addChild (block: Block) {
-    this.children.push(block);
-
     block.addToScene(this.scene);
   }
 
@@ -42,8 +40,6 @@ class Scene {
   }
 
   scene: THREE.Scene;
-
-  private children: Block[] = [];
 
 }
 
