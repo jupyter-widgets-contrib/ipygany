@@ -14,27 +14,6 @@ function interpolate (value: number, x1: number, val1: number, x2: number, val2:
   return (value - val1) * (x2 - x1) / (val2 - val1) + x1;
 };
 
-namespace Geometry {
-
-  export
-  type vec3 = [number, number, number];
-
-  export
-  function cross(a: vec3, b: vec3) : vec3 {
-    return [
-      a[1] * b[2] - a[2] * b[1],
-      a[2] * b[0] - a[0] * b[2],
-      a[0] * b[1] - a[1] * b[0]
-    ]
-  }
-
-  export
-  function dot(a: vec3, b: vec3) : number {
-    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
-  }
-
-}
-
 
 /**
  * IsoSurfaceUtils class. This class helps computing iso-surfaces using binary search trees.
@@ -113,24 +92,15 @@ class IsoSurfaceUtils {
     let i2: number;
 
     // Vertex 1 and 2
-    let v1: Geometry.vec3;
-    let v2: Geometry.vec3;
-    let v3: Geometry.vec3;
-
-    // Vectors
-    let v12: Geometry.vec3;
-    let v23: Geometry.vec3;
-    let v13: Geometry.vec3;
+    let v1: number[];
+    let v2: number[];
+    let v3: number[];
 
     // Vertex data 1 and 2
     let d1: number;
     let d2: number;
 
-    // Triangle normal
-    let normal1: Geometry.vec3 = [0., 0., 0.];
-    let normal2: Geometry.vec3 = [0., 0., 0.];
-
-    console.log(this.inputData);
+    this.inputData;
 
     for (let j = 0, len = tetrahedronCandidates.length; j < len; j++) {
       i = tetrahedronCandidates[j];
@@ -203,74 +173,28 @@ class IsoSurfaceUtils {
       }
 
       // Create triangles where data is equal to value
-      v1 = [interVertices[0], interVertices[1], interVertices[2]];
-      v2 = [interVertices[3], interVertices[4], interVertices[5]];
-      v3 = [interVertices[6], interVertices[7], interVertices[8]];
+      v1 = interVertices.slice(0, 3);
+      v2 = interVertices.slice(3, 6);
+      v3 = interVertices.slice(6, 9);
 
-      v12 = [v2[0]-v1[0], v2[1]-v1[1], v2[2]-v1[2]];
-      v23 = [v3[0]-v2[0], v3[1]-v2[1], v3[2]-v2[2]];
-      v13 = [v3[0]-v1[0], v3[1]-v1[1], v3[2]-v1[2]];
+      // Create first triangle
+      vertices.push(...v1, ...v3, ...v2);
 
-      normal1 = Geometry.cross(v12, v23);
-      normal2 = Geometry.cross(v12, v13);
+      // interDatas.forEach((interData, dataIndex) => {
+      //   surfaceDataArrays[dataIndex].push(interData[0]);
+      //   surfaceDataArrays[dataIndex].push(interData[2]);
+      //   surfaceDataArrays[dataIndex].push(interData[1]);
+      // });
 
-      // Create new triangles
-      if (Geometry.dot(normal1, normal2) < 0.0) {
-        // Create first triangle
-        vertices.push(
-          v1[0], v1[1], v1[2],
-          v2[0], v2[1], v2[2],
-          v3[0], v3[1], v3[2]
-        );
-
-        // interDatwas.forEach((interData, dataIndex) => {
-        //   surfaceDataArrays[dataIndex].push(interData[0]);
-        //   surfaceDataArrays[dataIndex].push(interData[1]);
-        //   surfaceDataArrays[dataIndex].push(interData[2]);
-        // });
-
-        // If we have 4 points (4*3 coordinates, so 2 triangles)
-        if (interVertices.length === 12) {
-          vertices.push(
-            v2[0], v2[1], v2[2],
-            interVertices[9], interVertices[10], interVertices[11],
-            v3[0], v3[1], v3[2]
-          );
-
-          // interDatas.forEach((interData, dataIndex) => {
-          //   surfaceDataArrays[dataIndex].push(interData[1]);
-          //   surfaceDataArrays[dataIndex].push(interData[3]);
-          //   surfaceDataArrays[dataIndex].push(interData[2]);
-          // });
-        }
-      } else {
-        // Create first triangle
-        vertices.push(
-          v1[0], v1[1], v1[2],
-          v3[0], v3[1], v3[2],
-          v2[0], v2[1], v2[2]
-        );
+      // If we have 4 points (4*3 coordinates, so 2 triangles)
+      if (interVertices.length === 12) {
+        vertices.push(...v2, ...v3, ...interVertices.slice(9, 12));
 
         // interDatas.forEach((interData, dataIndex) => {
-        //   surfaceDataArrays[dataIndex].push(interData[0]);
-        //   surfaceDataArrays[dataIndex].push(interData[2]);
         //   surfaceDataArrays[dataIndex].push(interData[1]);
+        //   surfaceDataArrays[dataIndex].push(interData[2]);
+        //   surfaceDataArrays[dataIndex].push(interData[3]);
         // });
-
-        // If we have 4 points (4*3 coordinates, so 2 triangles)
-        if (interVertices.length === 12) {
-          vertices.push(
-            v2[0], v2[1], v2[2],
-            v3[0], v3[1], v3[2],
-            interVertices[9], interVertices[10], interVertices[11]
-          );
-
-          // interDatas.forEach((interData, dataIndex) => {
-          //   surfaceDataArrays[dataIndex].push(interData[1]);
-          //   surfaceDataArrays[dataIndex].push(interData[2]);
-          //   surfaceDataArrays[dataIndex].push(interData[3]);
-          // });
-        }
       }
     }
 

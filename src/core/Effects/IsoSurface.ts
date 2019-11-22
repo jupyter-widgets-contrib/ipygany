@@ -53,7 +53,6 @@ class IsoSurface extends Effect {
 
     this.buildMaterial();
 
-    this.parent.on('change:vertices', this.updateGeometry.bind(this));
     this.inputComponent.on('change:array', this.onInputArrayChange.bind(this));
 
     this.initialized = true;
@@ -63,6 +62,7 @@ class IsoSurface extends Effect {
     [this.vertices, this.triangleIndices] = this.isoSurfaceUtils.computeIsoSurface(this.value);
 
     // Not using this.vertexBuffer.set because the number of vertices can change
+    this.geometry.dispose();
     this.vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
     this.geometry.setAttribute('position', this.vertexBuffer);
   }
@@ -100,6 +100,8 @@ class IsoSurface extends Effect {
   get inputDimension () : InputDimension {
     return 1;
   }
+
+  tetrahedronIndices: null = null;
 
   private isoSurfaceUtils: IsoSurfaceUtils;
 
