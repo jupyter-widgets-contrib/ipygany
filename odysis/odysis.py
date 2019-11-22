@@ -225,13 +225,13 @@ class TetraMesh(PolyMesh):
             ])
 
             # Sort triangles indices so that we can compare them and find duplicates
-            faces = np.sort(faces, axis=1)
+            sorted_faces = np.sort(faces, axis=1)
 
             # Get unique triangle indices and the number of times they appear
-            faces, counts = np.unique(faces, return_counts=True, axis=0)
+            _, unique_index, counts = np.unique(sorted_faces, return_index=True, return_counts=True, axis=0)
 
             # Extract triangles that appear exactly once
-            triangle_indices = faces[counts == 1]
+            triangle_indices = faces[unique_index[counts == 1]].flatten()
 
         super(TetraMesh, self).__init__(
             vertices=vertices, triangle_indices=triangle_indices,
