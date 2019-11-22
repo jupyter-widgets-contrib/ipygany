@@ -104,6 +104,8 @@ class NodeMesh {
     // @ts-ignore
     this.material.color = color;
 
+    this.material.alphaTest = 0.1;
+
     this.material.build();
 
     // @ts-ignore
