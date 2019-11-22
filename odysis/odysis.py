@@ -218,10 +218,10 @@ class TetraMesh(PolyMesh):
 
             # Extract all the triangle indices
             faces = np.concatenate([
-                tetrahedron_indices[:, [0, 1, 2]],
-                tetrahedron_indices[:, [0, 2, 3]],
-                tetrahedron_indices[:, [1, 2, 3]],
-                tetrahedron_indices[:, [0, 1, 3]]
+                tetrahedron_indices[:, [2, 1, 0]],
+                tetrahedron_indices[:, [0, 3, 2]],
+                tetrahedron_indices[:, [1, 3, 0]],
+                tetrahedron_indices[:, [2, 3, 1]]
             ])
 
             # Sort triangles indices so that we can compare them and find duplicates
