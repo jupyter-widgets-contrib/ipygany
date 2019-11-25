@@ -157,6 +157,7 @@ abstract class BlockModel extends _OdysisWidgetModel {
       _model_name: BlockModel.model_name,
       vertices: [],
       data: [],
+      environment_meshes: [],
       default_color: '#6395b0',
       default_alpha: 1.0,
     };
@@ -175,8 +176,12 @@ abstract class BlockModel extends _OdysisWidgetModel {
     return this.get('vertices');
   }
 
-  get data () : DataModel[] {
-    return this.get('data');
+  get data () : Data[] {
+    return this.get('data').map((dataModel: DataModel) => dataModel.data);;
+  }
+
+  get environmentMeshes () : THREE.Mesh[] {
+    return this.get('environment_meshes').map((model: any) => model.obj);
   }
 
   get defaultColor () : string {
@@ -200,6 +205,7 @@ abstract class BlockModel extends _OdysisWidgetModel {
     ..._OdysisWidgetModel.serializers,
     vertices: { deserialize: deserialize_float32array },
     data: { deserialize: (unpack_models as any) },
+    environment_meshes: { deserialize: (unpack_models as any) },
   }
 
   static model_name = 'BlockModel';
@@ -218,8 +224,7 @@ class PolyMeshModel extends BlockModel {
   }
 
   createBlock () {
-    const data = this.data.map((dataModel: DataModel) => dataModel.data);
-    return new PolyMesh(this.vertices, this.triangleIndices, data);
+    return new PolyMesh(this.vertices, this.triangleIndices, this.data, {environmentMeshes: this.environmentMeshes});
   }
 
   get triangleIndices () : Uint32Array {
@@ -255,10 +260,9 @@ class TetraMeshModel extends PolyMeshModel {
   }
 
   createBlock () {
-    const data = this.data.map((dataModel: DataModel) => dataModel.data);
     return new TetraMesh(
       this.vertices, this.triangleIndices,
-      this.tetrahedronIndices, data
+      this.tetrahedronIndices, this.data, {environmentMeshes: this.environmentMeshes}
     );
   }
 

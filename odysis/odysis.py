@@ -113,6 +113,8 @@ class Block(_OdysisWidgetBase):
 
     data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
 
+    environment_meshes = List(Instance(Widget), default_value=[]).tag(sync=True, **widget_serialization)
+
     def __getitem__(self, key):
         """Get a component by name or index."""
         if not isinstance(key, tuple) or len(key) != 2:

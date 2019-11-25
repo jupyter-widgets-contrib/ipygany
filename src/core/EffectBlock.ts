@@ -38,7 +38,7 @@ export
 class Effect extends Block {
 
   constructor (parent: Block, input?: Input) {
-    super(parent.vertices, parent.data);
+    super(parent.vertices, parent.data, parent.options);
 
     this.parent = parent;
 

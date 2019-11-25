@@ -5,7 +5,7 @@ import {
 } from './NodeMesh';
 
 import {
-  Block
+  Block, BlockOptions
 } from './Block';
 
 import {
@@ -19,8 +19,8 @@ import {
 export
 class PolyMesh extends Block {
 
-  constructor (vertices: Float32Array, triangleIndices: Uint32Array, data: Data[]) {
-    super(vertices, data);
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, data: Data[], options?: BlockOptions) {
+    super(vertices, data, options);
 
     this.triangleIndices = triangleIndices;
 
@@ -42,7 +42,6 @@ class PolyMesh extends Block {
 
     this.geometry.setAttribute('position', this.vertexBuffer);
     this.geometry.setIndex(this.indexBuffer);
-    this.geometry.center();
   }
 
   /**
@@ -53,8 +52,6 @@ class PolyMesh extends Block {
 
     this.vertexBuffer.set(this.vertices);
     this.vertexBuffer.needsUpdate = true;
-
-    this.geometry.center();
   }
 
   triangleIndices: Uint32Array;
@@ -74,8 +71,8 @@ class PolyMesh extends Block {
 export
 class TetraMesh extends PolyMesh {
 
-  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: Data[]) {
-    super(vertices, triangleIndices, data);
+  constructor (vertices: Float32Array, triangleIndices: Uint32Array, tetrahedronIndices: Uint32Array, data: Data[], options?: BlockOptions) {
+    super(vertices, triangleIndices, data, options);
 
     this.tetrahedronIndices = tetrahedronIndices;
   }

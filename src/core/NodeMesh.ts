@@ -125,19 +125,13 @@ class NodeMesh {
     // TODO: Copy other operators
     copy.colorOperators = this.colorOperators;
 
-    copy.scale = this.scale;
     copy.defaultColor = this.defaultColor;
 
     return copy;
   }
 
-  set scale (scale: THREE.Vector3) {
-    this._scale = scale;
-    this.mesh.scale.set(scale.x, scale.y, scale.z);
-  }
-
-  get scale () {
-    return this._scale;
+  set matrix (matrix: THREE.Matrix4) {
+    this.mesh.matrix.copy(matrix);
   }
 
   get boundingSphereRadius () {
@@ -197,7 +191,5 @@ class NodeMesh {
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;
   private defaultAlphaNode: Nodes.FloatNode;
-
-  private _scale: THREE.Vector3 = new THREE.Vector3(1, 1, 1);
 
 }

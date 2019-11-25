@@ -13,17 +13,41 @@ import {
 } from './Data';
 
 
+export
+interface BlockOptions {
+
+  position?: THREE.Vector3;
+  scale?: THREE.Vector3;
+
+  environmentMeshes?: THREE.Mesh[];
+
+}
+
+
 /**
  * Base class for all the Mesh and Effect classes
  */
 export
 abstract class Block extends Events {
 
-  constructor (vertices: Float32Array, data: Data[]) {
+  /**
+   * Block constructor. This takes the vertices and data as input, and some options.
+   */
+  constructor (vertices: Float32Array, data: Data[], options?: BlockOptions) {
     super();
 
     this._vertices = vertices;
     this._data = data;
+
+    if (options) {
+      this._environmentMeshes = options.environmentMeshes || this._environmentMeshes;
+
+      this._position = options.position || this._position;
+      this._scale = options.scale || this._scale;
+    }
+
+    this.updateMatrix();
+
   }
 
   /**
@@ -56,6 +80,10 @@ abstract class Block extends Events {
     for (const nodeMesh of this.meshes) {
       scene.add(nodeMesh.mesh);
     }
+
+    for (const mesh of this._environmentMeshes) {
+      scene.add(mesh);
+    }
   }
 
   /**
@@ -79,18 +107,41 @@ abstract class Block extends Events {
     }
   }
 
+  set position (position: THREE.Vector3) {
+    this._position.copy(position);
+
+    this.updateMatrix();
+  }
+
   set scale (scale: THREE.Vector3) {
+    this._scale.copy(scale);
+
+    this.updateMatrix();
+  }
+
+  private updateMatrix () {
+    this._matrix.set(
+      this._scale.x,             0,             0, this._position.x,
+                  0, this._scale.y,             0, this._position.y,
+                  0,             0, this._scale.z, this._position.z,
+                  0,             0,             0,                1
+    );
+
     for (const nodeMesh of this.meshes) {
-      nodeMesh.scale = scale;
+      nodeMesh.matrix = this._matrix;
+    }
+
+    for (const mesh of this._environmentMeshes) {
+      mesh.matrix.copy(this._matrix);
     }
   }
 
-  get boundingSphereRadius () {
-    const radius: number[] = [];
+  get options () {
+    return {environmentMeshes: this._environmentMeshes, position: this._position, scale: this._scale};
+  }
 
-    for (const nodeMesh of this.meshes) {
-      radius.push(nodeMesh.boundingSphereRadius);
-    }
+  get boundingSphereRadius () {
+    const radius = this.meshes.map((nodeMesh: NodeMesh) => nodeMesh.boundingSphereRadius);
 
     return Math.max(...radius);
   }
@@ -124,5 +175,10 @@ abstract class Block extends Events {
   tetrahedronIndices: null | Uint32Array = null;
 
   meshes: NodeMesh[] = [];
+  _environmentMeshes: THREE.Mesh[] = [];
+
+  _position: THREE.Vector3 = new THREE.Vector3(0., 0., 0.);
+  _scale: THREE.Vector3 = new THREE.Vector3(1., 1., 1.);
+  _matrix: THREE.Matrix4 = new THREE.Matrix4();
 
 }
