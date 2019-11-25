@@ -1,6 +1,8 @@
 // Copyright (c) Martin Renou
 // Distributed under the terms of the Modified BSD License.
 
+import * as THREE from 'three';
+
 import {
   WidgetModel, DOMWidgetModel, DOMWidgetView, ISerializers, unpack_models
 } from '@jupyter-widgets/base';
@@ -465,8 +467,14 @@ class SceneModel extends _OdysisDOMWidgetModel {
   private updateChildren () {
     // TODO: Remove old children
 
-    for (const child of this.get('children')) {
-      this.scene.addChild(child.block);
+    const blocks: Block[] = this.get('children').map((child: BlockModel) => child.block);
+    const boundingSphereRadius = Math.max(...blocks.map((block: Block) => block.boundingSphereRadius));
+    const scale = new THREE.Vector3(1 / boundingSphereRadius, 1 / boundingSphereRadius, 1 / boundingSphereRadius);
+
+    for (const block of blocks) {
+      block.scale = scale;
+
+      this.scene.addChild(block);
     }
   }
 

@@ -140,6 +140,13 @@ class NodeMesh {
     return this._scale;
   }
 
+  get boundingSphereRadius () {
+    this.geometry.computeBoundingSphere();
+    const { radius } = this.geometry.boundingSphere;
+
+    return radius;
+  }
+
   set defaultColor (defaultColor: string) {
     this._defaultColor = defaultColor;
 

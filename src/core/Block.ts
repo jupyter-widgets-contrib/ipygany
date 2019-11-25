@@ -85,6 +85,16 @@ abstract class Block extends Events {
     }
   }
 
+  get boundingSphereRadius () {
+    const radius: number[] = [];
+
+    for (const nodeMesh of this.meshes) {
+      radius.push(nodeMesh.boundingSphereRadius);
+    }
+
+    return Math.max(...radius);
+  }
+
   set defaultColor (defaultColor: string) {
     for (const nodeMesh of this.meshes) {
       nodeMesh.defaultColor = defaultColor;
