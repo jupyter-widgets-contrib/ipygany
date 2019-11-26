@@ -49,6 +49,8 @@ class IsoSurface extends Effect {
     this.geometry.setAttribute('position', this.vertexBuffer);
 
     this.mesh = new NodeMesh(THREE.Mesh, this.geometry);
+    this.mesh.sortTriangleIndices(this.lastCameraPosition);
+
     this.meshes.push(this.mesh);
 
     this.buildMaterial();
@@ -65,6 +67,10 @@ class IsoSurface extends Effect {
     this.geometry.dispose();
     this.vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
     this.geometry.setAttribute('position', this.vertexBuffer);
+    console.log('recompute triangles')
+    // @ts-ignore
+    this.geometry.index = null;
+    this.mesh.sortTriangleIndices(this.lastCameraPosition);
   }
 
   setInput(input?: Input) : void {

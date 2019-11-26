@@ -166,6 +166,71 @@ class NodeMesh {
     this.alphaOperators.push(new NodeOperator<Nodes.Node>(operation, alphaNode));
   }
 
+  /**
+   * Sort triangle indices by distance Camera/triangle.
+   */
+  sortTriangleIndices (cameraPosition: THREE.Vector3) {
+    if (this.mesh.type == 'Mesh') {
+      const vertex = this.geometry.getAttribute('position').array;
+
+      let indices: ArrayLike<number>;
+      if (this.geometry.index == null) {
+        indices = Array.from(Array(vertex.length / 3).keys());
+      } else {
+        indices = this.geometry.index.array;
+      }
+
+      // Triangle indices to sort
+      const triangles = Array.from(Array(indices.length / 3).keys());
+
+      // Compute distances camera/triangle
+      const distances = triangles.map((i: number) => {
+        const triangleIndex = 3 * i;
+        const triangle = [indices[triangleIndex], indices[triangleIndex + 1], indices[triangleIndex + 2]];
+
+        const v1Index = 3 * triangle[0];
+        const v2Index = 3 * triangle[1];
+        const v3Index = 3 * triangle[2];
+
+        // Get the three vertices
+        const v1 = [vertex[v1Index], vertex[v1Index + 1], vertex[v1Index + 2]];
+        const v2 = [vertex[v2Index], vertex[v2Index + 1], vertex[v2Index + 2]];
+        const v3 = [vertex[v3Index], vertex[v3Index + 1], vertex[v3Index + 2]];
+
+        // The triangle position is the mean of it's three points positions
+        const x = (v1[0] + v2[0] + v3[0]) / 3;
+        const y = (v1[1] + v2[1] + v3[1]) / 3;
+        const z = (v1[2] + v2[2] + v3[2]) / 3;
+
+        const trianglePosition = new THREE.Vector3(x, y, z);
+        return cameraPosition.distanceToSquared(trianglePosition);
+      });
+
+      // Sort triangle indices
+      triangles.sort((t1: number, t2: number) : number => {
+        return distances[t1] - distances[t2];
+      });
+
+      // And then compute new vertex indices
+      const newIndices = new Uint32Array(indices.length);
+      for (let i = 0; i < triangles.length; i++) {
+        const triangleIndex = triangles[i];
+
+        newIndices[3 * i] = indices[3 * triangleIndex]
+        newIndices[3 * i + 1] = indices[3 * triangleIndex + 1]
+        newIndices[3 * i + 2] = indices[3 * triangleIndex + 2]
+      }
+
+      if (this.geometry.index == null) {
+        const indexBuffer = new THREE.BufferAttribute(newIndices, 1);
+        this.geometry.setIndex(indexBuffer);
+      } else {
+        this.geometry.index.set(newIndices);
+        this.geometry.index.needsUpdate = true;
+      }
+    }
+  }
+
   dispose () {
     this.geometry.dispose();
     this.material.dispose();

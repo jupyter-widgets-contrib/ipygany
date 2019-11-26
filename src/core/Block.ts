@@ -171,6 +171,10 @@ abstract class Block extends Events {
     this.trigger('change:vertices');
   }
 
+  handleCameraMoveEnd (cameraPosition: THREE.Vector3) {
+    this.lastCameraPosition = cameraPosition;
+  }
+
   dispose () {
     for (const nodeMesh of this.meshes) {
       nodeMesh.dispose();
@@ -188,6 +192,8 @@ abstract class Block extends Events {
 
   _position: THREE.Vector3 = new THREE.Vector3(0., 0., 0.);
   _scale: THREE.Vector3 = new THREE.Vector3(1., 1., 1.);
+
+  protected lastCameraPosition: THREE.Vector3 = new THREE.Vector3(0., 0., 2.);
 
   parent: Block | null = null;
 
