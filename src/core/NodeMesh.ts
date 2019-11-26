@@ -69,6 +69,8 @@ class NodeMesh {
     this.geometry = geometry;
     this.material = new Nodes.StandardNodeMaterial();
 
+    this.hasIndices = this.geometry.index != null;
+
     // @ts-ignore: Monkey patching material, workaround for github.com/mrdoob/three.js/issues/12132
     this.material.version = 0;
 
@@ -124,6 +126,8 @@ class NodeMesh {
   copy () {
     const copy = new NodeMesh(this.meshCtor, this.geometry);
 
+    copy.hasIndices = this.hasIndices;
+
     // TODO: Copy other operators
     copy.alphaOperators = this.alphaOperators;
     copy.colorOperators = this.colorOperators;
@@ -174,10 +178,10 @@ class NodeMesh {
       const vertex = this.geometry.getAttribute('position').array;
 
       let indices: ArrayLike<number>;
-      if (this.geometry.index == null) {
-        indices = Array.from(Array(vertex.length / 3).keys());
-      } else {
+      if (this.hasIndices) {
         indices = this.geometry.index.array;
+      } else {
+        indices = Array.from(Array(vertex.length / 3).keys());
       }
 
       // Triangle indices to sort
@@ -208,7 +212,7 @@ class NodeMesh {
 
       // Sort triangle indices
       triangles.sort((t1: number, t2: number) : number => {
-        return distances[t1] - distances[t2];
+        return distances[t2] - distances[t1];
       });
 
       // And then compute new vertex indices
@@ -221,12 +225,12 @@ class NodeMesh {
         newIndices[3 * i + 2] = indices[3 * triangleIndex + 2]
       }
 
-      if (this.geometry.index == null) {
-        const indexBuffer = new THREE.BufferAttribute(newIndices, 1);
-        this.geometry.setIndex(indexBuffer);
-      } else {
+      if (this.hasIndices) {
         this.geometry.index.set(newIndices);
         this.geometry.index.needsUpdate = true;
+      } else {
+        const indexBuffer = new THREE.BufferAttribute(newIndices, 1);
+        this.geometry.setIndex(indexBuffer);
       }
     }
   }
@@ -248,5 +252,7 @@ class NodeMesh {
 
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;
+
+  private hasIndices: boolean;
 
 }

@@ -120,8 +120,6 @@ class Threshold extends Effect {
     this.geometry1.dispose();
     this.vertexBuffer1 = new THREE.BufferAttribute(vertices1, 3);
     this.geometry1.setAttribute('position', this.vertexBuffer1);
-    // @ts-ignore
-    this.geometry1.index = null;
     this.mesh1.sortTriangleIndices(this.lastCameraPosition);
   }
 
@@ -132,8 +130,6 @@ class Threshold extends Effect {
     this.geometry2.dispose();
     this.vertexBuffer2 = new THREE.BufferAttribute(vertices2, 3);
     this.geometry2.setAttribute('position', this.vertexBuffer2);
-    // @ts-ignore
-    this.geometry2.index = null;
     this.mesh2.sortTriangleIndices(this.lastCameraPosition);
   }
 
