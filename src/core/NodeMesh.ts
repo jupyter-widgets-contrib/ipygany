@@ -137,11 +137,9 @@ class NodeMesh {
     this.mesh.matrix.copy(matrix);
   }
 
-  get boundingSphereRadius () {
+  get boundingSphere () : THREE.Sphere {
     this.geometry.computeBoundingSphere();
-    const { radius } = this.geometry.boundingSphere;
-
-    return radius;
+    return this.geometry.boundingSphere;
   }
 
   set defaultColor (defaultColor: string) {

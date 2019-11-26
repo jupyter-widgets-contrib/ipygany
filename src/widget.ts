@@ -472,11 +472,19 @@ class SceneModel extends _OdysisDOMWidgetModel {
     // TODO: Remove old children
 
     const blocks: Block[] = this.get('children').map((child: BlockModel) => child.block);
-    const boundingSphereRadius = Math.max(...blocks.map((block: Block) => block.boundingSphereRadius));
+
+    if (blocks.length == 0) {
+      return;
+    }
+
+    const boundingSphereRadius = Math.max(...blocks.map((block: Block) => block.boundingSphere.radius));
     const scale = new THREE.Vector3(1 / boundingSphereRadius, 1 / boundingSphereRadius, 1 / boundingSphereRadius);
+
+    const position = blocks[0].boundingSphere.center;
 
     for (const block of blocks) {
       block.scale = scale;
+      block.position = new THREE.Vector3(-position.x, -position.y, -position.z);
 
       this.scene.addChild(block);
     }

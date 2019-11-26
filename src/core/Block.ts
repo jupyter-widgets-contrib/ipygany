@@ -152,10 +152,13 @@ abstract class Block extends Events {
     return {environmentMeshes: this._environmentMeshes, position: this._position, scale: this._scale};
   }
 
-  get boundingSphereRadius () {
-    const radius = this.meshes.map((nodeMesh: NodeMesh) => nodeMesh.boundingSphereRadius);
+  get boundingSphere () : THREE.Sphere {
+    let block: Block = this;
+    while (block.parent != null) {
+      block = block.parent;
+    }
 
-    return Math.max(...radius);
+    return block.boundingSphere;
   }
 
   set defaultColor (defaultColor: string) {
@@ -191,5 +194,7 @@ abstract class Block extends Events {
 
   _position: THREE.Vector3 = new THREE.Vector3(0., 0., 0.);
   _scale: THREE.Vector3 = new THREE.Vector3(1., 1., 1.);
+
+  parent: Block | null = null;
 
 }

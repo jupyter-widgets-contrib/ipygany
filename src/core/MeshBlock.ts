@@ -54,6 +54,11 @@ class PolyMesh extends Block {
     this.vertexBuffer.needsUpdate = true;
   }
 
+  get boundingSphere () : THREE.Sphere {
+    this.geometry.computeBoundingSphere();
+    return this.geometry.boundingSphere;
+  }
+
   triangleIndices: Uint32Array;
 
   geometry: THREE.BufferGeometry;
