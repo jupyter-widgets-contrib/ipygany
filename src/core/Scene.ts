@@ -20,12 +20,16 @@ class Scene {
     this.scene = new THREE.Scene();
 
     // light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     this.scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
     directionalLight.position.set(-1, 1.75, 1);
     this.scene.add(directionalLight);
+
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.2);
+    hemiLight.position.set(0, 2, 0);
+    this.scene.add(hemiLight);
   }
 
   /**
