@@ -109,7 +109,6 @@ class Block(_OdysisWidgetBase):
     vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
 
     default_color = Color('#6395b0').tag(sync=True)
-    default_alpha = CFloat(1.0).tag(sync=True)
 
     data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
 
@@ -294,6 +293,18 @@ class Effect(Block):
     def __init__(self, parent, **kwargs):
         """Create an Effect on the given Mesh or Effect output."""
         super(Effect, self).__init__(parent=parent, **kwargs)
+
+
+class Alpha(Effect):
+    """An transparency effect to another block."""
+
+    _model_name = Unicode('AlphaModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+
+    @default('input')
+    def _default_input(self):
+        return 0.7
 
 
 class IsoColor(Effect):

@@ -79,12 +79,11 @@ class NodeMesh {
 
     this._defaultColor = '#6395b0';
     this.defaultColorNode = new Nodes.ColorNode(this._defaultColor);
-    this.defaultAlphaNode = new Nodes.FloatNode(1.);
   }
 
   buildMaterial () {
     let position = new Nodes.PositionNode();
-    let alpha: NodeOperationResult<Nodes.Node> = this.defaultAlphaNode;
+    let alpha: NodeOperationResult<Nodes.Node> = new Nodes.FloatNode(1.);
     let color: NodeOperationResult<Nodes.Node> = this.defaultColorNode;
 
     for (const colorOperator of this.colorOperators) {
@@ -126,6 +125,7 @@ class NodeMesh {
     const copy = new NodeMesh(this.meshCtor, this.geometry);
 
     // TODO: Copy other operators
+    copy.alphaOperators = this.alphaOperators;
     copy.colorOperators = this.colorOperators;
 
     copy.defaultColor = this.defaultColor;
@@ -150,14 +150,6 @@ class NodeMesh {
 
   get defaultColor () {
     return this._defaultColor;
-  }
-
-  set defaultAlpha (defaultAlpha: number) {
-    this.defaultAlphaNode.value = defaultAlpha;
-  }
-
-  get defaultAlpha () {
-    return this.defaultAlphaNode.value;
   }
 
   /**
@@ -191,6 +183,5 @@ class NodeMesh {
 
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;
-  private defaultAlphaNode: Nodes.FloatNode;
 
 }

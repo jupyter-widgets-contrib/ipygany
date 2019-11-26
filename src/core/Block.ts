@@ -167,12 +167,6 @@ abstract class Block extends Events {
     }
   }
 
-  set defaultAlpha (defaultAlpha: number) {
-    for (const nodeMesh of this.meshes) {
-      nodeMesh.defaultAlpha = defaultAlpha;
-    }
-  }
-
   handleVerticesChange () {
     this.trigger('change:vertices');
   }

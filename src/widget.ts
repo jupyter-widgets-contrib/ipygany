@@ -39,7 +39,7 @@ import {
 } from './core/MeshBlock';
 
 import {
-  IsoColor, IsoSurface, Threshold
+  Alpha, IsoColor, IsoSurface, Threshold
 } from './core/Effects/effects';
 
 
@@ -159,7 +159,6 @@ abstract class BlockModel extends _OdysisWidgetModel {
       data: [],
       environment_meshes: [],
       default_color: '#6395b0',
-      default_alpha: 1.0,
     };
   }
 
@@ -188,13 +187,8 @@ abstract class BlockModel extends _OdysisWidgetModel {
     return this.get('default_color');
   }
 
-  get defaultAlpha () : number {
-    return this.get('default_alpha');
-  }
-
   initEventListeners() : void {
     this.on('change:default_color', () => { this.block.defaultColor = this.defaultColor; });
-    this.on('change:default_alpha', () => { this.block.defaultAlpha = this.defaultAlpha; });
   }
 
   block: Block;
@@ -320,6 +314,32 @@ abstract class EffectModel extends BlockModel {
   }
 
   static model_name = 'EffectModel';
+
+}
+
+
+export
+class AlphaModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: AlphaModel.model_name,
+    };
+  }
+
+  get input () {
+    const input = this.get('input');
+
+    return typeof input == 'string' ? input : [input];
+  }
+
+  createBlock () {
+    return new Alpha(this.parent.block, this.input);
+  }
+
+  block: Alpha;
+
+  static model_name = 'AlphaModel';
 
 }
 
