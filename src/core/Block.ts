@@ -46,6 +46,10 @@ abstract class Block extends Events {
       this._scale = options.scale || this._scale;
     }
 
+    for (const mesh of this._environmentMeshes) {
+      mesh.matrixAutoUpdate = false;
+    }
+
     this.updateMatrix();
 
   }
@@ -120,19 +124,27 @@ abstract class Block extends Events {
   }
 
   private updateMatrix () {
-    this._matrix.set(
-      this._scale.x,             0,             0, this._position.x,
-                  0, this._scale.y,             0, this._position.y,
-                  0,             0, this._scale.z, this._position.z,
-                  0,             0,             0,                1
-    );
+    const scaleMatrix = new THREE.Matrix4().makeScale(this._scale.x, this._scale.y, this._scale.z);
+    const positionMatrix = new THREE.Matrix4().makeTranslation(this._position.x, this._position.y, this._position.z);
+
+    const matrix = new THREE.Matrix4().multiplyMatrices(scaleMatrix, positionMatrix);
 
     for (const nodeMesh of this.meshes) {
-      nodeMesh.matrix = this._matrix;
+      nodeMesh.matrix = matrix;
     }
 
+    matrix.identity();
+
     for (const mesh of this._environmentMeshes) {
-      mesh.matrix.copy(this._matrix);
+      const meshPositionMatrix = new THREE.Matrix4().makeTranslation(
+        mesh.position.x + this._position.x,
+        mesh.position.y + this._position.y,
+        mesh.position.z + this._position.z
+      );
+
+      matrix.multiplyMatrices(scaleMatrix, meshPositionMatrix);
+      mesh.matrix.copy(matrix);
+      matrix.identity();
     }
   }
 
@@ -179,6 +191,5 @@ abstract class Block extends Events {
 
   _position: THREE.Vector3 = new THREE.Vector3(0., 0., 0.);
   _scale: THREE.Vector3 = new THREE.Vector3(1., 1., 1.);
-  _matrix: THREE.Matrix4 = new THREE.Matrix4();
 
 }

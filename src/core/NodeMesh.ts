@@ -74,6 +74,9 @@ class NodeMesh {
 
     this.mesh = new T(geometry, this.material);
 
+    // We need to set this to false because we directly play with the position matrix
+    this.mesh.matrixAutoUpdate = false;
+
     this._defaultColor = '#6395b0';
     this.defaultColorNode = new Nodes.ColorNode(this._defaultColor);
     this.defaultAlphaNode = new Nodes.FloatNode(1.);
