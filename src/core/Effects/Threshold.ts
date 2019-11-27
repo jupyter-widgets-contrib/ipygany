@@ -23,17 +23,31 @@ import {
 
 
 export
+interface ThresholdOptions {
+
+  min?: number;
+  max?: number;
+
+  dynamic?: boolean;
+
+}
+
+
+export
 class Threshold extends Effect {
 
-  constructor (parent: Block, input: Input, min: number, max: number) {
+  constructor (parent: Block, input: Input, options?: ThresholdOptions) {
     super(parent, input);
 
-    this._min = min;
-    this._max = max;
+    if (options) {
+      this._min = options.min !== undefined ? options.min : this._min;
+      this._max = options.max !== undefined ? options.max : this._max;
+      this.dynamic = options.dynamic !== undefined ? options.dynamic : this.dynamic;
+    }
 
     // Create min and max float nodes
-    this.minNode = new Nodes.FloatNode(min);
-    this.maxNode = new Nodes.FloatNode(max);
+    this.minNode = new Nodes.FloatNode(this._min);
+    this.maxNode = new Nodes.FloatNode(this._max);
 
     // GLSL's STEP function is more optimized than an if statement
     // Returns 1 if input < max, 0 otherwise
@@ -50,12 +64,12 @@ class Threshold extends Effect {
     if (this.parent.tetrahedronIndices != null) {
       this.inputComponent = this.inputs[0];
 
-      this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices);
+      this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.dynamic);
       this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
 
       // Create min/max iso-surface geometries
-      const [vertices1] = this.isoSurfaceUtils.computeIsoSurface(min);
-      const [vertices2] = this.isoSurfaceUtils.computeIsoSurface(max);
+      const [vertices1] = this.isoSurfaceUtils.computeIsoSurface(this._min);
+      const [vertices2] = this.isoSurfaceUtils.computeIsoSurface(this._max);
 
       this.geometry1 = new THREE.BufferGeometry();
       this.geometry2 = new THREE.BufferGeometry();
@@ -158,8 +172,10 @@ class Threshold extends Effect {
 
   private initialized: boolean = false;
 
-  private _min: number;
-  private _max: number;
+  private _min: number = 0;
+  private _max: number = 1;
+
+  private dynamic: boolean = false;
 
   private minNode: Nodes.FloatNode;
   private maxNode: Nodes.FloatNode;

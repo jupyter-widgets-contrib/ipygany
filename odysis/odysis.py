@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Unicode, List, Instance, CFloat, Tuple, Union, default
+    Bool, Unicode, List, Instance, CFloat, Tuple, Union, default
 )
 from traittypes import Array
 from ipywidgets import (
@@ -330,6 +330,7 @@ class IsoSurface(Effect):
     input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
 
     value = CFloat(0.).tag(sync=True)
+    dynamic = Bool(False).tag(sync=True)
 
     @default('input')
     def _default_input(self):
@@ -345,6 +346,7 @@ class Threshold(Effect):
 
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
+    dynamic = Bool(False).tag(sync=True)
 
     @default('input')
     def _default_input(self):
