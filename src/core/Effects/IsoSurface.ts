@@ -23,19 +23,33 @@ import {
 
 
 export
+interface IsoSurfaceOptions {
+
+  value?: number;
+
+  dynamic?: boolean;
+
+}
+
+
+export
 class IsoSurface extends Effect {
 
-  constructor (parent: Block, input: Input, value: number) {
+  constructor (parent: Block, input: Input, options?: IsoSurfaceOptions) {
     super(parent, input);
 
     if (this.parent.tetrahedronIndices == null) {
       throw 'Cannot compute IsoSurface on a Mesh that is not tetrahedron-based';
     }
 
-    this._value = value;
+    if (options) {
+      this._value = options.value !== undefined ? options.value : this._value;
+      this.dynamic = options.dynamic !== undefined ? options.dynamic : this.dynamic;
+    }
+
     this.inputComponent = this.inputs[0];
 
-    this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices);
+    this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.dynamic);
     this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
 
     // Remove meshes, only the iso-surface will stay
@@ -111,7 +125,8 @@ class IsoSurface extends Effect {
   private geometry: THREE.BufferGeometry;
   private mesh: NodeMesh;
 
-  private _value: number;
+  private _value: number = 0;
+  private dynamic: boolean = false;
 
   private initialized: boolean = false;
 

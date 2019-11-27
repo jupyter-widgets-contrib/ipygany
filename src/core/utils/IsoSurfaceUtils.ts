@@ -21,14 +21,17 @@ function interpolate (value: number, x1: number, val1: number, x2: number, val2:
 export
 class IsoSurfaceUtils {
 
-  constructor (vertices: Float32Array, tetrahedronIndices: Uint32Array) {
+  constructor (vertices: Float32Array, tetrahedronIndices: Uint32Array, dynamic: boolean = false) {
     this.initialVertices = vertices;
     this.initialTetrahedronIndices = tetrahedronIndices;
+    this.dynamic = dynamic;
   }
 
   updateInput (inputDataArray: TypedArray, inputData: Data[]) {
-    this.treeMin = this.createTree(inputDataArray, 'min');
-    this.treeMax = this.createTree(inputDataArray, 'max');
+    if (!this.dynamic) {
+      this.treeMin = this.createTree(inputDataArray, 'min');
+      this.treeMax = this.createTree(inputDataArray, 'max');
+    }
 
     this.previousValue = null;
 
@@ -37,42 +40,48 @@ class IsoSurfaceUtils {
   }
 
   computeIsoSurface (value: number) : [Float32Array, Uint32Array] {
-    // Compute
-    // Emin(value) = {t in tetras/ t.dataMin < value}
-    // Emax(value) = {t in tetras/ value < t.dataMax}
-    // Tetras sliced by the iso-surface are those which are in Emin AND Emax
-    if (this.previousValue != null) {
-      if (value > this.previousValue) {
-        // If Emin(previousValue) already computed then
-        // Emin(value) = Emin(previousValue) Union {t in tetras/ previousValue < t.dataMin < value}
-        this.Emin = this.Emin.concat(
-          this.treeMin.betweenBounds(
-            { $gte: this.previousValue, $lt: value })
-        );
-        this.Emax = this.treeMax.betweenBounds({ $gt: value });
+    let tetrahedronCandidates: number[];
+
+    if (!this.dynamic) {
+      // Compute
+      // Emin(value) = {t in tetras/ t.dataMin < value}
+      // Emax(value) = {t in tetras/ value < t.dataMax}
+      // Tetras sliced by the iso-surface are those which are in Emin AND Emax
+      if (this.previousValue != null) {
+        if (value > this.previousValue) {
+          // If Emin(previousValue) already computed then
+          // Emin(value) = Emin(previousValue) Union {t in tetras/ previousValue < t.dataMin < value}
+          this.Emin = this.Emin.concat(
+            this.treeMin.betweenBounds(
+              { $gte: this.previousValue, $lt: value })
+          );
+          this.Emax = this.treeMax.betweenBounds({ $gt: value });
+        } else {
+          this.Emin = this.treeMin.betweenBounds({ $lt: value });
+          // If Emax(previousValue) already computed then
+          // Emax(value) = Emax(previousValue) Union {t in tetras/ value < t.dataMin < previousValue}
+          this.Emax = this.Emax.concat(
+            this.treeMax.betweenBounds(
+              { $gt: value, $lte: this.previousValue })
+          );
+        }
       } else {
         this.Emin = this.treeMin.betweenBounds({ $lt: value });
-        // If Emax(previousValue) already computed then
-        // Emax(value) = Emax(previousValue) Union {t in tetras/ value < t.dataMin < previousValue}
-        this.Emax = this.Emax.concat(
-          this.treeMax.betweenBounds(
-            { $gt: value, $lte: this.previousValue })
-        );
+        this.Emax = this.treeMax.betweenBounds({ $gt: value });
       }
+
+      const Emin = this.Emin;
+      const Emax = new Set(this.Emax);
+
+      if (Emin == null) {
+        throw 'Unreachable';
+      }
+
+      // Compute intersection of Emin and Emax
+      tetrahedronCandidates = Emin.filter(x => Emax.has(x));
     } else {
-      this.Emin = this.treeMin.betweenBounds({ $lt: value });
-      this.Emax = this.treeMax.betweenBounds({ $gt: value });
+      tetrahedronCandidates = Array.from(Array(this.initialTetrahedronIndices.length / 4).keys());
     }
-
-    const Emin = this.Emin;
-    const Emax = new Set(this.Emax);
-
-    if (Emin == null) {
-      throw 'Unreachable';
-    }
-
-    // Compute intersection of Emin and Emax
-    const tetrahedronCandidates = Emin.filter(x => Emax.has(x));
 
     const vertices: number[] = [];
     // const isoSurfaceData = this.inputData.map((data: Data) => data.copy());
@@ -103,7 +112,7 @@ class IsoSurfaceUtils {
     this.inputData;
 
     for (let j = 0, len = tetrahedronCandidates.length; j < len; j++) {
-      i = tetrahedronCandidates[j];
+      i = 4 * tetrahedronCandidates[j];
 
       bl[0] = this.inputDataArray[this.initialTetrahedronIndices[i]] >= value;
       bl[1] = this.inputDataArray[this.initialTetrahedronIndices[i+1]] >= value;
@@ -222,7 +231,7 @@ class IsoSurfaceUtils {
           dataArray[this.initialTetrahedronIndices[i+2]],
           dataArray[this.initialTetrahedronIndices[i+3]]
         ),
-        i
+        i / 4
       );
     }
 
@@ -231,6 +240,7 @@ class IsoSurfaceUtils {
 
   private initialVertices: Float32Array;
   private initialTetrahedronIndices: Uint32Array;
+  private dynamic: boolean;
 
   private previousValue: number | null = null;
 

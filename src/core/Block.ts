@@ -40,10 +40,10 @@ abstract class Block extends Events {
     this._data = data;
 
     if (options) {
-      this._environmentMeshes = options.environmentMeshes || this._environmentMeshes;
+      this._environmentMeshes = options.environmentMeshes !== undefined ? options.environmentMeshes : this._environmentMeshes;
 
-      this._position = options.position || this._position;
-      this._scale = options.scale || this._scale;
+      this._position = options.position !== undefined ? options.position : this._position;
+      this._scale = options.scale !== undefined ? options.scale : this._scale;
     }
 
     for (const mesh of this._environmentMeshes) {

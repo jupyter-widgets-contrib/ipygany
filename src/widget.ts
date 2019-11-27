@@ -394,11 +394,16 @@ class IsoSurfaceModel extends EffectModel {
     return {...super.defaults(),
       _model_name: IsoSurfaceModel.model_name,
       value: 0.,
+      dynamic: false,
     };
   }
 
   get value () {
     return this.get('value');
+  }
+
+  get dynamic () {
+    return this.get('dynamic');
   }
 
   get input () {
@@ -408,7 +413,7 @@ class IsoSurfaceModel extends EffectModel {
   }
 
   createBlock () {
-    return new IsoSurface(this.parent.block, this.input, this.value);
+    return new IsoSurface(this.parent.block, this.input, {value: this.value, dynamic: this.dynamic});
   }
 
   initEventListeners () : void {
@@ -432,6 +437,7 @@ class ThresholdModel extends EffectModel {
       _model_name: ThresholdModel.model_name,
       min: 0.,
       max: 0.,
+      dynamic: false,
     };
   }
 
@@ -443,6 +449,10 @@ class ThresholdModel extends EffectModel {
     return this.get('max');
   }
 
+  get dynamic () {
+    return this.get('dynamic');
+  }
+
   get input () {
     const input = this.get('input');
 
@@ -450,7 +460,7 @@ class ThresholdModel extends EffectModel {
   }
 
   createBlock () {
-    return new Threshold(this.parent.block, this.input, this.min, this.max);
+    return new Threshold(this.parent.block, this.input, {min: this.min, max: this.max, dynamic: this.dynamic});
   }
 
   initEventListeners () : void {
