@@ -57,6 +57,7 @@ class Alpha extends Effect {
   }
 
   sortTriangleIndices () {
+    // TODO: Throttle this call?
     for (const nodeMesh of this.meshes) {
       nodeMesh.sortTriangleIndices(this.lastCameraPosition);
     }

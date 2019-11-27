@@ -174,6 +174,12 @@ class NodeMesh {
    * Sort triangle indices by distance Camera/triangle.
    */
   sortTriangleIndices (cameraPosition: THREE.Vector3) {
+    // Project camera position in the mesh coordinate system
+    const matrixInverse = new THREE.Matrix4().getInverse(this.mesh.matrix);
+    const projectedCameraPosition = new THREE.Vector3()
+      .copy(cameraPosition)
+      .applyMatrix4(matrixInverse);
+
     if (this.mesh.type == 'Mesh') {
       const vertex = this.geometry.getAttribute('position').array;
 
@@ -207,7 +213,7 @@ class NodeMesh {
         const z = (v1[2] + v2[2] + v3[2]) / 3;
 
         const trianglePosition = new THREE.Vector3(x, y, z);
-        return cameraPosition.distanceToSquared(trianglePosition);
+        return projectedCameraPosition.distanceToSquared(trianglePosition);
       });
 
       // Sort triangle indices
