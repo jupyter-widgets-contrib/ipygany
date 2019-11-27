@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
@@ -64,24 +63,21 @@ class Threshold extends Effect {
     if (this.parent.tetrahedronIndices != null) {
       this.inputComponent = this.inputs[0];
 
-      this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.dynamic);
-      this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
+      this.isoSurfaceUtils1 = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.data, this.dynamic);
+      this.isoSurfaceUtils1.updateInput(this.inputComponent.array);
+
+      this.isoSurfaceUtils2 = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.data, this.dynamic);
+      this.isoSurfaceUtils2.updateInput(this.inputComponent.array);
 
       // Create min/max iso-surface geometries
-      const [vertices1] = this.isoSurfaceUtils.computeIsoSurface(this._min);
-      const [vertices2] = this.isoSurfaceUtils.computeIsoSurface(this._max);
+      this.isoSurfaceUtils1.computeIsoSurface(this._min);
+      this.mesh1 = this.isoSurfaceUtils1.mesh;
 
-      this.geometry1 = new THREE.BufferGeometry();
-      this.geometry2 = new THREE.BufferGeometry();
+      this.isoSurfaceUtils2.computeIsoSurface(this._max);
+      this.mesh2 = this.isoSurfaceUtils2.mesh;
 
-      this.vertexBuffer1 = new THREE.BufferAttribute(vertices1, 3);
-      this.vertexBuffer2 = new THREE.BufferAttribute(vertices2, 3);
-
-      this.geometry1.setAttribute('position', this.vertexBuffer1);
-      this.geometry2.setAttribute('position', this.vertexBuffer2);
-
-      this.mesh1 = new NodeMesh(THREE.Mesh, this.geometry1);
-      this.mesh2 = new NodeMesh(THREE.Mesh, this.geometry2);
+      this.mesh1.copyMaterial(this.parent.meshes[0]);
+      this.mesh2.copyMaterial(this.parent.meshes[0]);
 
       this.meshes.push(this.mesh1);
       this.meshes.push(this.mesh2);
@@ -107,7 +103,8 @@ class Threshold extends Effect {
         this.inputComponent = this.inputs[0];
         this.inputComponent.on('change:array', this.onInputArrayChange.bind(this));
 
-        this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
+        this.isoSurfaceUtils1.updateInput(this.inputComponent.array);
+        this.isoSurfaceUtils2.updateInput(this.inputComponent.array);
 
         this.updateGeometry1();
         this.updateGeometry2();
@@ -118,30 +115,21 @@ class Threshold extends Effect {
   }
 
   onInputArrayChange () {
-    this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
+    this.isoSurfaceUtils1.updateInput(this.inputComponent.array);
+    this.isoSurfaceUtils2.updateInput(this.inputComponent.array);
 
     this.updateGeometry1();
     this.updateGeometry2();
   }
 
   updateGeometry1 () {
-    const [vertices1] = this.isoSurfaceUtils.computeIsoSurface(this.min);
-
-    // Not using this.vertexBuffer.set because the number of vertices can change
-    this.geometry1.dispose();
-    this.vertexBuffer1 = new THREE.BufferAttribute(vertices1, 3);
-    this.geometry1.setAttribute('position', this.vertexBuffer1);
+    this.isoSurfaceUtils1.computeIsoSurface(this.min);
 
     this.trigger('change:geometry');
   }
 
   updateGeometry2 () {
-    const [vertices2] = this.isoSurfaceUtils.computeIsoSurface(this.max);
-
-    // Not using this.vertexBuffer.set because the number of vertices can change
-    this.geometry2.dispose();
-    this.vertexBuffer2 = new THREE.BufferAttribute(vertices2, 3);
-    this.geometry2.setAttribute('position', this.vertexBuffer2);
+    this.isoSurfaceUtils2.computeIsoSurface(this.max);
 
     this.trigger('change:geometry');
   }
@@ -150,6 +138,10 @@ class Threshold extends Effect {
     this._min = value;
 
     this.minNode.value = value;
+
+    if (this.parent.tetrahedronIndices != null) {
+      this.updateGeometry1();
+    }
   }
 
   get min () {
@@ -160,6 +152,10 @@ class Threshold extends Effect {
     this._max = value;
 
     this.maxNode.value = value;
+
+    if (this.parent.tetrahedronIndices != null) {
+      this.updateGeometry2();
+    }
   }
 
   get max () {
@@ -185,12 +181,9 @@ class Threshold extends Effect {
 
   private thresholdAlpha: Nodes.OperatorNode;
 
-  private isoSurfaceUtils: IsoSurfaceUtils;
+  private isoSurfaceUtils1: IsoSurfaceUtils;
+  private isoSurfaceUtils2: IsoSurfaceUtils;
 
-  private vertexBuffer1: THREE.BufferAttribute;
-  private vertexBuffer2: THREE.BufferAttribute;
-  private geometry1: THREE.BufferGeometry;
-  private geometry2: THREE.BufferGeometry;
   private mesh1: NodeMesh;
   private mesh2: NodeMesh;
 

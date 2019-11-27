@@ -104,13 +104,6 @@ class Effect extends Block {
       // @ts-ignore: The error raise by TypeScript is not relevant here, as the length of inputs is already validated
       this.inputNode = new Nodes.JoinNode(...inputs.map(this.getInputNode.bind(this)));
     }
-
-    // Send component buffers to the GPU, if that's not done already.
-    for (const input of this.inputs) {
-      if (input instanceof Component) {
-        this.addComponent(input);
-      }
-    }
   }
 
   /**

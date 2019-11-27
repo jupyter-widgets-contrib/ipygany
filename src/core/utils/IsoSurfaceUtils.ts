@@ -1,12 +1,18 @@
 const BinaryTree: any = require('binary-search-tree');
 
+import * as THREE from 'three';
+
 import {
   TypedArray
 } from './types';
 
 import {
-  Data
+  Data, DataDict, datalistToDict
 } from '../Data';
+
+import {
+  NodeMesh
+} from '../NodeMesh';
 
 
 export
@@ -21,13 +27,24 @@ function interpolate (value: number, x1: number, val1: number, x2: number, val2:
 export
 class IsoSurfaceUtils {
 
-  constructor (vertices: Float32Array, tetrahedronIndices: Uint32Array, dynamic: boolean = false) {
+  constructor (vertices: Float32Array, tetrahedronIndices: Uint32Array, data: Data[], dynamic: boolean = false) {
     this.initialVertices = vertices;
     this.initialTetrahedronIndices = tetrahedronIndices;
+    this.initialData = data;
+
     this.dynamic = dynamic;
+
+    this.geometry = new THREE.BufferGeometry();
+    this._vertices = new Float32Array(0);
+
+    const vertexBuffer = new THREE.BufferAttribute(this._vertices, 3);
+    this.geometry.setAttribute('position', vertexBuffer);
+
+    const dataShallowCopy = this.initialData.map((data: Data) => data.copy(false));
+    this._isoSurfaceMesh = new NodeMesh(THREE.Mesh, this.geometry, dataShallowCopy);
   }
 
-  updateInput (inputDataArray: TypedArray, inputData: Data[]) {
+  updateInput (inputDataArray: TypedArray) {
     if (!this.dynamic) {
       this.treeMin = this.createTree(inputDataArray, 'min');
       this.treeMax = this.createTree(inputDataArray, 'max');
@@ -36,10 +53,9 @@ class IsoSurfaceUtils {
     this.previousValue = null;
 
     this.inputDataArray = inputDataArray;
-    this.inputData = inputData;
   }
 
-  computeIsoSurface (value: number) : [Float32Array, Uint32Array] {
+  computeIsoSurface (value: number) {
     let tetrahedronCandidates: number[];
 
     if (!this.dynamic) {
@@ -84,7 +100,7 @@ class IsoSurfaceUtils {
     }
 
     const vertices: number[] = [];
-    // const isoSurfaceData = this.inputData.map((data: Data) => data.copy());
+    const data: DataDict = datalistToDict(this.initialData, false);
 
     // Booleans representing if tetrahedron vertices data are over value
     const bl: [boolean, boolean, boolean, boolean] = [false, false, false, false];
@@ -92,6 +108,7 @@ class IsoSurfaceUtils {
     const bu: [boolean, boolean, boolean, boolean] = [false, false, false, false];
 
     let interVertices: number[];
+    let interData: DataDict;
 
     // Tetra index
     let i: number;
@@ -109,8 +126,6 @@ class IsoSurfaceUtils {
     let d1: number;
     let d2: number;
 
-    this.inputData;
-
     for (let j = 0, len = tetrahedronCandidates.length; j < len; j++) {
       i = 4 * tetrahedronCandidates[j];
 
@@ -124,19 +139,14 @@ class IsoSurfaceUtils {
       bu[2] = this.inputDataArray[this.initialTetrahedronIndices[i+2]] <= value;
       bu[3] = this.inputDataArray[this.initialTetrahedronIndices[i+3]] <= value;
 
-      // Uncomment those lines if you loop on tetras that are note
-      // sliced by the iso-surface. Here we assume that tetrahedrons
-      // sorting is efficient, and we don't need to check this.
-      /*if (!(bl[0] || bl[1] || bl[2] || bl[3]) ||
+      // If the tetra is not cut by the iso-surface, we continue to the next one
+      if (!(bl[0] || bl[1] || bl[2] || bl[3]) ||
           !(bu[0] || bu[1] || bu[2] || bu[3])) {
         continue;
-      }*/
+      }
 
       interVertices = [];
-
-      // dataLen = inputDataArrays.length;
-      // interDatas = new Array(dataLen);
-      // while (dataLen--) { interDatas[dataLen] = []; }
+      interData = datalistToDict(this.initialData, false);
 
       // Find if some of the edges are sliced by the iso-surface
       for (let k = 0; k < 3; k++) {
@@ -170,13 +180,15 @@ class IsoSurfaceUtils {
             );
 
             // Interpolate on each data
-            // inputDataArrays.forEach((inputDataArray, dataIndex) => {
-            //   interDatas[dataIndex].push(interpolate(
-            //     value,
-            //     inputDataArray[i1], d1,
-            //     inputDataArray[i2], d2)
-            //   );
-            // });
+            for (const data of this.initialData) {
+              for (const component of data.components) {
+                interData[data.name][component.name].array.push(interpolate(
+                  value,
+                  component.array[i1], d1,
+                  component.array[i2], d2,
+                ));
+              }
+            }
           }
         }
       }
@@ -189,33 +201,44 @@ class IsoSurfaceUtils {
       // Create first triangle
       vertices.push(...v1, ...v3, ...v2);
 
-      // interDatas.forEach((interData, dataIndex) => {
-      //   surfaceDataArrays[dataIndex].push(interData[0]);
-      //   surfaceDataArrays[dataIndex].push(interData[2]);
-      //   surfaceDataArrays[dataIndex].push(interData[1]);
-      // });
+      for (const dataName in interData) {
+        for (const componentName in interData[dataName]) {
+          const array = data[dataName][componentName].array;
+          const interArray = interData[dataName][componentName].array;
+
+          array.push(interArray[0], interArray[2], interArray[1]);
+        }
+      }
 
       // If we have 4 points (4*3 coordinates, so 2 triangles)
       if (interVertices.length === 12) {
         vertices.push(...v2, ...v3, ...interVertices.slice(9, 12));
 
-        // interDatas.forEach((interData, dataIndex) => {
-        //   surfaceDataArrays[dataIndex].push(interData[1]);
-        //   surfaceDataArrays[dataIndex].push(interData[2]);
-        //   surfaceDataArrays[dataIndex].push(interData[3]);
-        // });
+        for (const dataName in interData) {
+          for (const componentName in interData[dataName]) {
+            const array = data[dataName][componentName].array;
+            const interArray = interData[dataName][componentName].array;
+
+            array.push(interArray[1], interArray[2], interArray[3]);
+          }
+        }
       }
     }
 
-    // Create list of indices: [0, 1, 2, ..., numTriangles-2, numTriangles-1]
-    const numTriangles = vertices.length / 3;
-    const isoSurfaceTrianglesIndices = Uint32Array.from(Array(numTriangles).keys());
+    this._vertices = new Float32Array(vertices);
 
-    const isoSurfaceVertices = new Float32Array(vertices);
+    this._isoSurfaceMesh.vertices = this._vertices
+    this._isoSurfaceMesh.updateData(data);
 
     this.previousValue = value;
+  }
 
-    return [isoSurfaceVertices, isoSurfaceTrianglesIndices];
+  get mesh () {
+    return this._isoSurfaceMesh;
+  }
+
+  get vertices () : Float32Array {
+    return this._vertices;
   }
 
   private createTree (dataArray: TypedArray, value: 'min' | 'max'='min') {
@@ -240,6 +263,7 @@ class IsoSurfaceUtils {
 
   private initialVertices: Float32Array;
   private initialTetrahedronIndices: Uint32Array;
+  private initialData: Data[];
   private dynamic: boolean;
 
   private previousValue: number | null = null;
@@ -251,6 +275,9 @@ class IsoSurfaceUtils {
   private Emax: number[];
 
   private inputDataArray: TypedArray;
-  private inputData: Data[] = [];
+
+  private _isoSurfaceMesh: NodeMesh;
+  private geometry: THREE.BufferGeometry;
+  private _vertices: Float32Array;
 
 }
