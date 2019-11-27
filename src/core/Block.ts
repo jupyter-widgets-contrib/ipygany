@@ -61,6 +61,8 @@ abstract class Block extends Events {
     this._vertices = vertices;
 
     this.handleVerticesChange();
+
+    this.trigger('change:geometry');
   }
 
   /**
@@ -168,7 +170,6 @@ abstract class Block extends Events {
   }
 
   handleVerticesChange () {
-    this.trigger('change:vertices');
   }
 
   handleCameraMoveEnd (cameraPosition: THREE.Vector3) {

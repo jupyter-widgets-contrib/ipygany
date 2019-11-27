@@ -69,9 +69,6 @@ class Threshold extends Effect {
       this.mesh1 = new NodeMesh(THREE.Mesh, this.geometry1);
       this.mesh2 = new NodeMesh(THREE.Mesh, this.geometry2);
 
-      this.mesh1.sortTriangleIndices(this.lastCameraPosition);
-      this.mesh2.sortTriangleIndices(this.lastCameraPosition);
-
       this.meshes.push(this.mesh1);
       this.meshes.push(this.mesh2);
 
@@ -120,7 +117,8 @@ class Threshold extends Effect {
     this.geometry1.dispose();
     this.vertexBuffer1 = new THREE.BufferAttribute(vertices1, 3);
     this.geometry1.setAttribute('position', this.vertexBuffer1);
-    this.mesh1.sortTriangleIndices(this.lastCameraPosition);
+
+    this.trigger('change:geometry');
   }
 
   updateGeometry2 () {
@@ -130,7 +128,8 @@ class Threshold extends Effect {
     this.geometry2.dispose();
     this.vertexBuffer2 = new THREE.BufferAttribute(vertices2, 3);
     this.geometry2.setAttribute('position', this.vertexBuffer2);
-    this.mesh2.sortTriangleIndices(this.lastCameraPosition);
+
+    this.trigger('change:geometry');
   }
 
   set min (value: number) {

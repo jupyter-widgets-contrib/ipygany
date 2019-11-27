@@ -35,6 +35,8 @@ class Alpha extends Effect {
 
     this.sortTriangleIndices();
 
+    this.parent.on('change:geometry', this.sortTriangleIndices.bind(this));
+
     this.initialized = true;
   }
 
