@@ -69,7 +69,7 @@ class NodeMesh {
     this.geometry = geometry;
     this.material = new Nodes.StandardNodeMaterial();
 
-    this.hasIndices = this.geometry.index != null;
+    this.hasIndex = this.geometry.index != null;
 
     // @ts-ignore: Monkey patching material, workaround for github.com/mrdoob/three.js/issues/12132
     this.material.version = 0;
@@ -126,7 +126,7 @@ class NodeMesh {
   copy () {
     const copy = new NodeMesh(this.meshCtor, this.geometry);
 
-    copy.hasIndices = this.hasIndices;
+    copy.hasIndex = this.hasIndex;
 
     // TODO: Copy other operators
     copy.alphaOperators = this.alphaOperators;
@@ -178,7 +178,7 @@ class NodeMesh {
       const vertex = this.geometry.getAttribute('position').array;
 
       let indices: ArrayLike<number>;
-      if (this.hasIndices) {
+      if (this.hasIndex) {
         indices = this.geometry.index.array;
       } else {
         indices = Array.from(Array(vertex.length / 3).keys());
@@ -225,7 +225,7 @@ class NodeMesh {
         newIndices[3 * i + 2] = indices[3 * triangleIndex + 2]
       }
 
-      if (this.hasIndices) {
+      if (this.hasIndex) {
         this.geometry.index.set(newIndices);
         this.geometry.index.needsUpdate = true;
       } else {
@@ -253,6 +253,6 @@ class NodeMesh {
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;
 
-  private hasIndices: boolean;
+  private hasIndex: boolean;
 
 }
