@@ -69,6 +69,8 @@ class NodeMesh {
     this.geometry = geometry;
     this.material = new Nodes.StandardNodeMaterial();
 
+    this.hasIndex = this.geometry.index != null;
+
     // @ts-ignore: Monkey patching material, workaround for github.com/mrdoob/three.js/issues/12132
     this.material.version = 0;
 
@@ -124,6 +126,8 @@ class NodeMesh {
   copy () {
     const copy = new NodeMesh(this.meshCtor, this.geometry);
 
+    copy.hasIndex = this.hasIndex;
+
     // TODO: Copy other operators
     copy.alphaOperators = this.alphaOperators;
     copy.colorOperators = this.colorOperators;
@@ -166,6 +170,77 @@ class NodeMesh {
     this.alphaOperators.push(new NodeOperator<Nodes.Node>(operation, alphaNode));
   }
 
+  /**
+   * Sort triangle indices by distance Camera/triangle.
+   */
+  sortTriangleIndices (cameraPosition: THREE.Vector3) {
+    // Project camera position in the mesh coordinate system
+    const matrixInverse = new THREE.Matrix4().getInverse(this.mesh.matrix);
+    const projectedCameraPosition = new THREE.Vector3()
+      .copy(cameraPosition)
+      .applyMatrix4(matrixInverse);
+
+    if (this.mesh.type == 'Mesh') {
+      const vertex = this.geometry.getAttribute('position').array;
+
+      let indices: ArrayLike<number>;
+      if (this.hasIndex) {
+        indices = this.geometry.index.array;
+      } else {
+        indices = Array.from(Array(vertex.length / 3).keys());
+      }
+
+      // Triangle indices to sort
+      const triangles = Array.from(Array(indices.length / 3).keys());
+
+      // Compute distances camera/triangle
+      const distances = triangles.map((i: number) => {
+        const triangleIndex = 3 * i;
+        const triangle = [indices[triangleIndex], indices[triangleIndex + 1], indices[triangleIndex + 2]];
+
+        const v1Index = 3 * triangle[0];
+        const v2Index = 3 * triangle[1];
+        const v3Index = 3 * triangle[2];
+
+        // Get the three vertices
+        const v1 = [vertex[v1Index], vertex[v1Index + 1], vertex[v1Index + 2]];
+        const v2 = [vertex[v2Index], vertex[v2Index + 1], vertex[v2Index + 2]];
+        const v3 = [vertex[v3Index], vertex[v3Index + 1], vertex[v3Index + 2]];
+
+        // The triangle position is the mean of it's three points positions
+        const x = (v1[0] + v2[0] + v3[0]) / 3;
+        const y = (v1[1] + v2[1] + v3[1]) / 3;
+        const z = (v1[2] + v2[2] + v3[2]) / 3;
+
+        const trianglePosition = new THREE.Vector3(x, y, z);
+        return projectedCameraPosition.distanceToSquared(trianglePosition);
+      });
+
+      // Sort triangle indices
+      triangles.sort((t1: number, t2: number) : number => {
+        return distances[t2] - distances[t1];
+      });
+
+      // And then compute new vertex indices
+      const newIndices = new Uint32Array(indices.length);
+      for (let i = 0; i < triangles.length; i++) {
+        const triangleIndex = triangles[i];
+
+        newIndices[3 * i] = indices[3 * triangleIndex]
+        newIndices[3 * i + 1] = indices[3 * triangleIndex + 1]
+        newIndices[3 * i + 2] = indices[3 * triangleIndex + 2]
+      }
+
+      if (this.hasIndex) {
+        this.geometry.index.set(newIndices);
+        this.geometry.index.needsUpdate = true;
+      } else {
+        const indexBuffer = new THREE.BufferAttribute(newIndices, 1);
+        this.geometry.setIndex(indexBuffer);
+      }
+    }
+  }
+
   dispose () {
     this.geometry.dispose();
     this.material.dispose();
@@ -183,5 +258,7 @@ class NodeMesh {
 
   private _defaultColor: string;
   private defaultColorNode: Nodes.ColorNode;
+
+  private hasIndex: boolean;
 
 }

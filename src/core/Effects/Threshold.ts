@@ -117,6 +117,8 @@ class Threshold extends Effect {
     this.geometry1.dispose();
     this.vertexBuffer1 = new THREE.BufferAttribute(vertices1, 3);
     this.geometry1.setAttribute('position', this.vertexBuffer1);
+
+    this.trigger('change:geometry');
   }
 
   updateGeometry2 () {
@@ -126,6 +128,8 @@ class Threshold extends Effect {
     this.geometry2.dispose();
     this.vertexBuffer2 = new THREE.BufferAttribute(vertices2, 3);
     this.geometry2.setAttribute('position', this.vertexBuffer2);
+
+    this.trigger('change:geometry');
   }
 
   set min (value: number) {

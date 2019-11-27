@@ -33,6 +33,10 @@ class Alpha extends Effect {
 
     this.buildMaterial();
 
+    this.sortTriangleIndices();
+
+    this.parent.on('change:geometry', this.sortTriangleIndices.bind(this));
+
     this.initialized = true;
   }
 
@@ -46,13 +50,26 @@ class Alpha extends Effect {
     }
   }
 
+  handleCameraMoveEnd (cameraPosition: THREE.Vector3) {
+    super.handleCameraMoveEnd(cameraPosition);
+
+    this.sortTriangleIndices();
+  }
+
+  sortTriangleIndices () {
+    // TODO: Throttle this call?
+    for (const nodeMesh of this.meshes) {
+      nodeMesh.sortTriangleIndices(this.lastCameraPosition);
+    }
+  }
+
   get inputDimension () : InputDimension {
     return 1;
   }
 
   private initialized: boolean = false;
 
-  private alphaNode: IdentityNode;
+  private readonly alphaNode: IdentityNode;
 
   protected inputs: [Component];
   protected inputNode: Nodes.Node;

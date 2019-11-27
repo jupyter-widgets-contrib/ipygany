@@ -65,6 +65,8 @@ class IsoSurface extends Effect {
     this.geometry.dispose();
     this.vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
     this.geometry.setAttribute('position', this.vertexBuffer);
+
+    this.trigger('change:geometry');
   }
 
   setInput(input?: Input) : void {

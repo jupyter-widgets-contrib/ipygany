@@ -36,14 +36,26 @@ class Scene {
    * Add an Odysis block to the scene
    */
   addChild (block: Block) {
+    this.blocks.push(block);
     block.addToScene(this.scene);
+  }
+
+  handleCameraMoveEnd (cameraPosition: THREE.Vector3) {
+    for (const block of this.blocks) {
+      block.handleCameraMoveEnd(cameraPosition);
+    }
   }
 
   dispose () {
     this.scene.dispose();
+
+    for (const block of this.blocks) {
+      block.dispose();
+    }
   }
 
   scene: THREE.Scene;
+  blocks: Block[] = [];
 
 }
 
@@ -94,6 +106,8 @@ class Renderer {
     this.controls.panSpeed = 0.9;
     this.controls.dynamicDampingFactor = 0.9;
 
+    this.controls.addEventListener('end', this.handleCameraMoveEnd.bind(this));
+
     this.animate();
   }
 
@@ -142,6 +156,10 @@ class Renderer {
     this.renderer.render(this.scene.scene, this.camera);
 
     this.controls.update();
+  }
+
+  handleCameraMoveEnd () {
+    this.scene.handleCameraMoveEnd(this.camera.position);
   }
 
   dispose () {
