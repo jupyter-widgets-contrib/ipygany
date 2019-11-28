@@ -6,12 +6,73 @@ import {
 } from './utils/uuid';
 
 import {
-  TypedArray
+  TypedArray, Dict
 } from './utils/types';
 
 import {
   Events
 } from './Events';
+
+
+export
+interface ComponentDict {
+
+  array: number[];
+  shaderName: string;
+
+}
+
+
+export
+type DataDict = Dict<Dict<ComponentDict>>;
+
+
+export
+function datalistToDict (datalist: Data[], copyArrays: boolean = true) : DataDict {
+  const dict: DataDict = {};
+
+  for (const data of datalist) {
+    dict[data.name] = {};
+
+    for (const component of data.components) {
+      const array = copyArrays ? Array.from(component.array) : [];
+
+      dict[data.name][component.name] = {array, shaderName: component.shaderName};
+    }
+  }
+
+  return dict;
+}
+
+
+export
+function dictToDatalist (dict: DataDict) : Data[] {
+  const list: Data[] = [];
+
+  for (const dataName in dict) {
+    const components: Component[] = [];
+
+    for (const componentName in dict[dataName]) {
+      const componentDict = dict[dataName][componentName];
+
+      components.push(new Component(componentName, new Float32Array(componentDict.array), componentDict.shaderName));
+    }
+
+    list.push(new Data(dataName, components));
+  }
+
+  return list;
+}
+
+
+export
+function updateDatalistFromDict (datalist: Data[], dict: DataDict) : void {
+  for (const data of datalist) {
+    for (const component of data.components) {
+      component.array = new Float32Array(dict[data.name][component.name].array);
+    }
+  }
+}
 
 
 export
@@ -29,22 +90,17 @@ class Component extends Events {
   }
 
   /**
-   * Add this component to a given geometry.
-   */
-  addToGeometry (geometry: THREE.BufferGeometry) {
-    if (geometry.getAttribute(this.shaderName) === undefined) {
-      geometry.setAttribute(this.shaderName, this.bufferAttribute);
-    }
-  }
-
-  /**
    * Update the component array.
    */
   set array (array: TypedArray) {
-    this._array = array;
+    if (this._array.length == array.length) {
+      this.bufferAttribute.set(array);
+      this.bufferAttribute.needsUpdate = true;
+    } else {
+      this.bufferAttribute = new THREE.BufferAttribute(array, 1);
+    }
 
-    this.bufferAttribute.set(array);
-    this.bufferAttribute.needsUpdate = true;
+    this._array = array;
 
     this.trigger('change:array');
   }
@@ -56,8 +112,9 @@ class Component extends Events {
   /**
    * Returns a copy of this component
    */
-  copy () {
-    return new Component(this.name, this.array, this.shaderName);
+  copy (copyArray: boolean = true) {
+    const array = copyArray ? this.array : new Float32Array(0);
+    return new Component(this.name, array, this.shaderName);
   }
 
   name: string;
@@ -66,7 +123,7 @@ class Component extends Events {
   bufferAttribute: THREE.BufferAttribute;
   node: Nodes.AttributeNode;
 
-  private shaderName: string;
+  readonly shaderName: string;
 
 }
 
@@ -99,8 +156,8 @@ class Data {
   /**
    * Returns a copy of this data
    */
-  copy () {
-    const components = this.components.map((component: Component) => component.copy());
+  copy (copyArray: boolean = true) {
+    const components = this.components.map((component: Component) => component.copy(copyArray));
 
     return new Data(this.name, components);
   }

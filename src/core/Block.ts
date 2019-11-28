@@ -9,7 +9,7 @@ import {
 } from './NodeMesh';
 
 import {
-  Data, Component
+  Data
 } from './Data';
 
 
@@ -73,6 +73,13 @@ abstract class Block extends Events {
   }
 
   /**
+   * Set data list
+   */
+  set data (value: Data[]) {
+    this._data = value;
+  }
+
+  /**
    * Get data list
    */
   get data () {
@@ -101,16 +108,6 @@ abstract class Block extends Events {
     }
 
     this.trigger('change:material');
-  }
-
-  /**
-   * Add a component to the meshes, so that it can be used in shaders.
-   * This will send the entire component buffer to the GPU, so it should be used wisely.
-   */
-  addComponent (component: Component) {
-    for (const nodeMesh of this.meshes) {
-      nodeMesh.addComponent(component);
-    }
   }
 
   set position (position: THREE.Vector3) {

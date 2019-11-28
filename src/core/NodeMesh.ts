@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
-  Component
+  Data, DataDict
 } from './Data';
 
 
@@ -63,11 +63,20 @@ class NodeOperator<T extends Nodes.Node> {
 export
 class NodeMesh {
 
-  constructor (T: MeshConstructor, geometry: THREE.BufferGeometry) {
+  constructor (T: MeshConstructor, geometry: THREE.BufferGeometry, data: Data[]) {
     this.meshCtor = T;
 
     this.geometry = geometry;
     this.material = new Nodes.StandardNodeMaterial();
+
+    this.data = data;
+
+    // TODO: Add those components lazily by looking over which nodes are used?
+    for (const data of this.data) {
+      for (const component of data.components) {
+        this.geometry.setAttribute(component.shaderName, component.bufferAttribute);
+      }
+    }
 
     this.hasIndex = this.geometry.index != null;
 
@@ -81,6 +90,34 @@ class NodeMesh {
 
     this._defaultColor = '#6395b0';
     this.defaultColorNode = new Nodes.ColorNode(this._defaultColor);
+  }
+
+  set vertices (vertices: Float32Array) {
+    const vertexBuffer = (this.geometry.getAttribute('position') as THREE.Float32BufferAttribute);
+
+    if (vertexBuffer.array.length == vertices.length) {
+      vertexBuffer.set(vertices);
+      vertexBuffer.needsUpdate = true;
+    } else {
+      this.geometry.deleteAttribute('position');
+      const newVertexBuffer = new THREE.BufferAttribute(vertices, 3);
+      this.geometry.setAttribute('position', newVertexBuffer);
+    }
+  }
+
+  updateData (dict: DataDict) {
+    for (const data of this.data) {
+      for (const component of data.components) {
+        const oldBuffer = component.bufferAttribute;
+
+        component.array = new Float32Array(dict[data.name][component.name].array)
+
+        if (component.bufferAttribute !== oldBuffer) {
+          this.geometry.deleteAttribute(component.shaderName);
+          this.geometry.setAttribute(component.shaderName, component.bufferAttribute);
+        }
+      }
+    }
   }
 
   buildMaterial () {
@@ -116,25 +153,26 @@ class NodeMesh {
     this.material.version++;
   }
 
-  /**
-   * Add a component to this NodeMesh, so that it can be used in shaders.
-   */
-  addComponent (component: Component) {
-    component.addToGeometry(this.geometry);
-  }
-
   copy () {
-    const copy = new NodeMesh(this.meshCtor, this.geometry);
+    const copy = new NodeMesh(this.meshCtor, this.geometry, this.data);
 
     copy.hasIndex = this.hasIndex;
 
     // TODO: Copy other operators
-    copy.alphaOperators = this.alphaOperators;
-    copy.colorOperators = this.colorOperators;
+    copy.alphaOperators = this.alphaOperators.slice();
+    copy.colorOperators = this.colorOperators.slice();
 
     copy.defaultColor = this.defaultColor;
 
     return copy;
+  }
+
+  copyMaterial (other: NodeMesh) {
+    // TODO: Copy other operators
+    this.alphaOperators = other.alphaOperators.slice();
+    this.colorOperators = other.colorOperators.slice();
+
+    this.defaultColor = other.defaultColor;
   }
 
   set matrix (matrix: THREE.Matrix4) {
@@ -249,6 +287,7 @@ class NodeMesh {
   geometry: THREE.BufferGeometry;
   material: Nodes.StandardNodeMaterial;
   mesh: THREE.Mesh;
+  readonly data: Data[];
 
   private meshCtor: MeshConstructor;
 

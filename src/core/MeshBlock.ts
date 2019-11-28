@@ -25,23 +25,17 @@ class PolyMesh extends Block {
     this.triangleIndices = triangleIndices;
 
     this.geometry = new THREE.BufferGeometry();
-    this.initializeBufferGeometry();
 
-    this.mesh = new NodeMesh(THREE.Mesh, this.geometry);
+    const vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
+    const indexBuffer = new THREE.BufferAttribute(this.triangleIndices, 1);
+
+    this.geometry.setAttribute('position', vertexBuffer);
+    this.geometry.setIndex(indexBuffer);
+
+    this.mesh = new NodeMesh(THREE.Mesh, this.geometry, this.data);
     this.meshes.push(this.mesh);
 
     this.buildMaterial();
-  }
-
-  /**
-   * Initialize the buffer geometry
-   */
-  private initializeBufferGeometry () {
-    this.vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
-    this.indexBuffer = new THREE.BufferAttribute(this.triangleIndices, 1);
-
-    this.geometry.setAttribute('position', this.vertexBuffer);
-    this.geometry.setIndex(this.indexBuffer);
   }
 
   /**
@@ -50,8 +44,7 @@ class PolyMesh extends Block {
   handleVerticesChange () {
     super.handleVerticesChange();
 
-    this.vertexBuffer.set(this.vertices);
-    this.vertexBuffer.needsUpdate = true;
+    this.mesh.vertices = this.vertices;
   }
 
   get boundingSphere () : THREE.Sphere {
@@ -62,8 +55,6 @@ class PolyMesh extends Block {
   triangleIndices: Uint32Array;
 
   geometry: THREE.BufferGeometry;
-  private vertexBuffer: THREE.BufferAttribute;
-  private indexBuffer: THREE.BufferAttribute;
 
   mesh: NodeMesh;
 

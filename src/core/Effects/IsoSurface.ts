@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import * as Nodes from 'three/examples/jsm/nodes/Nodes';
 
 import {
@@ -47,22 +46,21 @@ class IsoSurface extends Effect {
       this.dynamic = options.dynamic !== undefined ? options.dynamic : this.dynamic;
     }
 
-    this.inputComponent = this.inputs[0];
-
-    this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.dynamic);
-    this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
-
     // Remove meshes, only the iso-surface will stay
     this.meshes = [];
 
-    [this.vertices, this.triangleIndices] = this.isoSurfaceUtils.computeIsoSurface(this.value);
+    this.inputComponent = this.inputs[0];
 
-    this.geometry = new THREE.BufferGeometry();
+    this.isoSurfaceUtils = new IsoSurfaceUtils(this.parent.vertices, this.parent.tetrahedronIndices, this.data, this.dynamic);
+    this.isoSurfaceUtils.updateInput(this.inputComponent.array);
 
-    this.vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
-    this.geometry.setAttribute('position', this.vertexBuffer);
+    this.isoSurfaceUtils.computeIsoSurface(this.value);
+    this.mesh = this.isoSurfaceUtils.mesh;
+    this.vertices = this.isoSurfaceUtils.vertices;
+    this.data = this.mesh.data;
 
-    this.mesh = new NodeMesh(THREE.Mesh, this.geometry);
+    this.mesh.copyMaterial(this.parent.meshes[0]);
+
     this.meshes.push(this.mesh);
 
     this.buildMaterial();
@@ -73,12 +71,9 @@ class IsoSurface extends Effect {
   }
 
   updateGeometry () {
-    [this.vertices, this.triangleIndices] = this.isoSurfaceUtils.computeIsoSurface(this.value);
+    this.isoSurfaceUtils.computeIsoSurface(this.value);
 
-    // Not using this.vertexBuffer.set because the number of vertices can change
-    this.geometry.dispose();
-    this.vertexBuffer = new THREE.BufferAttribute(this.vertices, 3);
-    this.geometry.setAttribute('position', this.vertexBuffer);
+    this.vertices = this.isoSurfaceUtils.vertices;
 
     this.trigger('change:geometry');
   }
@@ -92,14 +87,12 @@ class IsoSurface extends Effect {
       this.inputComponent = this.inputs[0];
       this.inputComponent.on('change:array', this.onInputArrayChange.bind(this));
 
-      this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
-
-      this.updateGeometry();
+      this.onInputArrayChange();
     }
   }
 
   onInputArrayChange () {
-    this.isoSurfaceUtils.updateInput(this.inputComponent.array, this.parent.data);
+    this.isoSurfaceUtils.updateInput(this.inputComponent.array);
 
     this.updateGeometry();
   }
@@ -121,8 +114,6 @@ class IsoSurface extends Effect {
 
   private isoSurfaceUtils: IsoSurfaceUtils;
 
-  private vertexBuffer: THREE.BufferAttribute;
-  private geometry: THREE.BufferGeometry;
   private mesh: NodeMesh;
 
   private _value: number = 0;
