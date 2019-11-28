@@ -19,28 +19,12 @@ import {
 import '../css/odysis.css'
 
 import {
-  Scene, Renderer
-} from './core/Scene';
-
-import {
-  Data, Component
-} from './core/Data';
-
-import {
-  Block
-} from './core/Block';
-
-import {
-  Effect
-} from './core/EffectBlock';
-
-import {
-  PolyMesh, TetraMesh
-} from './core/MeshBlock';
-
-import {
+  Scene, Renderer,
+  Data, Component,
+  Block, Effect,
+  PolyMesh, TetraMesh,
   Alpha, IsoColor, IsoSurface, Threshold
-} from './core/Effects/effects';
+} from 'ganyjs';
 
 
 function deserialize_float32array (data: any, manager: any) {
