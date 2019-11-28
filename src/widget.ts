@@ -16,7 +16,7 @@ import {
 } from './version';
 
 // Import the CSS
-import '../css/odysis.css'
+import '../css/gany.css'
 
 import {
   Scene, Renderer,
@@ -36,12 +36,12 @@ function deserialize_uint32array (data: any, manager: any) {
 }
 
 
-abstract class _OdysisWidgetModel extends WidgetModel {
+abstract class _GanyWidgetModel extends WidgetModel {
 
   defaults () {
     return {...super.defaults(),
-      _model_module: _OdysisWidgetModel.model_module,
-      _model_module_version: _OdysisWidgetModel.model_module_version,
+      _model_module: _GanyWidgetModel.model_module,
+      _model_module_version: _GanyWidgetModel.model_module_version,
     };
   }
 
@@ -51,14 +51,14 @@ abstract class _OdysisWidgetModel extends WidgetModel {
 }
 
 
-abstract class _OdysisDOMWidgetModel extends DOMWidgetModel {
+abstract class _GanyDOMWidgetModel extends DOMWidgetModel {
 
   defaults () {
     return {...super.defaults(),
-      _model_module: _OdysisDOMWidgetModel.model_module,
-      _model_module_version: _OdysisDOMWidgetModel.model_module_version,
-      _view_module: _OdysisDOMWidgetModel.view_module,
-      _view_module_version: _OdysisDOMWidgetModel.view_module_version,
+      _model_module: _GanyDOMWidgetModel.model_module,
+      _model_module_version: _GanyDOMWidgetModel.model_module_version,
+      _view_module: _GanyDOMWidgetModel.view_module,
+      _view_module_version: _GanyDOMWidgetModel.view_module_version,
     };
   }
 
@@ -71,7 +71,7 @@ abstract class _OdysisDOMWidgetModel extends DOMWidgetModel {
 
 
 export
-class ComponentModel extends _OdysisWidgetModel {
+class ComponentModel extends _GanyWidgetModel {
 
   defaults () {
     return {...super.defaults(),
@@ -92,7 +92,7 @@ class ComponentModel extends _OdysisWidgetModel {
   component: Component;
 
   static serializers: ISerializers = {
-    ..._OdysisWidgetModel.serializers,
+    ..._GanyWidgetModel.serializers,
     array: { deserialize: deserialize_float32array },
   }
 
@@ -102,7 +102,7 @@ class ComponentModel extends _OdysisWidgetModel {
 
 
 export
-class DataModel extends _OdysisWidgetModel {
+class DataModel extends _GanyWidgetModel {
 
   defaults() {
     return {...super.defaults(),
@@ -125,7 +125,7 @@ class DataModel extends _OdysisWidgetModel {
   data: Data;
 
   static serializers: ISerializers = {
-    ..._OdysisWidgetModel.serializers,
+    ..._GanyWidgetModel.serializers,
     components: { deserialize: (unpack_models as any) },
   }
 
@@ -134,7 +134,7 @@ class DataModel extends _OdysisWidgetModel {
 }
 
 
-abstract class BlockModel extends _OdysisWidgetModel {
+abstract class BlockModel extends _GanyWidgetModel {
 
   defaults() {
     return {...super.defaults(),
@@ -180,7 +180,7 @@ abstract class BlockModel extends _OdysisWidgetModel {
   abstract createBlock() : Block;
 
   static serializers: ISerializers = {
-    ..._OdysisWidgetModel.serializers,
+    ..._GanyWidgetModel.serializers,
     vertices: { deserialize: deserialize_float32array },
     data: { deserialize: (unpack_models as any) },
     environment_meshes: { deserialize: (unpack_models as any) },
@@ -462,7 +462,7 @@ class ThresholdModel extends EffectModel {
 
 
 export
-class SceneModel extends _OdysisDOMWidgetModel {
+class SceneModel extends _GanyDOMWidgetModel {
 
   defaults() {
     return {...super.defaults(),
@@ -507,7 +507,7 @@ class SceneModel extends _OdysisDOMWidgetModel {
   scene: Scene;
 
   static serializers: ISerializers = {
-    ..._OdysisDOMWidgetModel.serializers,
+    ..._GanyDOMWidgetModel.serializers,
     children: { deserialize: (unpack_models as any) },
   }
 
@@ -521,7 +521,7 @@ export
 class SceneView extends DOMWidgetView {
 
   render () {
-    this.el.classList.add('odysis-scene');
+    this.el.classList.add('gany-scene');
 
     this.renderer = new Renderer(this.el, this.model.scene);
 

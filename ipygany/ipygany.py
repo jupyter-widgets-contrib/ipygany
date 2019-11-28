@@ -24,13 +24,13 @@ from .vtk_loader import (
 from ._frontend import module_version, module_name
 
 
-class _OdysisWidgetBase(Widget):
+class _GanyWidgetBase(Widget):
     _model_module = Unicode(module_name).tag(sync=True)
 
     _model_module_version = Unicode(module_version).tag(sync=True)
 
 
-class _OdysisDOMWidgetBase(DOMWidget):
+class _GanyDOMWidgetBase(DOMWidget):
     _view_module = Unicode(module_name).tag(sync=True)
     _model_module = Unicode(module_name).tag(sync=True)
 
@@ -38,7 +38,7 @@ class _OdysisDOMWidgetBase(DOMWidget):
     _model_module_version = Unicode(module_version).tag(sync=True)
 
 
-class Component(_OdysisWidgetBase):
+class Component(_GanyWidgetBase):
     """A data component widget."""
 
     _model_name = Unicode('ComponentModel').tag(sync=True)
@@ -52,7 +52,7 @@ class Component(_OdysisWidgetBase):
     # TODO Compute min and max in the constructor?
 
 
-class Data(_OdysisWidgetBase):
+class Data(_GanyWidgetBase):
     """A data widget."""
 
     _model_name = Unicode('DataModel').tag(sync=True)
@@ -98,7 +98,7 @@ def _update_data_widget(grid_data, block_widget):
             component_widget.array = component['array']
 
 
-class Block(_OdysisWidgetBase):
+class Block(_GanyWidgetBase):
     """A 3-D element widget.
 
     This class is not intended to be instantiated directly.
@@ -353,7 +353,7 @@ class Threshold(Effect):
         return self.parent.data[0].name
 
 
-class Scene(_OdysisDOMWidgetBase):
+class Scene(_GanyDOMWidgetBase):
     """A 3-D Scene widget."""
 
     _view_name = Unicode('SceneView').tag(sync=True)

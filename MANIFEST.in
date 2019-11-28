@@ -8,7 +8,7 @@ include .coverage.rc
 include tsconfig.json
 include package.json
 include webpack.config.js
-include odysis/labextension/*.tgz
+include ipygany/labextension/*.tgz
 
 # Documentation
 graft docs
@@ -25,7 +25,7 @@ graft tests
 prune tests/build
 
 # Javascript files
-graft odysis/nbextension
+graft ipygany/nbextension
 graft src
 prune **/node_modules
 prune coverage

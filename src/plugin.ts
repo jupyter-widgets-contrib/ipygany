@@ -19,7 +19,7 @@ import {
   MODULE_NAME, MODULE_VERSION
 } from './version';
 
-const EXTENSION_ID = 'odysis:plugin';
+const EXTENSION_ID = 'ipygany:plugin';
 
 /**
  * The example plugin.

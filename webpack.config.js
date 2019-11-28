@@ -27,7 +27,7 @@ module.exports = [
     entry: './src/extension.ts',
     output: {
       filename: 'index.js',
-      path: path.resolve(__dirname, 'odysis', 'nbextension', 'static'),
+      path: path.resolve(__dirname, 'ipygany', 'nbextension', 'static'),
       libraryTarget: 'amd'
     },
     module: {
@@ -39,7 +39,7 @@ module.exports = [
   },
 
   /**
-   * Embeddable odysis bundle
+   * Embeddable ipygany bundle
    *
    * This bundle is almost identical to the notebook extension bundle. The only
    * difference is in the configuration of the webpack public path for the
@@ -54,8 +54,8 @@ module.exports = [
         filename: 'index.js',
         path: path.resolve(__dirname, 'dist'),
         libraryTarget: 'amd',
-        library: "odysis",
-        publicPath: 'https://unpkg.com/odysis@' + version + '/dist/'
+        library: "ipygany",
+        publicPath: 'https://unpkg.com/ipygany@' + version + '/dist/'
     },
     devtool: 'source-map',
     module: {
@@ -76,7 +76,7 @@ module.exports = [
     output: {
       filename: 'embed-bundle.js',
       path: path.resolve(__dirname, 'docs', 'source', '_static'),
-      library: "odysis",
+      library: "ipygany",
       libraryTarget: 'amd'
     },
     module: {

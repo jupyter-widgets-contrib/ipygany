@@ -145,12 +145,12 @@ $RECYCLE.BIN/
 # ----
 
 **/node_modules/
-odysis/nbextension/static/index.*
-odysis/labextension/*.tgz
+ipygany/nbextension/static/index.*
+ipygany/labextension/*.tgz
 
 # Coverage data
 # -------------
 **/coverage/
 
 # Packed lab extensions
-odysis/labextension
+ipygany/labextension

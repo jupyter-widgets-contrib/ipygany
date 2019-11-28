@@ -1,5 +1,5 @@
 {
-  "name": "odysis",
+  "name": "ipygany",
   "version": "0.1.0",
   "description": "Scientific Visualization in Jupyter",
   "keywords": [
@@ -13,9 +13,9 @@
     "dist/*.js",
     "css/*.css"
   ],
-  "homepage": "https://github.com/martinRenou/odysis",
+  "homepage": "https://github.com/martinRenou/ipygany",
   "bugs": {
-    "url": "https://github.com/martinRenou/odysis/issues"
+    "url": "https://github.com/martinRenou/ipygany/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -26,18 +26,18 @@
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/martinRenou/odysis"
+    "url": "https://github.com/martinRenou/ipygany"
   },
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
-    "build:labextension": "npm run clean:labextension && mkdirp odysis/labextension && cd odysis/labextension && npm pack ../..",
+    "build:labextension": "npm run clean:labextension && mkdirp ipygany/labextension && cd ipygany/labextension && npm pack ../..",
     "build:lib": "tsc",
     "build:nbextension": "webpack -p",
     "build:all": "npm run build:labextension && npm run build:nbextension",
     "clean": "npm run clean:lib && npm run clean:nbextension",
     "clean:lib": "rimraf lib",
-    "clean:labextension": "rimraf odysis/labextension",
-    "clean:nbextension": "rimraf odysis/nbextension/static/index.js",
+    "clean:labextension": "rimraf ipygany/labextension",
+    "clean:nbextension": "rimraf ipygany/nbextension/static/index.js",
     "prepack": "npm run build:lib",
     "test": "npm run test:firefox",
     "test:chrome": "karma start --browsers=Chrome tests/karma.conf.js",

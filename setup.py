@@ -19,7 +19,7 @@ from setuptools import setup
 
 
 # The name of the project
-name = 'odysis'
+name = 'ipygany'
 
 # Ensure a valid python version
 ensure_python('>=3.4')
@@ -44,10 +44,10 @@ package_data_spec = {
 }
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/odysis',
+    ('share/jupyter/nbextensions/ipygany',
         nb_path, '*.js*'),
     ('share/jupyter/lab/extensions', lab_path, '*.tgz'),
-    ('etc/jupyter/nbconfig/notebook.d' , HERE, 'odysis.json')
+    ('etc/jupyter/nbconfig/notebook.d' , HERE, 'ipygany.json')
 ]
 
 
@@ -68,7 +68,7 @@ setup_args = dict(
     packages        = find_packages(),
     author          = 'Martin Renou',
     author_email    = 'martin.renou@gmail.com',
-    url             = 'https://github.com/martinRenou/odysis',
+    url             = 'https://github.com/martinRenou/ipygany',
     license         = 'BSD',
     platforms       = "Linux, Mac OS X, Windows",
     keywords        = ['Jupyter', 'Widgets', 'IPython'],

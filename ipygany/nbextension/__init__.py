@@ -8,6 +8,6 @@ def _jupyter_nbextension_paths():
     return [{
         'section': 'notebook',
         'src': 'nbextension/static',
-        'dest': 'odysis',
-        'require': 'odysis/extension'
+        'dest': 'ipygany',
+        'require': 'ipygany/extension'
     }]

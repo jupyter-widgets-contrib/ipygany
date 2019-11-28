@@ -6,7 +6,7 @@ define(function() {
     window['requirejs'].config({
         map: {
             '*': {
-                'odysis': 'nbextensions/odysis/index',
+                'ipygany': 'nbextensions/ipygany/index',
             },
         }
     });
