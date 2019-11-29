@@ -26,4 +26,4 @@ install:
   - pip install -e .
   - if [[ $TRAVIS_OS_NAME == linux && $PYTHON_VERSION != 2.7 ]]; then jupyter labextension install .; fi
 script:
-  - flake8 ipygany
+  - flake8 ipygany --ignore=E501
