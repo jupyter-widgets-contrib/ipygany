@@ -5,7 +5,6 @@ addons:
  chrome: beta
 env:
  matrix:
-  - PYTHON_VERSION=3.5
   - PYTHON_VERSION=3.6
   - PYTHON_VERSION=3.7
 before_install:
@@ -18,9 +17,8 @@ before_install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n test-environment python=$PYTHON_VERSION
+  - conda create -q -n test-environment python=$PYTHON_VERSION ipywidgets nodejs flake8 vtk
   - source activate test-environment
-  - conda install -c conda-forge ipywidgets nodejs flake8 vtk
   - if [[ $TRAVIS_OS_NAME == linux ]]; then conda install -c conda-forge jupyterlab; fi
 install:
   - pip install -e .
