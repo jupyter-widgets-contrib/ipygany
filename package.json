@@ -13,9 +13,9 @@
     "dist/*.js",
     "css/*.css"
   ],
-  "homepage": "https://github.com/martinRenou/ipygany",
+  "homepage": "https://github.com/QuantStack/ipygany",
   "bugs": {
-    "url": "https://github.com/martinRenou/ipygany/issues"
+    "url": "https://github.com/QuantStack/ipygany/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -26,7 +26,7 @@
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/martinRenou/ipygany"
+    "url": "https://github.com/QuantStack/ipygany"
   },
   "scripts": {
     "build": "npm run build:lib && npm run build:nbextension",
