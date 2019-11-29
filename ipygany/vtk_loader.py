@@ -115,15 +115,15 @@ def get_ugrid_data(grid):
         # For each component of the array of data
         for i_comp in range(nb_components):
             component_name = arr.GetComponentName(i_comp)
-            component_name = 'X' + str(i_comp+1) if component_name is None else component_name
+            component_name = 'X' + str(i_comp + 1) if component_name is None else component_name
             component_min, component_max = arr.GetRange(i_comp)
 
             values = (arr.GetComponent(i_value, i_comp) for i_value in range(nb_values))
 
             components[component_name] = {
-              'array': array(dtype, values),
-              'min': component_min,
-              'max': component_max
+                'array': array(dtype, values),
+                'min': component_min,
+                'max': component_max
             }
 
         out[arr_name] = components
