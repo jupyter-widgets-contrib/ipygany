@@ -18,7 +18,7 @@ prune docs/gh-pages
 prune docs/dist
 
 # Examples
-exclude examples
+recursive-exclude examples *
 
 # Tests
 graft tests

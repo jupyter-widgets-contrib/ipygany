@@ -85,6 +85,7 @@ setup_args = dict(
         'Framework :: Jupyter',
     ],
     include_package_data = True,
+    exclude=['examples*'],
     install_requires = [
         'ipywidgets>=7.0.0',
         'traittypes',
