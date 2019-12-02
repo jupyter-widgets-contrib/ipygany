@@ -126,7 +126,7 @@ class Block(_GanyWidgetBase):
             for data in self.data:
                 if data.name == data_name:
                     return data[component_name]
-                raise KeyError('Data {} not found.'.format(key))
+            raise KeyError('Data {} not found.'.format(data_name))
 
         if isinstance(data_name, int):
             return self.data[data_name][component_name]
@@ -193,7 +193,7 @@ class PolyMesh(Block):
             if reload_triangles:
                 self.triangle_indices = get_ugrid_triangles(grid)
             if reload_data:
-                self.data = _update_data_widget(get_ugrid_data(grid), self)
+                _update_data_widget(get_ugrid_data(grid), self)
 
 
 class TetraMesh(PolyMesh):
@@ -277,7 +277,7 @@ class TetraMesh(PolyMesh):
             if reload_tetrahedrons:
                 self.tetrahedron_indices = get_ugrid_tetrahedrons(grid)
             if reload_data:
-                self.data = _update_data_widget(get_ugrid_data(grid), self)
+                _update_data_widget(get_ugrid_data(grid), self)
 
 
 class Effect(Block):
