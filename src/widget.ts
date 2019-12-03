@@ -231,6 +231,7 @@ class PolyMeshModel extends BlockModel {
     super.initEventListeners();
 
     this.on('change:vertices', () => { this.block.vertices = this.vertices; });
+    this.on('change:triangle_indices', () => { this.block.triangleIndices = this.triangleIndices; });
   }
 
   block: PolyMesh;
