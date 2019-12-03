@@ -1,5 +1,7 @@
 import numpy as np
 
+from ipywidgets import Widget, widget_serialization
+
 
 def array_to_binary(ar, obj=None, force_contiguous=True):
     if ar is None:
@@ -19,7 +21,18 @@ def json_to_array(json, obj=None):
     return np.array(json)
 
 
+def component_array_to_json(value, obj=None, force_contiguous=True):
+    if isinstance(value, Widget):
+        return widget_serialization['to_json'](value, obj)
+    else:
+        return array_to_binary(value, obj, force_contiguous)
+
+
 array_serialization = dict(
     to_json=array_to_binary,
     from_json=json_to_array
+)
+
+component_array_serialization = dict(
+    to_json=component_array_to_json
 )

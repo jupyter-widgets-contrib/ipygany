@@ -15,7 +15,7 @@ from ipywidgets import (
 )
 import vtk
 
-from .serialization import array_serialization
+from .serialization import array_serialization, component_array_serialization
 from .vtk_loader import (
     load_vtk, FLOAT32, UINT32,
     get_ugrid_vertices, get_ugrid_triangles, get_ugrid_tetrahedrons, get_ugrid_data
@@ -44,7 +44,7 @@ class Component(_GanyWidgetBase):
     _model_name = Unicode('ComponentModel').tag(sync=True)
 
     name = Unicode().tag(sync=True)
-    array = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
+    array = Union((Instance(Widget), Array())).tag(sync=True, **component_array_serialization)
 
     min = CFloat(allow_none=True, default_value=None)
     max = CFloat(allow_none=True, default_value=None)

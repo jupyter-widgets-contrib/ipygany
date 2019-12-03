@@ -35,6 +35,14 @@ function deserialize_uint32array (data: any, manager: any) {
     return new Uint32Array(data.data.buffer);
 }
 
+function deserialize_component_array (value: any, manager: any) {
+  if (typeof value == 'string') {
+    return unpack_models(value, manager);
+  } else {
+    return deserialize_float32array(value, manager);
+  }
+}
+
 
 abstract class _GanyWidgetModel extends WidgetModel {
 
@@ -81,19 +89,29 @@ class ComponentModel extends _GanyWidgetModel {
     };
   }
 
+  get array () {
+    const array = this.get('array');
+
+    if (array.hasOwnProperty('name') && array.name == 'NDArrayModel') {
+      return array.getNDArray().data;
+    } else {
+      return array;
+    }
+  }
+
   initialize (attributes: any, options: any) {
     super.initialize(attributes, options);
 
-    this.component = new Component(this.get('name'), this.get('array'));
+    this.component = new Component(this.get('name'), this.array);
 
-    this.on('change:array', () => { this.component.array = this.get('array'); });
+    this.on('change:array', () => { this.component.array = this.array; });
   }
 
   component: Component;
 
   static serializers: ISerializers = {
     ..._GanyWidgetModel.serializers,
-    array: { deserialize: deserialize_float32array },
+    array: { deserialize: deserialize_component_array },
   }
 
   static model_name = 'ComponentModel';
