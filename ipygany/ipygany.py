@@ -159,7 +159,7 @@ class PolyMesh(Block):
         )
 
     @staticmethod
-    def from_vtk(path):
+    def from_vtk(path, **kwargs):
         """Pass a path to a VTK Unstructured Grid file (``.vtu``) or pass a ``vtkUnstructuredGrid`` object to use.
 
         Parameters
@@ -180,7 +180,8 @@ class PolyMesh(Block):
         return PolyMesh(
             vertices=get_ugrid_vertices(grid),
             triangle_indices=get_ugrid_triangles(grid),
-            data=_grid_data_to_data_widget(get_ugrid_data(grid))
+            data=_grid_data_to_data_widget(get_ugrid_data(grid)),
+            **kwargs
         )
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True):
@@ -240,7 +241,7 @@ class TetraMesh(PolyMesh):
         )
 
     @staticmethod
-    def from_vtk(path):
+    def from_vtk(path, **kwargs):
         """Pass a path to a VTK Unstructured Grid file (``.vtu``) or pass a ``vtkUnstructuredGrid`` object to use.
 
         Parameters
@@ -262,7 +263,8 @@ class TetraMesh(PolyMesh):
             vertices=get_ugrid_vertices(grid),
             triangle_indices=get_ugrid_triangles(grid),
             tetrahedron_indices=get_ugrid_tetrahedrons(grid),
-            data=_grid_data_to_data_widget(get_ugrid_data(grid))
+            data=_grid_data_to_data_widget(get_ugrid_data(grid)),
+            **kwargs
         )
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True, reload_tetrahedrons=False):
