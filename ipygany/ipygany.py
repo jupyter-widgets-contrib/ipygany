@@ -364,6 +364,7 @@ class Scene(_GanyDOMWidgetBase):
     children = List(Instance(Block)).tag(sync=True, **widget_serialization)
 
     background_color = Color('#fff').tag(sync=True)
+    background_opacity = CFloat(0.).tag(sync=True)
 
     def __init__(self, children=[], **kwargs):
         """Construct a Scene."""
