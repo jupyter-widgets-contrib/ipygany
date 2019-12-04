@@ -488,6 +488,7 @@ class SceneModel extends _GanyDOMWidgetModel {
       _model_name: SceneModel.model_name,
       _view_name: SceneModel.view_name,
       background_color: '#fff',
+      background_opacity: 0.,
       children: [],
     };
   }
@@ -499,6 +500,14 @@ class SceneModel extends _GanyDOMWidgetModel {
 
     this.updateChildren();
     this.on('change:children', this.updateChildren.bind(this));
+  }
+
+  get backgroundColor () : string {
+    return this.get('background_color')
+  }
+
+  get backgroundOpacity () : number {
+    return this.get('background_opacity')
   }
 
   private updateChildren () {
@@ -546,7 +555,8 @@ class SceneView extends DOMWidgetView {
 
     this.displayed.then(() => {
       this.renderer.initialize();
-      this.renderer.backgroundColor = this.model.get('background_color');
+      this.renderer.backgroundColor = this.model.backgroundColor
+      this.renderer.backgroundOpacity = this.model.backgroundOpacity;
 
       this.initEventListeners();
     });
@@ -555,7 +565,8 @@ class SceneView extends DOMWidgetView {
   initEventListeners () {
     window.addEventListener('resize', this.resize.bind(this), false);
 
-    this.model.on('change:background_color', () => { this.renderer.backgroundColor = this.model.get('background_color'); });
+    this.model.on('change:background_color', () => { this.renderer.backgroundColor = this.model.backgroundColor; });
+    this.model.on('change:background_opacity', () => { this.renderer.backgroundOpacity = this.model.backgroundOpacity; });
   }
 
   processPhosphorMessage (msg: Message) {
