@@ -89,8 +89,7 @@ setup_args = dict(
     install_requires = [
         'ipywidgets>=7.0.0',
         'traittypes',
-        'numpy',
-        'vtk',
+        'numpy'
     ],
     extras_require = {
         'test': [
@@ -99,7 +98,7 @@ setup_args = dict(
             'nbval',
         ],
         'examples': [
-            # Any requirements for the examples to run
+            'vtk'
         ],
         'docs': [
             'sphinx>=1.5',
