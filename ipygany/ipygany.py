@@ -13,15 +13,13 @@ from ipywidgets import (
     DOMWidget, Widget,
     Color
 )
-import vtk
 
 from .serialization import array_serialization, component_array_serialization
-from .vtk_loader import (
-    load_vtk, FLOAT32, UINT32,
-    get_ugrid_vertices, get_ugrid_triangles, get_ugrid_tetrahedrons, get_ugrid_data
-)
 
 from ._frontend import module_version, module_name
+
+FLOAT32 = 'f'
+UINT32 = 'I'
 
 
 class _GanyWidgetBase(Widget):
@@ -167,6 +165,13 @@ class PolyMesh(Block):
         path : str or vtk.vtkUnstructuredGrid
             The path to the VTK file or an unstructured grid in memory.
         """
+        import vtk
+
+        from .vtk_loader import (
+            load_vtk,
+            get_ugrid_vertices, get_ugrid_triangles, get_ugrid_data
+        )
+
         if isinstance(path, str):
             grid = load_vtk(path)
         elif isinstance(path, vtk.vtkUnstructuredGrid):
@@ -186,6 +191,10 @@ class PolyMesh(Block):
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True):
         """Reload a vtk file, entirely or partially."""
+        from .vtk_loader import (
+            load_vtk, get_ugrid_vertices, get_ugrid_triangles, get_ugrid_data
+        )
+
         grid = load_vtk(path)
 
         with self.hold_sync():
@@ -249,6 +258,12 @@ class TetraMesh(PolyMesh):
         path : str or vtk.vtkUnstructuredGrid
             The path to the VTK file or an unstructured grid in memory.
         """
+        import vtk
+
+        from .vtk_loader import (
+            load_vtk, get_ugrid_vertices, get_ugrid_triangles, get_ugrid_tetrahedrons, get_ugrid_data
+        )
+
         if isinstance(path, str):
             grid = load_vtk(path)
         elif isinstance(path, vtk.vtkUnstructuredGrid):
@@ -269,6 +284,10 @@ class TetraMesh(PolyMesh):
 
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True, reload_tetrahedrons=False):
         """Reload a vtk file, entirely or partially."""
+        from .vtk_loader import (
+            load_vtk, get_ugrid_vertices, get_ugrid_triangles, get_ugrid_tetrahedrons, get_ugrid_data
+        )
+
         grid = load_vtk(path)
 
         with self.hold_sync():
