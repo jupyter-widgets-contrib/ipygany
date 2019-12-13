@@ -371,6 +371,21 @@ class Effect(Block):
         super(Effect, self).__init__(parent=parent, **kwargs)
 
 
+class Warp(Effect):
+    """A warp effect to another block."""
+
+    _model_name = Unicode('WarpModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+
+    offset = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=0.).tag(sync=True)
+    factor = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=1.).tag(sync=True)
+
+    @default('input')
+    def _default_input(self):
+        return self.parent.data[0].name
+
+
 class Alpha(Effect):
     """An transparency effect to another block."""
 

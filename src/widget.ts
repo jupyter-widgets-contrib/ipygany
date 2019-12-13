@@ -23,7 +23,7 @@ import {
   Data, Component,
   Block, Effect,
   PolyMesh, TetraMesh, PointCloud,
-  Alpha, IsoColor, IsoSurface, Threshold
+  Warp, Alpha, IsoColor, IsoSurface, Threshold
 } from 'ganyjs';
 
 
@@ -348,6 +348,57 @@ abstract class EffectModel extends BlockModel {
 
 
 export
+class WarpModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: WarpModel.model_name,
+    };
+  }
+
+  get input () {
+    return this.get('input');
+  }
+
+  get offset () : THREE.Vector3 {
+    const offset = this.get('offset');
+
+    if (typeof offset == 'number') {
+      return new THREE.Vector3(offset, offset, offset);
+    } else {
+      return new THREE.Vector3(offset[0], offset[1], offset[2]);
+    }
+  }
+
+  get factor () {
+    const factor = this.get('factor');
+
+    if (typeof factor == 'number') {
+      return new THREE.Vector3(factor, factor, factor);
+    } else {
+      return new THREE.Vector3(factor[0], factor[1], factor[2]);;
+    }
+  }
+
+  createBlock () {
+    return new Warp(this.parent.block, this.input, this.factor, this.offset);
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:factor', () => { this.block.factor = this.factor; });
+    this.on('change:offset', () => { this.block.offset = this.offset; });
+  }
+
+  block: Warp;
+
+  static model_name = 'WarpModel';
+
+}
+
+
+export
 class AlphaModel extends EffectModel {
 
   defaults() {
@@ -405,8 +456,8 @@ class IsoColorModel extends EffectModel {
   initEventListeners () : void {
     super.initEventListeners();
 
-    this.on('change:min', () => { this.block.min = this.min });
-    this.on('change:max', () => { this.block.max = this.max });
+    this.on('change:min', () => { this.block.min = this.min; });
+    this.on('change:max', () => { this.block.max = this.max; });
   }
 
   block: IsoColor;
