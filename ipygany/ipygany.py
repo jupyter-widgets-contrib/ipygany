@@ -301,6 +301,61 @@ class TetraMesh(PolyMesh):
                 _update_data_widget(get_ugrid_data(grid), self)
 
 
+class PointCloud(Block):
+    """A 3-D point-cloud widget."""
+
+    _model_name = Unicode('PointCloudModel').tag(sync=True)
+
+    def __init__(self, vertices=[], data=[], **kwargs):
+        """Construct a PointCloud."""
+        super(PointCloud, self).__init__(vertices=vertices, data=data, **kwargs)
+
+    @staticmethod
+    def from_vtk(path, **kwargs):
+        """Pass a path to a VTK Unstructured Grid file (``.vtu``) or pass a ``vtkUnstructuredGrid`` object to use.
+
+        Parameters
+        ----------
+        path : str or vtk.vtkUnstructuredGrid
+            The path to the VTK file or an unstructured grid in memory.
+        """
+        import vtk
+
+        from .vtk_loader import (
+            load_vtk, get_ugrid_vertices, get_ugrid_data
+        )
+
+        if isinstance(path, str):
+            grid = load_vtk(path)
+        elif isinstance(path, vtk.vtkUnstructuredGrid):
+            grid = path
+        elif hasattr(path, "cast_to_unstructured_grid"):
+            # Allows support for any PyVista mesh
+            grid = path.cast_to_unstructured_grid()
+        else:
+            raise TypeError("Only unstructured grids supported at this time.")
+
+        return PointCloud(
+            vertices=get_ugrid_vertices(grid),
+            data=_grid_data_to_data_widget(get_ugrid_data(grid)),
+            **kwargs
+        )
+
+    def reload(self, path, reload_vertices=False, reload_data=True):
+        """Reload a vtk file, entirely or partially."""
+        from .vtk_loader import (
+            load_vtk, get_ugrid_vertices, get_ugrid_data
+        )
+
+        grid = load_vtk(path)
+
+        with self.hold_sync():
+            if reload_vertices:
+                self.vertices = get_ugrid_vertices(grid)
+            if reload_data:
+                _update_data_widget(get_ugrid_data(grid), self)
+
+
 class Effect(Block):
     """An effect applied to another block.
 
