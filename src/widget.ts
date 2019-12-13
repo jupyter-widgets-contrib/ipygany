@@ -22,7 +22,7 @@ import {
   Scene, Renderer,
   Data, Component,
   Block, Effect,
-  PolyMesh, TetraMesh,
+  PolyMesh, TetraMesh, PointCloud,
   Alpha, IsoColor, IsoSurface, Threshold
 } from 'ganyjs';
 
@@ -275,6 +275,32 @@ class TetraMeshModel extends PolyMeshModel {
   }
 
   static model_name = 'TetraMeshModel';
+
+}
+
+
+export
+class PointCloudModel extends BlockModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: PointCloudModel.model_name,
+    };
+  }
+
+  createBlock () {
+    return new PointCloud(this.vertices, this.data, {environmentMeshes: this.environmentMeshes});
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:vertices', () => { this.block.vertices = this.vertices; });
+  }
+
+  block: PointCloud;
+
+  static model_name = 'PointCloudModel';
 
 }
 
