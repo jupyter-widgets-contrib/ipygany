@@ -4,6 +4,7 @@
 # Copyright (c) Martin Renou.
 # Distributed under the terms of the Modified BSD License.
 
+from .colormaps import colormaps
 from .ipygany import (  # noqa
     PolyMesh, TetraMesh, PointCloud,
     Scene,

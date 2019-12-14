@@ -508,6 +508,10 @@ class IsoColorModel extends EffectModel {
     return this.get('max');
   }
 
+  get colormap () : string {
+    return this.get('colormap');
+  }
+
   get input () {
     const input = this.get('input');
 
@@ -515,7 +519,7 @@ class IsoColorModel extends EffectModel {
   }
 
   createBlock () {
-    return new IsoColor(this.parent.block, this.input, this.min, this.max);
+    return new IsoColor(this.parent.block, this.input, this.min, this.max, this.colormap);
   }
 
   initEventListeners () : void {
@@ -523,6 +527,7 @@ class IsoColorModel extends EffectModel {
 
     this.on('change:min', () => { this.block.min = this.min; });
     this.on('change:max', () => { this.block.max = this.max; });
+    this.on('change:colormap', () => { this.block.colorMap = this.colormap; });
   }
 
   block: IsoColor;
