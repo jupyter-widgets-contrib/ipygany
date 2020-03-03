@@ -398,6 +398,14 @@ class Alpha(Effect):
         return 0.7
 
 
+class RGB(Effect):
+    """A color effect to another block."""
+
+    _model_name = Unicode('RGBModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+
+
 class IsoColor(Effect):
     """An IsoColor effect to another block."""
 
