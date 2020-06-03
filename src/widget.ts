@@ -23,7 +23,7 @@ import {
   Data, Component,
   Block, Effect,
   PolyMesh, TetraMesh, PointCloud,
-  Warp, Alpha, IsoColor, IsoSurface, Threshold
+  Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold
 } from 'ganyjs';
 
 
@@ -420,6 +420,30 @@ class AlphaModel extends EffectModel {
   block: Alpha;
 
   static model_name = 'AlphaModel';
+
+}
+
+
+export
+class RGBModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: RGBModel.model_name,
+    };
+  }
+
+  get input () {
+    return this.get('input');
+  }
+
+  createBlock () {
+    return new RGB(this.parent.block, this.input);
+  }
+
+  block: RGB;
+
+  static model_name = 'RGBModel';
 
 }
 
