@@ -53,7 +53,7 @@
     "backbone": "^1.4.0",
     "binary-search-tree": "^0.2.6",
     "ganyjs": "^0.2.0",
-    "three": "^0.110.0",
+    "three": "^0.112.0",
     "uuid": "^3.3.3"
   },
   "devDependencies": {
