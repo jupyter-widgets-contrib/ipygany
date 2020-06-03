@@ -5,10 +5,10 @@
 # Distributed under the terms of the Modified BSD License.
 
 from .ipygany import (  # noqa
-  PolyMesh, TetraMesh, PointCloud,
-  Scene,
-  Data, Component,
-  Alpha, IsoColor, Threshold, IsoSurface, Warp
+    PolyMesh, TetraMesh, PointCloud,
+    Scene,
+    Data, Component,
+    Alpha, IsoColor, Threshold, IsoSurface, Warp
 )
 from ._version import __version__, version_info  # noqa
 
