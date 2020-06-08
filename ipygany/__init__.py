@@ -8,7 +8,8 @@ from .ipygany import (  # noqa
     PolyMesh, TetraMesh, PointCloud,
     Scene,
     Data, Component,
-    Alpha, RGB, IsoColor, Threshold, IsoSurface, Warp
+    Alpha, RGB, IsoColor, Threshold, IsoSurface, Warp,
+    Water
 )
 from ._version import __version__, version_info  # noqa
 

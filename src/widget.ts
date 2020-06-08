@@ -23,7 +23,8 @@ import {
   Data, Component,
   Block, Effect,
   PolyMesh, TetraMesh, PointCloud,
-  Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold
+  Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold,
+  Water,
 } from 'ganyjs';
 
 
@@ -582,6 +583,26 @@ class ThresholdModel extends EffectModel {
 
 
 export
+class WaterModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: WaterModel.model_name,
+    };
+  }
+
+  createBlock () {
+    return new Water(this.parent.block);
+  }
+
+  block: Water;
+
+  static model_name = 'WaterModel';
+
+}
+
+
+export
 class SceneModel extends _GanyDOMWidgetModel {
 
   defaults() {
@@ -629,7 +650,7 @@ class SceneModel extends _GanyDOMWidgetModel {
       block.scale = scale;
       block.position = new THREE.Vector3(-position.x, -position.y, -position.z);
 
-      this.scene.addChild(block);
+      this.scene.addBlock(block);
     }
   }
 

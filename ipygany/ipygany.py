@@ -452,6 +452,12 @@ class Threshold(Effect):
         return self.parent.data[0].name
 
 
+class Water(Effect):
+    """An nice Water effect to another block."""
+
+    _model_name = Unicode('WaterModel').tag(sync=True)
+
+
 class Scene(_GanyDOMWidgetBase):
     """A 3-D Scene widget."""
 
