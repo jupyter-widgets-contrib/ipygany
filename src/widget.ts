@@ -591,8 +591,14 @@ class UnderWaterModel extends EffectModel {
     };
   }
 
+  get input () {
+    const input = this.get('input');
+
+    return typeof input == 'string' ? input : [input];
+  }
+
   createBlock () {
-    return new UnderWater(this.parent.block);
+    return new UnderWater(this.parent.block, this.input);
   }
 
   block: UnderWater;

@@ -150,7 +150,7 @@ class PolyMesh(Block):
 
         # If there are no triangle indices, assume vertices are given in the right order for constructing the triangles.
         if triangle_indices.size == 0:
-            triangle_indices = np.arange(vertices.size, dtype=np.UINT32)
+            triangle_indices = np.arange(vertices.size, dtype=np.uint32)
 
         super(PolyMesh, self).__init__(
             vertices=vertices, triangle_indices=triangle_indices, data=data, **kwargs
@@ -456,6 +456,12 @@ class UnderWater(Effect):
     """An nice UnderWater effect to another block."""
 
     _model_name = Unicode('UnderWaterModel').tag(sync=True)
+
+    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode())).tag(sync=True)
+
+    @default('input')
+    def _default_input(self):
+        return self.parent.data[0].name
 
 
 class Water(Effect):
