@@ -452,10 +452,18 @@ class Threshold(Effect):
         return self.parent.data[0].name
 
 
+class UnderWater(Effect):
+    """An nice UnderWater effect to another block."""
+
+    _model_name = Unicode('UnderWaterModel').tag(sync=True)
+
+
 class Water(Effect):
     """An nice Water effect to another block."""
 
     _model_name = Unicode('WaterModel').tag(sync=True)
+
+    under_water_blocks = List(Instance(UnderWater)).tag(sync=True, **widget_serialization)
 
 
 class Scene(_GanyDOMWidgetBase):

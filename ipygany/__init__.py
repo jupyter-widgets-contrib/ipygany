@@ -9,7 +9,7 @@ from .ipygany import (  # noqa
     Scene,
     Data, Component,
     Alpha, RGB, IsoColor, Threshold, IsoSurface, Warp,
-    Water
+    Water, UnderWater
 )
 from ._version import __version__, version_info  # noqa
 

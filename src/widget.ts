@@ -24,7 +24,7 @@ import {
   Block, Effect,
   PolyMesh, TetraMesh, PointCloud,
   Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold,
-  Water,
+  Water, UnderWater,
 } from 'ganyjs';
 
 
@@ -583,21 +583,51 @@ class ThresholdModel extends EffectModel {
 
 
 export
+class UnderWaterModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: UnderWaterModel.model_name,
+    };
+  }
+
+  createBlock () {
+    return new UnderWater(this.parent.block);
+  }
+
+  block: UnderWater;
+
+  static model_name = 'UnderWaterModel';
+
+}
+
+
+export
 class WaterModel extends EffectModel {
 
   defaults() {
     return {...super.defaults(),
       _model_name: WaterModel.model_name,
+      under_water_blocks: [],
     };
   }
 
+  get underWaterBlocks () : UnderWater[] {
+    return this.get('under_water_blocks').map((underWaterBlockWidget: UnderWaterModel) => underWaterBlockWidget.block);
+  }
+
   createBlock () {
-    return new Water(this.parent.block);
+    return new Water(this.parent.block, this.underWaterBlocks);
   }
 
   block: Water;
 
   static model_name = 'WaterModel';
+
+  static serializers: ISerializers = {
+    ...EffectModel.serializers,
+    under_water_blocks: { deserialize: (unpack_models as any) },
+  }
 
 }
 
