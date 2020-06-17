@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+dependencies:
+  - vtk
+  - h5py
+  - pythreejs
+  - nodejs
+  - ipygany=0.2.0
