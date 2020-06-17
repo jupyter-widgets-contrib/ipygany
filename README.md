@@ -1,53 +1,48 @@
-# ipygany
+<h1 align="center">ipygany</h1>
+<h2 align="center"> Jupyter Interactive Widgets library for 3-D mesh analysis
 
-3-D Scientific Visualization in Jupyter
 
-## Installation
+**ipygany is an early developer preview. Features and implementation are subject to change.**
 
-You can install using `pip`:
+Features
+========
 
-```bash
-pip install ipygany
-```
+**ipygany** has many features including:
 
-Or using `conda`:
+- **VTK loader** for displaying your computation results in the Jupyter Notebook
+- **Structured and Unstructured grids** support
+- 2-D cell based meshes support (quads, triangles...) as well as 3-D cell based meshes support (tetrahedrons, quadratic tetrahedrons...)
+- **Animations**
+- **IsoColor** effect
+- **Warp** effect
+- **IsoSurface** computation
+- **Threshold** effect (for visualizing only the parts that are inside of a range of data)
+- **Point cloud** visualization
+- **Water** effect, for nice water visualization with real-time caustics
+
+Most of those features are **very fast**, because they are computed entirely on the GPU.
+
+Installation
+============
+
+You can install **ipygany** with conda:
 
 ```bash
 conda install -c conda-forge ipygany
 ```
 
-And if you use jupyterlab:
+Or using pip:
+
+```bash
+pip install ipygany
+jupyter nbextension enable --py --sys-prefix ipygany
+```
+
+For JupyterLab
+--------------
+
+You need to install the labextension for **ipygany**:
 
 ```bash
 jupyter labextension install @jupyter-widgets/jupyterlab-manager ipygany
-```
-
-If you are using Jupyter Notebook 5.2 or earlier, you may also need to enable
-the nbextension:
-```bash
-jupyter nbextension enable --py [--sys-prefix|--user|--system] ipygany
-```
-
-## Installation from sources
-
-You can install using `pip`:
-
-```bash
-git clone https://github.com/martinRenou/ipygany
-cd ipygany
-pip install .
-```
-
-And if you use jupyterlab:
-
-```bash
-jupyter labextension install @jupyter-widgets/jupyterlab-manager
-jupyter labextension install .
-```
-
-And you use the classical Jupyter:
-
-```bash
-jupyter nbextension install --py --symlink --sys-prefix ipygany
-jupyter nbextension enable --py --sys-prefix ipygany
 ```
