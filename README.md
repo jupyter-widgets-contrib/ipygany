@@ -1,5 +1,5 @@
 <h1 align="center">ipygany</h1>
-<h2 align="center"> Jupyter Interactive Widgets library for 3-D mesh analysis
+<h2 align="center"> Jupyter Interactive Widgets library for 3-D mesh analysis</h2>
 
 
 **ipygany is an early developer preview. Features and implementation are subject to change.**
