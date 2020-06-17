@@ -23,7 +23,8 @@ import {
   Data, Component,
   Block, Effect,
   PolyMesh, TetraMesh, PointCloud,
-  Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold
+  Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold,
+  Water, UnderWater,
 } from 'ganyjs';
 
 
@@ -582,6 +583,62 @@ class ThresholdModel extends EffectModel {
 
 
 export
+class UnderWaterModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: UnderWaterModel.model_name,
+    };
+  }
+
+  get input () {
+    const input = this.get('input');
+
+    return typeof input == 'string' ? input : [input];
+  }
+
+  createBlock () {
+    return new UnderWater(this.parent.block, this.input);
+  }
+
+  block: UnderWater;
+
+  static model_name = 'UnderWaterModel';
+
+}
+
+
+export
+class WaterModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: WaterModel.model_name,
+      under_water_blocks: [],
+    };
+  }
+
+  get underWaterBlocks () : UnderWater[] {
+    return this.get('under_water_blocks').map((underWaterBlockWidget: UnderWaterModel) => underWaterBlockWidget.block);
+  }
+
+  createBlock () {
+    return new Water(this.parent.block, {underWaterBlocks: this.underWaterBlocks, causticsEnabled: false});
+  }
+
+  block: Water;
+
+  static model_name = 'WaterModel';
+
+  static serializers: ISerializers = {
+    ...EffectModel.serializers,
+    under_water_blocks: { deserialize: (unpack_models as any) },
+  }
+
+}
+
+
+export
 class SceneModel extends _GanyDOMWidgetModel {
 
   defaults() {
@@ -629,7 +686,7 @@ class SceneModel extends _GanyDOMWidgetModel {
       block.scale = scale;
       block.position = new THREE.Vector3(-position.x, -position.y, -position.z);
 
-      this.scene.addChild(block);
+      this.scene.addBlock(block);
     }
   }
 
