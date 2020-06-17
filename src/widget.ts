@@ -623,7 +623,7 @@ class WaterModel extends EffectModel {
   }
 
   createBlock () {
-    return new Water(this.parent.block, this.underWaterBlocks);
+    return new Water(this.parent.block, {underWaterBlocks: this.underWaterBlocks, causticsEnabled: false});
   }
 
   block: Water;
