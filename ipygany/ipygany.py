@@ -471,6 +471,9 @@ class Water(Effect):
 
     under_water_blocks = List(Instance(UnderWater)).tag(sync=True, **widget_serialization)
 
+    caustics_enabled = Bool(False).tag(sync=True)
+    caustics_factor = CFloat(0.2).tag(sync=True)
+
 
 class Scene(_GanyDOMWidgetBase):
     """A 3-D Scene widget."""
