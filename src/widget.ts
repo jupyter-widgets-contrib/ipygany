@@ -615,7 +615,17 @@ class WaterModel extends EffectModel {
     return {...super.defaults(),
       _model_name: WaterModel.model_name,
       under_water_blocks: [],
+      caustics_enabled: false,
+      caustics_factor: 0.2,
     };
+  }
+
+  get causticsFactor () : number {
+    return this.get('caustics_factor');
+  }
+
+  get causticsEnabled () : boolean {
+    return this.get('caustics_enabled');
   }
 
   get underWaterBlocks () : UnderWater[] {
@@ -623,7 +633,18 @@ class WaterModel extends EffectModel {
   }
 
   createBlock () {
-    return new Water(this.parent.block, {underWaterBlocks: this.underWaterBlocks, causticsEnabled: false});
+    return new Water(this.parent.block, {
+      underWaterBlocks: this.underWaterBlocks,
+      causticsEnabled: this.causticsEnabled,
+      causticsFactor: this.causticsFactor,
+    });
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:caustics_enabled', () => { this.block.causticsEnabled = this.causticsEnabled });
+    this.on('change:caustics_factor', () => { this.block.causticsFactor = this.causticsFactor });
   }
 
   block: Water;
