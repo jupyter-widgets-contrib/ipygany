@@ -8,6 +8,10 @@ import {
 } from '@jupyter-widgets/base';
 
 import {
+  ImageView
+} from '@jupyter-widgets/controls';
+
+import {
   Message
 } from '@phosphor/messaging';
 
@@ -186,8 +190,8 @@ abstract class BlockModel extends _GanyWidgetModel {
     return this.get('environment_meshes').map((model: any) => model.obj);
   }
 
-  get defaultColor () : string {
-    return this.get('default_color');
+  get defaultColor () : THREE.Color {
+    return new THREE.Color(this.get('default_color'));
   }
 
   initEventListeners() : void {
@@ -588,7 +592,15 @@ class UnderWaterModel extends EffectModel {
   defaults() {
     return {...super.defaults(),
       _model_name: UnderWaterModel.model_name,
+      default_color: '#F2FFD2',
+      texture: null,
     };
+  }
+
+  initialize (attributes: any, options: any) {
+    super.initialize(attributes, options);
+
+    this.setTexture();
   }
 
   get input () {
@@ -597,13 +609,48 @@ class UnderWaterModel extends EffectModel {
     return typeof input == 'string' ? input : [input];
   }
 
+  get defaultcolor () {
+    return new THREE.Color(this.get('default_color'));
+  }
+
+  setTexture () {
+    const image = this.get('texture');
+
+    if (image === null) {
+      this.block.texture = null;
+
+      return;
+    }
+
+    this.widget_manager.create_view(image, {}).then((imageView: ImageView) => {
+      const textureLoader = new THREE.TextureLoader();
+
+      textureLoader.load(imageView.el.src, (texture: THREE.Texture) => {
+        this.block.texture = texture;
+      });
+    });
+  }
+
   createBlock () {
-    return new UnderWater(this.parent.block, this.input);
+    return new UnderWater(this.parent.block, this.input, { defaultColor: this.defaultColor });
+  }
+
+  initEventListeners() : void {
+    super.initEventListeners();
+
+    this.on('change:texture', () => {
+      this.setTexture();
+    });
   }
 
   block: UnderWater;
 
   static model_name = 'UnderWaterModel';
+
+  static serializers: ISerializers = {
+    ...EffectModel.serializers,
+    texture: { deserialize: (unpack_models as any) },
+  }
 
 }
 
