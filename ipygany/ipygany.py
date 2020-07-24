@@ -11,7 +11,7 @@ from traittypes import Array
 from ipywidgets import (
     widget_serialization,
     DOMWidget, Widget,
-    Color
+    Color, Image
 )
 
 from .serialization import array_serialization, component_array_serialization
@@ -458,6 +458,9 @@ class UnderWater(Effect):
     _model_name = Unicode('UnderWaterModel').tag(sync=True)
 
     input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode())).tag(sync=True)
+
+    default_color = Color('#F2FFD2').tag(sync=True)
+    texture = Instance(Image, allow_none=True, default_value=None).tag(sync=True, **widget_serialization)
 
     @default('input')
     def _default_input(self):
