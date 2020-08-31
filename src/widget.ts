@@ -713,8 +713,8 @@ class SceneModel extends _GanyDOMWidgetModel {
     return {...super.defaults(),
       _model_name: SceneModel.model_name,
       _view_name: SceneModel.view_name,
-      background_color: '#fff',
-      background_opacity: 0.,
+      background_color: 'white',
+      background_opacity: 1.,
       children: [],
     };
   }
