@@ -680,10 +680,18 @@ class WaterModel extends EffectModel {
   }
 
   createBlock () {
+    // TODO Add texture to the package
+    const url = 'https://raw.githubusercontent.com/martinRenou/threejs-caustics/master/assets/TropicalSunnyDay_';
+
     return new Water(this.parent.block, {
       underWaterBlocks: this.underWaterBlocks,
       causticsEnabled: this.causticsEnabled,
       causticsFactor: this.causticsFactor,
+      skybox: new THREE.CubeTextureLoader().load([
+        url + 'px.jpg', url + 'nx.jpg',
+        url + 'py.jpg', url + 'ny.jpg',
+        url + 'pz.jpg', url + 'nz.jpg',
+      ]),
     });
   }
 
