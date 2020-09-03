@@ -600,6 +600,7 @@ class UnderWaterModel extends EffectModel {
       _model_name: UnderWaterModel.model_name,
       default_color: '#F2FFD2',
       texture: null,
+      texture_scale: 2.,
     };
   }
 
@@ -615,8 +616,8 @@ class UnderWaterModel extends EffectModel {
     return typeof input == 'string' ? input : [input];
   }
 
-  get defaultcolor () {
-    return new THREE.Color(this.get('default_color'));
+  get textureScale () {
+    return this.get('texture_scale');
   }
 
   setTexture () {
@@ -638,7 +639,7 @@ class UnderWaterModel extends EffectModel {
   }
 
   createBlock () {
-    return new UnderWater(this.parent.block, this.input, { defaultColor: this.defaultColor });
+    return new UnderWater(this.parent.block, this.input, { defaultColor: this.defaultColor, textureScale: this.textureScale });
   }
 
   initEventListeners() : void {
@@ -646,6 +647,9 @@ class UnderWaterModel extends EffectModel {
 
     this.on('change:texture', () => {
       this.setTexture();
+    });
+    this.on('change:texture_scale', () => {
+      this.block.textureScale = this.textureScale;
     });
   }
 
