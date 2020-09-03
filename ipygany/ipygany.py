@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Bool, Unicode, List, Instance, CFloat, Tuple, Union, default
+    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, Union, default, validate
 )
 from traittypes import Array
 from ipywidgets import (
@@ -108,7 +108,7 @@ class Block(_GanyWidgetBase):
 
     default_color = Color('#6395b0').tag(sync=True)
 
-    data = List(Instance(Data), default_value=[]).tag(sync=True, **widget_serialization)
+    data = Union((Dict(), List(Instance(Data)))).tag(sync=True, **widget_serialization)
 
     environment_meshes = List(Instance(Widget), default_value=[]).tag(sync=True, **widget_serialization)
 
@@ -130,6 +130,15 @@ class Block(_GanyWidgetBase):
             return self.data[data_name][component_name]
 
         raise KeyError('Invalid key {}.'.format(key))
+
+    @validate('data')
+    def _validate_data(self, proposal):
+        data = proposal['value']
+
+        if isinstance(data, dict):
+            return [Data(name=name, components=components) for name, components in data.items()]
+
+        return data
 
 
 class PolyMesh(Block):
