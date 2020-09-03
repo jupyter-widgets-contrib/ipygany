@@ -21,7 +21,7 @@ def json_to_array(json, obj=None):
     return np.array(json)
 
 
-def component_array_to_json(value, obj=None, force_contiguous=True):
+def data_array_to_json(value, obj=None, force_contiguous=True):
     if isinstance(value, Widget):
         return widget_serialization['to_json'](value, obj)
     else:
@@ -33,6 +33,6 @@ array_serialization = dict(
     from_json=json_to_array
 )
 
-component_array_serialization = dict(
-    to_json=component_array_to_json
+data_array_serialization = dict(
+    to_json=data_array_to_json
 )

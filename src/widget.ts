@@ -40,7 +40,7 @@ function deserialize_uint32array (data: any, manager: any) {
     return new Uint32Array(data.data.buffer);
 }
 
-function deserialize_component_array (value: any, manager: any) {
+function deserialize_data_array (value: any, manager: any) {
   if (typeof value == 'string') {
     return unpack_models(value, manager);
   } else {
@@ -98,7 +98,7 @@ class ComponentModel extends _GanyWidgetModel {
     const array = this.get('array');
 
     if (array.hasOwnProperty('name') && array.name == 'NDArrayModel') {
-      return array.getNDArray().data;
+      return new Float32Array(array.getNDArray().data);
     } else {
       return array;
     }
@@ -116,7 +116,7 @@ class ComponentModel extends _GanyWidgetModel {
 
   static serializers: ISerializers = {
     ..._GanyWidgetModel.serializers,
-    array: { deserialize: deserialize_component_array },
+    array: { deserialize: deserialize_data_array },
   }
 
   static model_name = 'ComponentModel';
@@ -178,8 +178,14 @@ abstract class BlockModel extends _GanyWidgetModel {
     this.initEventListeners();
   }
 
-  get vertices () : Float32Array {
-    return this.get('vertices');
+  get vertices () {
+    const array = this.get('vertices');
+
+    if (array.hasOwnProperty('name') && array.name == 'NDArrayModel') {
+      return new Float32Array(array.getNDArray().data);
+    } else {
+      return array;
+    }
   }
 
   get data () : Data[] {
@@ -204,7 +210,7 @@ abstract class BlockModel extends _GanyWidgetModel {
 
   static serializers: ISerializers = {
     ..._GanyWidgetModel.serializers,
-    vertices: { deserialize: deserialize_float32array },
+    vertices: { deserialize: deserialize_data_array },
     data: { deserialize: (unpack_models as any) },
     environment_meshes: { deserialize: (unpack_models as any) },
   }
