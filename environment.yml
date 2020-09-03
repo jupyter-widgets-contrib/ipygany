@@ -5,4 +5,4 @@ dependencies:
   - h5py
   - pythreejs
   - nodejs
-  - ipygany=0.3.2
+  - ipygany=0.3.3
