@@ -14,7 +14,7 @@ from ipywidgets import (
     Color, Image
 )
 
-from .serialization import array_serialization, component_array_serialization
+from .serialization import array_serialization, data_array_serialization
 
 from ._frontend import module_version, module_name
 
@@ -42,7 +42,7 @@ class Component(_GanyWidgetBase):
     _model_name = Unicode('ComponentModel').tag(sync=True)
 
     name = Unicode().tag(sync=True)
-    array = Union((Instance(Widget), Array())).tag(sync=True, **component_array_serialization)
+    array = Union((Instance(Widget), Array())).tag(sync=True, **data_array_serialization)
 
     min = CFloat(allow_none=True, default_value=None)
     max = CFloat(allow_none=True, default_value=None)
@@ -104,7 +104,7 @@ class Block(_GanyWidgetBase):
 
     _model_name = Unicode('BlockModel').tag(sync=True)
 
-    vertices = Array(default_value=array(FLOAT32)).tag(sync=True, **array_serialization)
+    vertices = Union((Instance(Widget), Array()), default_value=array(FLOAT32)).tag(sync=True, **data_array_serialization)
 
     default_color = Color('#6395b0').tag(sync=True)
 
@@ -145,12 +145,15 @@ class PolyMesh(Block):
         A PolyMesh is a triangle-based mesh. ``vertices`` is the array of points, ``triangle_indices`` is the array of triangle
         indices.
         """
-        vertices = np.asarray(vertices).flatten()
+        if not isinstance(vertices, Widget):
+            vertices = np.asarray(vertices).flatten()
         triangle_indices = np.asarray(triangle_indices).flatten()
 
         # If there are no triangle indices, assume vertices are given in the right order for constructing the triangles.
         if triangle_indices.size == 0:
-            triangle_indices = np.arange(vertices.size, dtype=np.uint32)
+            l_vertices = np.asarray(vertices.array).flatten().size if isinstance(vertices, Widget) else vertices.size
+
+            triangle_indices = np.arange(l_vertices, dtype=np.uint32)
 
         super(PolyMesh, self).__init__(
             vertices=vertices, triangle_indices=triangle_indices, data=data, **kwargs
