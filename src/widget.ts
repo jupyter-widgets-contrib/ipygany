@@ -600,6 +600,8 @@ class UnderWaterModel extends EffectModel {
       _model_name: UnderWaterModel.model_name,
       default_color: '#F2FFD2',
       texture: null,
+      texture_scale: 2.,
+      texture_position: [1., 1., 0.],
     };
   }
 
@@ -615,8 +617,13 @@ class UnderWaterModel extends EffectModel {
     return typeof input == 'string' ? input : [input];
   }
 
-  get defaultcolor () {
-    return new THREE.Color(this.get('default_color'));
+  get textureScale () {
+    return this.get('texture_scale');
+  }
+
+  get texturePosition (): THREE.Vector3 {
+    const texturePosition = this.get('texture_position');
+    return new THREE.Vector3(texturePosition[0], texturePosition[1], texturePosition[2]);
   }
 
   setTexture () {
@@ -638,7 +645,7 @@ class UnderWaterModel extends EffectModel {
   }
 
   createBlock () {
-    return new UnderWater(this.parent.block, this.input, { defaultColor: this.defaultColor });
+    return new UnderWater(this.parent.block, this.input, { defaultColor: this.defaultColor, textureScale: this.textureScale, texturePosition: this.texturePosition });
   }
 
   initEventListeners() : void {
@@ -646,6 +653,12 @@ class UnderWaterModel extends EffectModel {
 
     this.on('change:texture', () => {
       this.setTexture();
+    });
+    this.on('change:texture_scale', () => {
+      this.block.textureScale = this.textureScale;
+    });
+    this.on('change:texture_position', () => {
+      this.block.texturePosition = this.texturePosition;
     });
   }
 
