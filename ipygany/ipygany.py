@@ -465,6 +465,7 @@ class UnderWater(Effect):
     default_color = Color('#F2FFD2').tag(sync=True)
     texture = Instance(Image, allow_none=True, default_value=None).tag(sync=True, **widget_serialization)
     texture_scale = CFloat(2.).tag(sync=True)
+    texture_position = Tuple(minlen=2, maxlen=2, default_value=(1., 1., 0.)).tag(sync=True)
 
     @default('input')
     def _default_input(self):
