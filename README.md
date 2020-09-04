@@ -1,7 +1,7 @@
 <h1 align="center">ipygany</h1>
 <h2 align="center"> Jupyter Interactive Widgets library for 3-D mesh analysis</h2>
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/QuantStack/ipygany/master?filepath=examples)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/QuantStack/ipygany/stable?filepath=examples)
 
 **ipygany is an early developer preview. Features and implementation are subject to change.**
 
