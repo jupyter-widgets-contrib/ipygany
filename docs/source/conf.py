@@ -2,7 +2,7 @@
 import sphinx_rtd_theme
 
 extensions = [
-    # 'jupyter_sphinx',
+    'jupyter_sphinx',
 ]
 
 templates_path = ['_templates']
@@ -26,4 +26,4 @@ pygments_style = 'sphinx'
 html_theme = "sphinx_rtd_theme"
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 htmlhelp_basename = 'ipyganydoc'
-html_static_path = ['_static']
+html_static_path = []
