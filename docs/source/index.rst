@@ -11,3 +11,9 @@ ipygany: Scientific visualization in the Jupyter notebook
     :caption: Usage
 
     usage
+
+.. toctree::
+    :caption: Effects
+    :maxdepth: 2
+
+    api_reference/warp
