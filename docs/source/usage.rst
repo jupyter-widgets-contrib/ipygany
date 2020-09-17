@@ -17,6 +17,9 @@ You need to create a 3D ``Scene`` widget in order to display your loaded mesh in
 
 .. jupyter-execute::
 
+    import os
+    raise RuntimeError(os.getcwd())
+
     from ipygany import Scene, PolyMesh
 
     mesh = PolyMesh.from_vtk('source/assets/fastscapelib_topo.vtk')
