@@ -13,6 +13,12 @@ ipygany: Scientific visualization in the Jupyter notebook
     usage
 
 .. toctree::
+    :caption: Mesh
+    :maxdepth: 2
+
+    api_reference/polymesh
+
+.. toctree::
     :caption: Effects
     :maxdepth: 2
 

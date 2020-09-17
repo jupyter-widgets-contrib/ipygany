@@ -9,7 +9,6 @@ Loading your mesh in the Notebook
 ---------------------------------
 
 ``ipygany`` provides a ``PolyMesh`` class for loading triangle-based meshes, and a ``TetraMesh`` class for tetrahedron-based meshes.
-Your meshes can be structured or unstructured grids.
 
 You can either use vtk to load your meshes, or manually pass vertices buffers.
 
