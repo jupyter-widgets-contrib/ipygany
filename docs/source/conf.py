@@ -7,10 +7,6 @@ extensions = [
 
 templates_path = ['_templates']
 
-
-def setup(app):
-    app.add_css_file("main_stylesheet.css")
-
 master_doc = 'index'
 source_suffix = '.rst'
 
