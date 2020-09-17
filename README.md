@@ -54,6 +54,12 @@ pip install ipygany
 jupyter nbextension enable --py --sys-prefix ipygany
 ```
 
+If you want to load vtk files in `ipygany`, you also need to install vtk, you can install it with conda:
+
+```bash
+conda install -c conda-forge vtk
+```
+
 For JupyterLab
 --------------
 
