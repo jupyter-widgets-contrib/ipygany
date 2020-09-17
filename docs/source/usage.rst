@@ -1,0 +1,4 @@
+.. _usage-section:
+
+Usage
+=====
