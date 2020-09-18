@@ -458,6 +458,7 @@ class Threshold(Effect):
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
     dynamic = Bool(False).tag(sync=True)
+    inclusive = Bool(True).tag(sync=True)
 
     @default('input')
     def _default_input(self):
