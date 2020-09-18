@@ -17,6 +17,7 @@ ipygany: Scientific visualization in the Jupyter notebook
     :maxdepth: 2
 
     api_reference/polymesh
+    api_reference/tetramesh
 
 .. toctree::
     :caption: Effects

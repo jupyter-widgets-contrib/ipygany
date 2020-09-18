@@ -1,7 +1,7 @@
 PolyMesh
 ========
 
-The ``PolyMesh`` widget represents a triangle-based mesh unstructured mesh.
+The ``PolyMesh`` widget represents a triangle-based unstructured mesh.
 
 You can either load a mesh from a ``vtk`` file (needs the vtk library installed),
 or manually populate the vertices and triangle data.
@@ -60,7 +60,10 @@ Load from memory:
     vertices[:, :, 2] = z
     vertices = vertices.reshape(10000, 3)
 
-    mesh = PolyMesh(vertices=vertices, triangle_indices=triangle_indices)
+    mesh = PolyMesh(
+        vertices=vertices,
+        triangle_indices=triangle_indices
+    )
 
     scene = Scene([mesh])
     scene
