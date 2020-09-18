@@ -553,6 +553,7 @@ class ThresholdModel extends EffectModel {
       min: 0.,
       max: 0.,
       dynamic: false,
+      inclusive: true,
     };
   }
 
@@ -568,6 +569,10 @@ class ThresholdModel extends EffectModel {
     return this.get('dynamic');
   }
 
+  get inclusive (): boolean {
+    return this.get('inclusive');
+  }
+
   get input () {
     const input = this.get('input');
 
@@ -575,7 +580,10 @@ class ThresholdModel extends EffectModel {
   }
 
   createBlock () {
-    return new Threshold(this.parent.block, this.input, {min: this.min, max: this.max, dynamic: this.dynamic});
+    return new Threshold(this.parent.block, this.input, {
+      min: this.min, max: this.max,
+      dynamic: this.dynamic, inclusive: this.inclusive
+    });
   }
 
   initEventListeners () : void {
@@ -583,6 +591,7 @@ class ThresholdModel extends EffectModel {
 
     this.on('change:min', () => { this.block.min = this.min });
     this.on('change:max', () => { this.block.max = this.max });
+    this.on('change:inclusive', () => { this.block.inclusive = this.inclusive });
   }
 
   block: Threshold;

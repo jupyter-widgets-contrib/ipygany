@@ -53,7 +53,7 @@
     "@jupyter-widgets/controls": "^2.0.0",
     "backbone": "^1.4.0",
     "binary-search-tree": "^0.2.6",
-    "ganyjs": "^0.6.1",
+    "ganyjs": "^0.6.2",
     "three": "^0.118.0",
     "uuid": "^3.3.3"
   },
