@@ -16,7 +16,7 @@ Load from a ``vtk`` file:
     from ipygany import Scene, PolyMesh
 
 
-    mesh = PolyMesh.from_vtk('source/assets/fastscapelib_topo.vtk')
+    mesh = PolyMesh.from_vtk('assets/fastscapelib_topo.vtk')
 
     scene = Scene([mesh])
     scene

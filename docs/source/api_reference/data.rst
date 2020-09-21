@@ -24,7 +24,7 @@ the node data in the file:
     from ipygany import TetraMesh
 
 
-    mesh = TetraMesh.from_vtk('source/assets/piston.vtu')
+    mesh = TetraMesh.from_vtk('assets/piston.vtu')
 
     for data in mesh.data:
         print(data.name, ':', [component.name for component in data.components])

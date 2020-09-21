@@ -16,7 +16,7 @@ Load from a ``vtk`` file:
     from ipygany import Scene, TetraMesh
 
 
-    mesh = TetraMesh.from_vtk('source/assets/piston.vtu')
+    mesh = TetraMesh.from_vtk('assets/piston.vtu')
 
     scene = Scene([mesh])
     scene

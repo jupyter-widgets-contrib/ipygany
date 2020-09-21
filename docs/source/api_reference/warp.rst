@@ -35,7 +35,7 @@ Examples
     from ipygany import Scene, IsoColor, TetraMesh, Warp
 
     # Load a Piston mesh, which contains displacement data
-    mesh = TetraMesh.from_vtk('source/assets/piston.vtu')
+    mesh = TetraMesh.from_vtk('assets/piston.vtu')
 
     # Colorize the mesh by the dX displacement
     colored_mesh = IsoColor(mesh, input=('RESU____DEPL', 'DX'), min=-1.39e-06, max=1.39e-06)
