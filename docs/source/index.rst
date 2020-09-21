@@ -11,3 +11,25 @@ ipygany: Scientific visualization in the Jupyter notebook
     :caption: Usage
 
     usage
+
+.. toctree::
+    :caption: Mesh
+    :maxdepth: 2
+
+    api_reference/polymesh
+    api_reference/tetramesh
+    api_reference/data
+
+.. toctree::
+    :caption: Effects
+    :maxdepth: 2
+
+    api_reference/isocolor
+    api_reference/warp
+    api_reference/threshold
+
+.. toctree::
+    :caption: Special effects
+    :maxdepth: 2
+
+    api_reference/water

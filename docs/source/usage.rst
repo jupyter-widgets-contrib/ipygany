@@ -9,7 +9,6 @@ Loading your mesh in the Notebook
 ---------------------------------
 
 ``ipygany`` provides a ``PolyMesh`` class for loading triangle-based meshes, and a ``TetraMesh`` class for tetrahedron-based meshes.
-Your meshes can be structured or unstructured grids.
 
 You can either use vtk to load your meshes, or manually pass vertices buffers.
 
@@ -17,12 +16,9 @@ You need to create a 3D ``Scene`` widget in order to display your loaded mesh in
 
 .. jupyter-execute::
 
-    import os
-    raise RuntimeError(os.getcwd())
-
     from ipygany import Scene, PolyMesh
 
-    mesh = PolyMesh.from_vtk('source/assets/fastscapelib_topo.vtk')
+    mesh = PolyMesh.from_vtk('assets/fastscapelib_topo.vtk')
     mesh.default_color = 'gray'
 
     scene = Scene([mesh])
