@@ -1,24 +1,21 @@
-IsoColor
-========
+Threshold
+=========
 
-The ``IsoColor`` widget colorize your mesh given.
+The ``Threshold`` widget hides part of your mesh for which the does not fit in a given range.
 
-.. note::
-    Currently, you can only use the default Viridis colormap, we'd like to support all paraview colormaps
-
-The ``input`` attribute should be the name of the ``Component`` you want to use for colorizing the mesh. You also need to pass the ``min`` and ``max`` of the component array.
+The ``input`` attribute should be the name of the ``Component`` you want to use for hiding the mesh. You also need to pass the ``min`` and ``max`` of that the component should respect.
 
 For example, if you have a 1-D ``Data`` named ``"height"``, you can simply pass its name as input:
 
 .. code::
 
-    isocolor_mesh = IsoColor(mesh, input='height')
+    threshold_mesh = Threshold(mesh, input='height')
 
 If you have a 3-D ``Data``, you will need to pass the right component name, by passing a tuple containing (data name, component name):
 
 .. code::
 
-    isocolor_mesh = IsoColor(mesh, input=('displacement', 'z'))
+    threshold_mesh = Threshold(mesh, input=('displacement', 'z'))
 
 
 Examples
@@ -73,12 +70,14 @@ Examples
     height_min = np.min(z)
     height_max = np.max(z)
 
-    # Colorize by height
-    colored_mesh = IsoColor(mesh, input='height', min=height_min, max=height_max)
+    # Hide parts of the mesh
+    threshold_mesh = Threshold(mesh, input='height', min=height_min, max=height_max)
 
-    # Create a slider that will dynamically change the boundaries of the colormap
-    colormap_slider = FloatSlider(value=height_max, min=0., max=height_max)
+    # Create a slider that will dynamically change the boundaries of the threshold
+    threshold_slider_min = FloatSlider(value=height_min, min=height_min, max=height_max)
+    threshold_slider_max = FloatSlider(value=height_max, min=height_min, max=height_max)
 
-    jslink((colored_mesh, 'max'), (colormap_slider, 'value'))
+    jslink((threshold_mesh, 'min'), (threshold_slider_min, 'value'))
+    jslink((threshold_mesh, 'max'), (threshold_slider_max, 'value'))
 
-    VBox((Scene([colored_mesh]), colormap_slider))
+    VBox((Scene([threshold_mesh]), threshold_slider_min, threshold_slider_max))

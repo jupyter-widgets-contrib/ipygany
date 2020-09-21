@@ -44,7 +44,7 @@ Examples
     warped_mesh = Warp(colored_mesh, input='RESU____DEPL', factor=300)
 
     # Create a slider that will dynamically change the warp factor value
-    warp_slider = FloatSlider(value=300, min=0, max=500)
+    warp_slider = FloatSlider(value=300, min=0, max=800)
 
     jslink((warped_mesh, 'factor'), (warp_slider, 'value'))
 
