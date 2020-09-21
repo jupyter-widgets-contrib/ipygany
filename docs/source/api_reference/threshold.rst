@@ -74,8 +74,8 @@ Examples
     threshold_mesh = Threshold(mesh, input='height', min=height_min, max=height_max)
 
     # Create a slider that will dynamically change the boundaries of the threshold
-    threshold_slider_min = FloatSlider(value=height_min, min=height_min, max=height_max)
-    threshold_slider_max = FloatSlider(value=height_max, min=height_min, max=height_max)
+    threshold_slider_min = FloatSlider(value=height_min, min=-0.3, max=1.)
+    threshold_slider_max = FloatSlider(value=height_max, min=-0.3, max=1.)
 
     jslink((threshold_mesh, 'min'), (threshold_slider_min, 'value'))
     jslink((threshold_mesh, 'max'), (threshold_slider_max, 'value'))
