@@ -33,7 +33,7 @@ Examples
     colored_mesh = IsoColor(mesh, input=('RESU____DEPL', 'DX'), min=-1.39e-06, max=1.39e-06)
 
     # Hides part of the mesh
-    threshold_mesh = Threshold(warped_mesh, input=('RESU____DEPL', 'DX'), min=-1.39e-06, max=1.0e-07)
+    threshold_mesh = Threshold(colored_mesh, input=('RESU____DEPL', 'DX'), min=-1.39e-06, max=1.0e-07)
 
     # Create a slider that will dynamically change the threshold boundary
     threshold_slider = FloatSlider(value=0., min=0, max=1.0e-07)
