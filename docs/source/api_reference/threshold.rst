@@ -23,6 +23,27 @@ Examples
 
 .. jupyter-execute::
 
+    from ipywidgets import FloatSlider, VBox, jslink
+    from ipygany import Scene, IsoColor, TetraMesh, Threshold
+
+    # Load a Piston mesh, which contains displacement data
+    mesh = TetraMesh.from_vtk('assets/piston.vtu')
+
+    # Colorize the mesh by the dX displacement
+    colored_mesh = IsoColor(mesh, input=('RESU____DEPL', 'DX'), min=-1.39e-06, max=1.39e-06)
+
+    # Hides part of the mesh
+    threshold_mesh = Threshold(warped_mesh, input=('RESU____DEPL', 'DX'), min=-1.39e-06, max=1.0e-07)
+
+    # Create a slider that will dynamically change the threshold boundary
+    threshold_slider = FloatSlider(value=0., min=0, max=1.0e-07)
+
+    jslink((threshold_mesh, 'max'), (threshold_slider, 'value'))
+
+    VBox((Scene([threshold_mesh]), threshold_slider))
+
+.. jupyter-execute::
+
     import numpy as np
     from ipywidgets import FloatSlider, VBox, jslink
     from ipygany import Scene, Threshold, PolyMesh, Component
