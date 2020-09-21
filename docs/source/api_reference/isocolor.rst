@@ -28,7 +28,7 @@ Examples
 
     import numpy as np
     from ipywidgets import FloatSlider, VBox, jslink
-    from ipygany import Scene, IsoColor, PolyMesh, Component, IsoColor
+    from ipygany import Scene, IsoColor, PolyMesh, Component
 
 
     # Create triangle indices
