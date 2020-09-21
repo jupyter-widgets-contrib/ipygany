@@ -3,7 +3,7 @@ Warp
 
 The ``Warp`` widget will modify the mesh geometry.
 
-It is similar to ``Paraview`` and ``vtk``'s warp-by-vector effect, but instead of computing the transformation on the CPU,
+It is similar to ``Paraview``, ``PyVista`` and ``vtk``'s warp-by-vector effect, but instead of computing the transformation on the CPU,
 it is entirely computed on the GPU. Which means that changing the warp factor does not involve looping over the mesh vertices,
 we only send the new ``factor`` value to the GPU.
 

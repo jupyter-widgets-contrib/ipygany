@@ -18,6 +18,7 @@ ipygany: Scientific visualization in the Jupyter notebook
 
     api_reference/polymesh
     api_reference/tetramesh
+    api_reference/data
 
 .. toctree::
     :caption: Effects
