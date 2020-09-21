@@ -24,4 +24,5 @@ ipygany: Scientific visualization in the Jupyter notebook
     :caption: Effects
     :maxdepth: 2
 
+    api_reference/isocolor
     api_reference/warp

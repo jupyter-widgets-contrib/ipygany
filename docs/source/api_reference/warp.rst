@@ -11,7 +11,7 @@ The ``input`` attribute should be a 3-D tuple containing ``Components`` names or
 
 .. code::
 
-    warped_mesh = Warp(mesh, input="displacement")
+    warped_mesh = Warp(mesh, input='displacement')
 
 If you only want to visualize the last component of your displacement data, simply set the other two components to ``0``:
 
