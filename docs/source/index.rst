@@ -27,3 +27,9 @@ ipygany: Scientific visualization in the Jupyter notebook
     api_reference/isocolor
     api_reference/warp
     api_reference/threshold
+
+.. toctree::
+    :caption: Special effects
+    :maxdepth: 2
+
+    api_reference/water
