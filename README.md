@@ -2,6 +2,7 @@
 <h2 align="center"> Jupyter Interactive Widgets library for 3-D mesh analysis</h2>
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/QuantStack/ipygany/stable?filepath=examples)
+[![Documentation](http://readthedocs.org/projects/ipygany/badge/?version=latest)](https://ipygany.readthedocs.io/en/latest/?badge=latest)
 
 **ipygany is an early developer preview. Features and implementation are subject to change.**
 
@@ -22,6 +23,13 @@ Features
 - **Water** effect, for nice water visualization with real-time caustics
 
 Most of those features are **very fast**, because they are computed entirely on the GPU.
+
+Documentation
+=============
+
+To get started with using `ipygany`, check out the full documentation
+
+https://ipygany.readthedocs.io
 
 Examples
 ========
