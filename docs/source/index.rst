@@ -33,3 +33,9 @@ ipygany: Scientific visualization in the Jupyter notebook
     :maxdepth: 2
 
     api_reference/water
+
+.. toctree::
+    :caption: More examples
+    :maxdepth: 2
+
+    api_reference/pyvista
