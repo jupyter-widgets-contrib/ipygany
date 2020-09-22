@@ -29,12 +29,12 @@ Examples
 
 
     # Create triangle indices
-    Nr = 100
-    Nc = 100
+    nx = 100
+    ny = 100
 
-    triangle_indices = np.empty((Nr - 1, Nc - 1, 2, 3), dtype=int)
+    triangle_indices = np.empty((ny - 1, nx - 1, 2, 3), dtype=int)
 
-    r = np.arange(Nr * Nc).reshape(Nr, Nc)
+    r = np.arange(nx * ny).reshape(ny, nx)
 
     triangle_indices[:, :, 0, 0] = r[:-1, :-1]
     triangle_indices[:, :, 1, 0] = r[:-1, 1:]
@@ -46,18 +46,18 @@ Examples
     triangle_indices.shape = (-1, 3)
 
     # Create vertices
-    x = np.arange(-5, 5, 0.1)
-    y = np.arange(-5, 5, 0.1)
+    x = np.arange(-5, 5, 10/nx)
+    y = np.arange(-5, 5, 10/ny)
 
     xx, yy = np.meshgrid(x, y, sparse=True)
 
     z = np.sin(xx**2 + yy**2) / (xx**2 + yy**2)
 
-    vertices = np.empty((100, 100, 3))
+    vertices = np.empty((ny, nx, 3))
     vertices[:, :, 0] = xx
     vertices[:, :, 1] = yy
     vertices[:, :, 2] = z
-    vertices = vertices.reshape(10000, 3)
+    vertices = vertices.reshape(nx * ny, 3)
 
     height_component = Component(name='value', array=z)
 
