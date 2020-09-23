@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, Union, default, validate
+    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
 )
 from traittypes import Array
 from ipywidgets import (
@@ -70,6 +70,15 @@ class Data(_GanyWidgetBase):
         """Create a new Data instance given its name and components."""
         super(Data, self).__init__(name=name, components=components, **kwargs)
 
+    @property
+    def dim(self):
+        """Get the data dimension."""
+        return len(self.components)
+
+    def as_input(self):
+        """Internal method of ipygany. Do not use this."""
+        return [(self.name, comp.name) for comp in self.components]
+
     def __getitem__(self, key):
         """Get a component by name or index."""
         if isinstance(key, str):
@@ -97,13 +106,10 @@ def _grid_data_to_data_widget(grid_data):
     """Turn a vtk grid into Data widgets."""
     data = []
     for key, value in grid_data.items():
-        d = Data(
-            name=key,
-            components=[
-                Component(name=comp_name, array=comp['array'])
-                for comp_name, comp in value.items()
-            ]
-        )
+        d = Data(key, [
+            Component(comp_name, comp['array'])
+            for comp_name, comp in value.items()
+        ])
         data.append(d)
 
     return data
@@ -135,20 +141,32 @@ class Block(_GanyWidgetBase):
 
     def __getitem__(self, key):
         """Get a component by name or index."""
-        if not isinstance(key, tuple) or len(key) != 2:
-            raise KeyError('You can only access data by (data_name, component_name) tuple.')
+        if not (isinstance(key, str) or (isinstance(key, tuple) and len(key) == 2)):
+            raise KeyError('You can only access data by (data_name, component_name) tuple or data_name string.')
 
+        # This prevents failures when this method is called in the constructor
+        # self.data is not yet initialized
+        actual_data = self.data if len(self.data) else (self.parent.data if self.parent else [])
+
+        # If the key is a string, we assume it's the data name
+        if isinstance(key, str):
+            for data in actual_data:
+                if data.name == key:
+                    return data
+            raise KeyError('Data {} not found.'.format(key))
+
+        # Otherwise it's a (data name, component name) tuple
         data_name = key[0]
         component_name = key[1]
 
         if isinstance(data_name, str):
-            for data in self.data:
+            for data in actual_data:
                 if data.name == data_name:
                     return data[component_name]
             raise KeyError('Data {} not found.'.format(data_name))
 
         if isinstance(data_name, int):
-            return self.data[data_name][component_name]
+            return actual_data[data_name][component_name]
 
         raise KeyError('Invalid key {}.'.format(key))
 
@@ -403,20 +421,98 @@ class Effect(Block):
         """Create an Effect on the given Mesh or Effect output."""
         super(Effect, self).__init__(parent=parent, **kwargs)
 
+    @property
+    def data(self):
+        """Get data."""
+        return self.parent.data
+
 
 class Warp(Effect):
     """A warp effect to another block."""
 
     _model_name = Unicode('WarpModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+    input = Union((Tuple(), Unicode())).tag(sync=True)
 
     offset = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=0.).tag(sync=True)
     factor = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=1.).tag(sync=True)
 
     @default('input')
     def _default_input(self):
-        return self.parent.data[0].name
+        if not len(self.parent.data):
+            return (0, 0, 0)
+
+        return self._validate_input_impl(self.parent.data[0].name)
+
+    @validate('input')
+    def _validate_input(self, proposal):
+        return self._validate_input_impl(proposal['value'])
+
+    def _validate_input_impl(self, value):
+        # Input is a data name
+        if isinstance(value, str):
+            input_data = self[value]
+
+            # Simply use this data
+            if input_data.dim == 3:
+                return input_data.name
+
+            # Take all the components and fill in with zeros
+            if input_data.dim < 3:
+                chosen_input = input_data.as_input()
+
+                while len(chosen_input) != 3:
+                    chosen_input.append(0.)
+
+                return chosen_input
+
+            # input_data.dim > 3, take only the first 3 components
+            return input_data.as_input()[:3]
+
+        # Input as a tuple
+        if isinstance(value, (tuple, list)):
+            if len(value) != 3:
+                raise TraitError('input is of dimension {} but expected input dimension is {}'.format(len(value), 3))
+
+            inputs = []
+
+            # Check all elements in the tuple
+            for el in value:
+                # Component selection by name
+                if isinstance(el, (tuple, list)):
+                    if len(el) != 2:
+                        raise TraitError('{} is not a valid component'.format(el))
+
+                    try:
+                        self[el[0], el[1]]
+                    except:
+                        raise TraitError('{} is not a valid component'.format(el))
+
+                    inputs.append(el)
+                    continue
+
+                # Data selection by name
+                if isinstance(el, str):
+                    try:
+                        data = self[el]
+                    except:
+                        raise TraitError('{} is not a valid component'.format(el))
+
+                    if data.dim != 1:
+                        raise TraitError('{} is ambiguous, please select a component'.format(el))
+
+                    inputs.append((data.name, data.components[0].name))
+                    continue
+
+                if isinstance(el, (float, int)):
+                    inputs.append(el)
+                    continue
+
+                raise TraitError('{} is not a valid input'.format(el))
+
+            return tuple(inputs)
+
+        raise RuntimeError('{} is not a valid input'.format(value))
 
 
 class Alpha(Effect):
