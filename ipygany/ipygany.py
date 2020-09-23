@@ -47,7 +47,15 @@ class Component(_GanyWidgetBase):
     min = CFloat(allow_none=True, default_value=None)
     max = CFloat(allow_none=True, default_value=None)
 
-    # TODO Compute min and max in the constructor?
+    def __init__(self, name, array, **kwargs):
+        """Create a new Component instance given its name and array."""
+        super(Component, self).__init__(name=name, array=array, **kwargs)
+
+        if self.min is None:
+            self.min = np.min(self.array)
+
+        if self.max is None:
+            self.max = np.max(self.array)
 
 
 class Data(_GanyWidgetBase):
@@ -56,7 +64,11 @@ class Data(_GanyWidgetBase):
     _model_name = Unicode('DataModel').tag(sync=True)
 
     name = Unicode().tag(sync=True)
-    components = List(Instance(Component)).tag(sync=True, **widget_serialization)
+    components = Union((Dict(), List(Instance(Component)))).tag(sync=True, **widget_serialization)
+
+    def __init__(self, name, components, **kwargs):
+        """Create a new Data instance given its name and components."""
+        super(Data, self).__init__(name=name, components=components, **kwargs)
 
     def __getitem__(self, key):
         """Get a component by name or index."""
@@ -70,6 +82,15 @@ class Data(_GanyWidgetBase):
             return self.components[key]
 
         raise KeyError('Invalid key {}.'.format(key))
+
+    @validate('components')
+    def _validate_components(self, proposal):
+        components = proposal['value']
+
+        if isinstance(components, dict):
+            return [Component(name, array) for name, array in components.items()]
+
+        return components
 
 
 def _grid_data_to_data_widget(grid_data):
@@ -136,7 +157,7 @@ class Block(_GanyWidgetBase):
         data = proposal['value']
 
         if isinstance(data, dict):
-            return [Data(name=name, components=components) for name, components in data.items()]
+            return [Data(name, components) for name, components in data.items()]
 
         return data
 
