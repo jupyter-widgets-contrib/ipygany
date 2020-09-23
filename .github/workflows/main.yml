@@ -30,7 +30,7 @@ jobs:
         conda-channels: conda-forge
 
     - name: Conda install dependencies
-      run: conda install python=${{ matrix.python-version }} pip nodejs=13 ipywidgets jupyter jupyterlab vtk flake8
+      run: conda install python=${{ matrix.python-version }} pip nodejs=13 ipywidgets jupyter jupyterlab vtk flake8 pytest
 
     - name: Install ipygany
       run: pip install -e .
@@ -38,6 +38,9 @@ jobs:
     - name: Install labextension (Only on Ubuntu for build speed)
       if: matrix.os == 'ubuntu-latest'
       run: jupyter labextension install .
+
+    - name: Run Python tests
+      run: pytest tests
 
     - name: Test flake8
       run: flake8 ipygany --ignore=E501
