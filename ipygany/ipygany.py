@@ -474,43 +474,38 @@ class Warp(Effect):
             if len(value) != 3:
                 raise TraitError('input is of dimension {} but expected input dimension is {}'.format(len(value), 3))
 
-            inputs = []
-
             # Check all elements in the tuple
-            for el in value:
-                # Component selection by name
-                if isinstance(el, (tuple, list)):
-                    if len(el) != 2:
-                        raise TraitError('{} is not a valid component'.format(el))
+            return tuple(self._validate_input_component(el) for el in value)
 
-                    try:
-                        self[el[0], el[1]]
-                    except KeyError:
-                        raise TraitError('{} is not a valid component'.format(el))
+        raise TraitError('{} is not a valid input'.format(value))
 
-                    inputs.append(el)
-                    continue
+    def _validate_input_component(self, value):
+        # Component selection by name
+        if isinstance(value, (tuple, list)):
+            if len(value) != 2:
+                raise TraitError('{} is not a valid component'.format(value))
 
-                # Data selection by name
-                if isinstance(el, str):
-                    try:
-                        data = self[el]
-                    except KeyError:
-                        raise TraitError('{} is not a valid component'.format(el))
+            try:
+                self[value[0], value[1]]
+            except KeyError:
+                raise TraitError('{} is not a valid component'.format(value))
 
-                    if data.dim != 1:
-                        raise TraitError('{} is ambiguous, please select a component'.format(el))
+            return value
 
-                    inputs.append((data.name, data.components[0].name))
-                    continue
+        # Data selection by name
+        if isinstance(value, str):
+            try:
+                data = self[value]
+            except KeyError:
+                raise TraitError('{} is not a valid data'.format(value))
 
-                if isinstance(el, (float, int)):
-                    inputs.append(el)
-                    continue
+            if data.dim != 1:
+                raise TraitError('{} is ambiguous, please select a component'.format(value))
 
-                raise TraitError('{} is not a valid input'.format(el))
+            return (data.name, data.components[0].name)
 
-            return tuple(inputs)
+        if isinstance(value, (float, int)):
+            return value
 
         raise TraitError('{} is not a valid input'.format(value))
 
