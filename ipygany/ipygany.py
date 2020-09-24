@@ -415,6 +415,8 @@ class Effect(Block):
 
     _model_name = Unicode('EffectModel').tag(sync=True)
 
+    input = Union((Tuple(), Unicode(), CFloat())).tag(sync=True)
+
     parent = Instance(Block).tag(sync=True, **widget_serialization)
 
     def __init__(self, parent, **kwargs):
@@ -426,23 +428,19 @@ class Effect(Block):
         """Get data."""
         return self.parent.data
 
-
-class Warp(Effect):
-    """A warp effect to another block."""
-
-    _model_name = Unicode('WarpModel').tag(sync=True)
-
-    input = Union((Tuple(), Unicode())).tag(sync=True)
-
-    offset = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=0.).tag(sync=True)
-    factor = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=1.).tag(sync=True)
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 0
 
     @default('input')
     def _default_input(self):
-        if not len(self.parent.data):
-            return (0, 0, 0)
+        if not len(self.data):
+            if not self.input_dim:
+                return 0
+            return tuple(0 for _ in range(self.input_dim))
 
-        return self._validate_input_impl(self.parent.data[0].name)
+        return self._validate_input_impl(self.data[0].name)
 
     @validate('input')
     def _validate_input(self, proposal):
@@ -454,28 +452,32 @@ class Warp(Effect):
             input_data = self[value]
 
             # Simply use this data
-            if input_data.dim == 3:
+            if input_data.dim == self.input_dim:
                 return input_data.name
 
             # Take all the components and fill in with zeros
-            if input_data.dim < 3:
+            if input_data.dim < self.input_dim:
                 chosen_input = input_data.as_input()
 
-                while len(chosen_input) != 3:
+                while len(chosen_input) != self.input_dim:
                     chosen_input.append(0.)
 
                 return chosen_input
 
-            # input_data.dim > 3, take only the first 3 components
-            return input_data.as_input()[:3]
+            # input_data.dim > self.input_dim, take only the first self.input_dim components
+            return input_data.as_input()[:self.input_dim]
 
         # Input as a tuple
         if isinstance(value, (tuple, list)):
-            if len(value) != 3:
-                raise TraitError('input is of dimension {} but expected input dimension is {}'.format(len(value), 3))
+            if len(value) != self.input_dim:
+                raise TraitError('input is of dimension {} but expected input dimension is {}'.format(len(value), self.input_dim))
 
             # Check all elements in the tuple
             return tuple(self._validate_input_component(el) for el in value)
+
+        # Input is a number
+        if isinstance(value, (float, int)) and self.input_dim == 1:
+            return value
 
         raise TraitError('{} is not a valid input'.format(value))
 
@@ -508,6 +510,20 @@ class Warp(Effect):
             return value
 
         raise TraitError('{} is not a valid input'.format(value))
+
+
+class Warp(Effect):
+    """A warp effect to another block."""
+
+    _model_name = Unicode('WarpModel').tag(sync=True)
+
+    offset = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=0.).tag(sync=True)
+    factor = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=1.).tag(sync=True)
+
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 3
 
 
 class Alpha(Effect):
