@@ -485,7 +485,7 @@ class Warp(Effect):
 
                     try:
                         self[el[0], el[1]]
-                    except:
+                    except KeyError:
                         raise TraitError('{} is not a valid component'.format(el))
 
                     inputs.append(el)
@@ -495,7 +495,7 @@ class Warp(Effect):
                 if isinstance(el, str):
                     try:
                         data = self[el]
-                    except:
+                    except KeyError:
                         raise TraitError('{} is not a valid component'.format(el))
 
                     if data.dim != 1:
