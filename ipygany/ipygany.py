@@ -512,7 +512,7 @@ class Warp(Effect):
 
             return tuple(inputs)
 
-        raise RuntimeError('{} is not a valid input'.format(value))
+        raise TraitError('{} is not a valid input'.format(value))
 
 
 class Alpha(Effect):
