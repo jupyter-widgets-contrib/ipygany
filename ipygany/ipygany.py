@@ -52,10 +52,10 @@ class Component(_GanyWidgetBase):
         super(Component, self).__init__(name=name, array=array, **kwargs)
 
         if self.min is None:
-            self.min = np.min(self.array)
+            self.min = np.min(self.array) if not isinstance(self.array, Widget) else np.min(self.array.array)
 
         if self.max is None:
-            self.max = np.max(self.array)
+            self.max = np.max(self.array) if not isinstance(self.array, Widget) else np.max(self.array.array)
 
 
 class Data(_GanyWidgetBase):
