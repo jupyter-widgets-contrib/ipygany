@@ -30,7 +30,7 @@ jobs:
         conda-channels: conda-forge
 
     - name: Conda install dependencies
-      run: conda install python=${{ matrix.python-version }} pip nodejs=13 ipywidgets jupyter jupyterlab vtk flake8 pytest
+      run: conda install python=${{ matrix.python-version }} pip nodejs=13 ipywidgets jupyter jupyterlab vtk flake8 pytest ipydatawidgets
 
     - name: Install ipygany
       run: pip install -e .

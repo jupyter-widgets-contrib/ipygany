@@ -2,6 +2,8 @@ import pytest
 
 import numpy as np
 
+from ipydatawidgets import NDArrayWidget
+
 from ipygany import PolyMesh, Data, Component
 
 
@@ -52,6 +54,12 @@ def test_mesh_data_creation():
 
 def test_component_creation():
     comp = Component('z', np.array([1., 2., 3.]))
+
+    assert comp.name == 'z'
+    assert comp.min == 1.
+    assert comp.max == 3.
+
+    comp = Component('z', NDArrayWidget(np.array([1., 2., 3.])))
 
     assert comp.name == 'z'
     assert comp.min == 1.
