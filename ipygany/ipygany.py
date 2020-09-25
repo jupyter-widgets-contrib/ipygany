@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, Union, default, validate
+    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
 )
 from traittypes import Array
 from ipywidgets import (
@@ -70,6 +70,15 @@ class Data(_GanyWidgetBase):
         """Create a new Data instance given its name and components."""
         super(Data, self).__init__(name=name, components=components, **kwargs)
 
+    @property
+    def dim(self):
+        """Get the data dimension."""
+        return len(self.components)
+
+    def as_input(self):
+        """Internal method of ipygany. Do not use this."""
+        return [(self.name, comp.name) for comp in self.components]
+
     def __getitem__(self, key):
         """Get a component by name or index."""
         if isinstance(key, str):
@@ -97,13 +106,10 @@ def _grid_data_to_data_widget(grid_data):
     """Turn a vtk grid into Data widgets."""
     data = []
     for key, value in grid_data.items():
-        d = Data(
-            name=key,
-            components=[
-                Component(name=comp_name, array=comp['array'])
-                for comp_name, comp in value.items()
-            ]
-        )
+        d = Data(key, [
+            Component(comp_name, comp['array'])
+            for comp_name, comp in value.items()
+        ])
         data.append(d)
 
     return data
@@ -135,20 +141,32 @@ class Block(_GanyWidgetBase):
 
     def __getitem__(self, key):
         """Get a component by name or index."""
-        if not isinstance(key, tuple) or len(key) != 2:
-            raise KeyError('You can only access data by (data_name, component_name) tuple.')
+        if not (isinstance(key, str) or (isinstance(key, tuple) and len(key) == 2)):
+            raise KeyError('You can only access data by (data_name, component_name) tuple or data_name string.')
 
+        # This prevents failures when this method is called in the constructor
+        # self.data is not yet initialized
+        actual_data = self.data if len(self.data) else (self.parent.data if self.parent else [])
+
+        # If the key is a string, we assume it's the data name
+        if isinstance(key, str):
+            for data in actual_data:
+                if data.name == key:
+                    return data
+            raise KeyError('Data {} not found.'.format(key))
+
+        # Otherwise it's a (data name, component name) tuple
         data_name = key[0]
         component_name = key[1]
 
         if isinstance(data_name, str):
-            for data in self.data:
+            for data in actual_data:
                 if data.name == data_name:
                     return data[component_name]
             raise KeyError('Data {} not found.'.format(data_name))
 
         if isinstance(data_name, int):
-            return self.data[data_name][component_name]
+            return actual_data[data_name][component_name]
 
         raise KeyError('Invalid key {}.'.format(key))
 
@@ -397,11 +415,104 @@ class Effect(Block):
 
     _model_name = Unicode('EffectModel').tag(sync=True)
 
+    input = Union((Tuple(), Unicode(), CFloat())).tag(sync=True)
+
     parent = Instance(Block).tag(sync=True, **widget_serialization)
 
     def __init__(self, parent, **kwargs):
         """Create an Effect on the given Mesh or Effect output."""
         super(Effect, self).__init__(parent=parent, **kwargs)
+
+    @property
+    def data(self):
+        """Get data."""
+        return self.parent.data
+
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 0
+
+    @default('input')
+    def _default_input(self):
+        if not len(self.data):
+            if self.input_dim == 0 or self.input_dim == 1:
+                return 0
+            return tuple(0 for _ in range(self.input_dim))
+
+        return self._validate_input_impl(self.data[0].name)
+
+    @validate('input')
+    def _validate_input(self, proposal):
+        return self._validate_input_impl(proposal['value'])
+
+    def _validate_input_impl(self, value):
+        # Input is a data name
+        if isinstance(value, str):
+            input_data = self[value]
+
+            # Simply use this data
+            if input_data.dim == self.input_dim:
+                return input_data.name
+
+            # Take all the components and fill in with zeros
+            if input_data.dim < self.input_dim:
+                chosen_input = input_data.as_input()
+
+                while len(chosen_input) != self.input_dim:
+                    chosen_input.append(0.)
+
+                return chosen_input
+
+            # input_data.dim > self.input_dim, take only the first self.input_dim components
+            return input_data.as_input()[:self.input_dim]
+
+        # Input as a tuple
+        if isinstance(value, (tuple, list)):
+            if self.input_dim == 1 and len(value) == 2:
+                return self._validate_input_component(value)
+
+            if len(value) != self.input_dim:
+                raise TraitError('input is of dimension {} but expected input dimension is {}'.format(len(value), self.input_dim))
+
+            # Check all elements in the tuple
+            return tuple(self._validate_input_component(el) for el in value)
+
+        # Input is a number
+        if isinstance(value, (float, int)) and self.input_dim == 1:
+            return value
+
+        raise TraitError('{} is not a valid input'.format(value))
+
+    def _validate_input_component(self, value):
+        # Component selection by name
+        if isinstance(value, (tuple, list)):
+            if len(value) != 2:
+                raise TraitError('{} is not a valid component'.format(value))
+
+            try:
+                self[value[0], value[1]]
+            except KeyError:
+                raise TraitError('{} is not a valid component'.format(value))
+
+            return value
+
+        # Data selection by name
+        if isinstance(value, str):
+            try:
+                data = self[value]
+            except KeyError:
+                raise TraitError('{} is not a valid data'.format(value))
+
+            if data.dim != 1:
+                raise TraitError('{} is ambiguous, please select a component'.format(value))
+
+            return (data.name, data.components[0].name)
+
+        if isinstance(value, (float, int)):
+            return value
+
+        raise TraitError('{} is not a valid input'.format(value))
 
 
 class Warp(Effect):
@@ -409,14 +520,13 @@ class Warp(Effect):
 
     _model_name = Unicode('WarpModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     offset = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=0.).tag(sync=True)
     factor = Union((Tuple(trait=Unicode, minlen=3, maxlen=3), CFloat(0.)), default_value=1.).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 3
 
 
 class Alpha(Effect):
@@ -424,11 +534,14 @@ class Alpha(Effect):
 
     _model_name = Unicode('AlphaModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     @default('input')
     def _default_input(self):
         return 0.7
+
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class RGB(Effect):
@@ -436,7 +549,10 @@ class RGB(Effect):
 
     _model_name = Unicode('RGBModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 3
 
 
 class IsoColor(Effect):
@@ -444,14 +560,13 @@ class IsoColor(Effect):
 
     _model_name = Unicode('IsoColorModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class IsoSurface(Effect):
@@ -459,14 +574,13 @@ class IsoSurface(Effect):
 
     _model_name = Unicode('IsoSurfaceModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     value = CFloat(0.).tag(sync=True)
     dynamic = Bool(False).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class Threshold(Effect):
@@ -474,16 +588,15 @@ class Threshold(Effect):
 
     _model_name = Unicode('ThresholdModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
     dynamic = Bool(False).tag(sync=True)
     inclusive = Bool(True).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class UnderWater(Effect):
@@ -491,16 +604,15 @@ class UnderWater(Effect):
 
     _model_name = Unicode('UnderWaterModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     default_color = Color('#F2FFD2').tag(sync=True)
     texture = Instance(Image, allow_none=True, default_value=None).tag(sync=True, **widget_serialization)
     texture_scale = CFloat(2.).tag(sync=True)
     texture_position = Tuple(minlen=2, maxlen=2, default_value=(1., 1., 0.)).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class Water(Effect):

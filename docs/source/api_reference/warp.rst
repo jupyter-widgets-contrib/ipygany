@@ -19,11 +19,12 @@ If you only want to visualize the last component of your displacement data, simp
 
     warped_mesh = Warp(mesh, input=(0, 0, ('displacement', 'z')))
 
-If your mesh contains a 1-D ``Data``, you can also warp by selecting the component:
+If your mesh contains a 1-D ``Data``, you can also warp using this data by setting it to the wanted dimension:
 
 .. code::
 
-    warped_mesh = Warp(mesh, input=(('height', 'value'), 0, 0))
+    x_warped_mesh = Warp(mesh, input=('height', 0, 0))  # Warp by 'height' data on the x-axis
+    z_warped_mesh = Warp(mesh, input=(0, 0, 'height'))  # Warp by 'height' data on the z-axis
 
 
 Examples
@@ -110,8 +111,8 @@ Like other ipygany's effects, you can combine it with other effects. Here we app
     )
 
     # Colorize by curvature
-    colored_mesh = IsoColor(mesh, input=('height', 'value'), min=np.min(z), max=np.max(z))
-    warped_mesh = Warp(colored_mesh, input=(0, 0, ('height', 'value')))
+    colored_mesh = IsoColor(mesh, input='height', min=np.min(z), max=np.max(z))
+    warped_mesh = Warp(colored_mesh, input=(0, 0, 'height'))
 
     # Create a slider that will dynamically change the warp factor value
     warp_slider = FloatSlider(value=0, min=0, max=1)

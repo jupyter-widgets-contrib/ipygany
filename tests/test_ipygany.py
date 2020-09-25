@@ -4,28 +4,14 @@ import numpy as np
 
 from ipydatawidgets import NDArrayWidget
 
-from ipygany import PolyMesh, Data, Component
+from ipygany import PolyMesh, Component
 
-
-vertices = np.array([
-    [0., 0., 0.],
-    [0., 0., 0.],
-    [0., 0., 0.],
-])
-
-triangles = np.array([
-    [0, 1, 2],
-])
-
-data_1d = Data(name='1d', components=[Component('x', np.array([0., 0., 0.]))])
-data_3d = Data('3d', [
-    Component(name='x', array=np.array([1., 1., 1.])),
-    Component('y', np.array([2., 2., 2.])),
-    Component('z', np.array([3., 3., 3.])),
-])
+from .utils import get_test_assets
 
 
 def test_data_access():
+    vertices, triangles, data_1d, data_3d = get_test_assets()
+
     poly = PolyMesh(vertices=vertices, triangle_indices=triangles, data=[data_1d, data_3d])
 
     assert np.all(np.equal(poly['1d', 'x'].array, np.array([0., 0., 0.])))
@@ -33,6 +19,8 @@ def test_data_access():
 
 
 def test_mesh_data_creation():
+    vertices, triangles, data_1d, data_3d = get_test_assets()
+
     poly = PolyMesh(vertices=vertices, triangle_indices=triangles, data={
         '1d': [Component('x', np.array([0., 0., 0.]))],
         '2d': [Component('x', np.array([1., 1., 1.])), Component('y', np.array([2., 2., 2.]))]
