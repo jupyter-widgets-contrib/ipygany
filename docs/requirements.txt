@@ -1,6 +1,6 @@
 ipygany
 pygments==2.6.1
-jupyter-sphinx==0.2.4a1
+jupyter-sphinx
 vtk
 meshpy
 pyvista
