@@ -27,7 +27,7 @@ import {
   Data, Component,
   Block, Effect,
   PolyMesh, TetraMesh, PointCloud,
-  Warp, Alpha, RGB, IsoColor, IsoSurface, Threshold,
+  Warp, WarpByScalar, Alpha, RGB, IsoColor, IsoSurface, Threshold,
   Water, UnderWater,
 } from 'ganyjs';
 
@@ -405,6 +405,40 @@ class WarpModel extends EffectModel {
   block: Warp;
 
   static model_name = 'WarpModel';
+
+}
+
+
+export
+class WarpByScalarModel extends EffectModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: WarpByScalarModel.model_name,
+    };
+  }
+
+  get input () {
+    return this.get('input');
+  }
+
+  get factor () {
+    return this.get('factor');
+  }
+
+  createBlock () {
+    return new WarpByScalar(this.parent.block, this.input, this.factor);
+  }
+
+  initEventListeners () : void {
+    super.initEventListeners();
+
+    this.on('change:factor', () => { this.block.factor = this.factor; });
+  }
+
+  block: WarpByScalar;
+
+  static model_name = 'WarpByScalarModel';
 
 }
 

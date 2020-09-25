@@ -529,6 +529,19 @@ class Warp(Effect):
         return 3
 
 
+class WarpByScalar(Effect):
+    """A warp-by-scalar effect to another block."""
+
+    _model_name = Unicode('WarpByScalarModel').tag(sync=True)
+
+    factor = CFloat(1.).tag(sync=True)
+
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
+
+
 class Alpha(Effect):
     """An transparency effect to another block."""
 
