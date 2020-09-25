@@ -546,7 +546,10 @@ class RGB(Effect):
 
     _model_name = Unicode('RGBModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 3
 
 
 class IsoColor(Effect):
@@ -568,14 +571,13 @@ class IsoSurface(Effect):
 
     _model_name = Unicode('IsoSurfaceModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     value = CFloat(0.).tag(sync=True)
     dynamic = Bool(False).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class Threshold(Effect):
@@ -583,16 +585,15 @@ class Threshold(Effect):
 
     _model_name = Unicode('ThresholdModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
     dynamic = Bool(False).tag(sync=True)
     inclusive = Bool(True).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class UnderWater(Effect):
@@ -600,16 +601,15 @@ class UnderWater(Effect):
 
     _model_name = Unicode('UnderWaterModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     default_color = Color('#F2FFD2').tag(sync=True)
     texture = Instance(Image, allow_none=True, default_value=None).tag(sync=True, **widget_serialization)
     texture_scale = CFloat(2.).tag(sync=True)
     texture_position = Tuple(minlen=2, maxlen=2, default_value=(1., 1., 0.)).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class Water(Effect):
