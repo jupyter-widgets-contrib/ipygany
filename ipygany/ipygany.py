@@ -436,7 +436,7 @@ class Effect(Block):
     @default('input')
     def _default_input(self):
         if not len(self.data):
-            if not self.input_dim:
+            if self.input_dim == 0 or self.input_dim == 1:
                 return 0
             return tuple(0 for _ in range(self.input_dim))
 
@@ -531,11 +531,14 @@ class Alpha(Effect):
 
     _model_name = Unicode('AlphaModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     @default('input')
     def _default_input(self):
         return 0.7
+
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class RGB(Effect):
@@ -551,14 +554,13 @@ class IsoColor(Effect):
 
     _model_name = Unicode('IsoColorModel').tag(sync=True)
 
-    input = Union((Tuple(trait=Unicode, minlen=2, maxlen=2), Unicode(), CFloat(0.))).tag(sync=True)
-
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
 
-    @default('input')
-    def _default_input(self):
-        return self.parent.data[0].name
+    @property
+    def input_dim(self):
+        """Input dimension."""
+        return 1
 
 
 class IsoSurface(Effect):
