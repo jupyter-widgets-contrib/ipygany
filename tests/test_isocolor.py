@@ -30,11 +30,11 @@ def test_input():
 
     colored_mesh = IsoColor(poly)
 
-    with pytest.raises(TraitError):
-        colored_mesh.input = ('1d', 0)
-
     colored_mesh.input = ('1d', )
     assert colored_mesh.input == (('1d', 'x'), )
+
+    colored_mesh.input = ('3d', 'x')
+    assert colored_mesh.input == ('3d', 'x')
 
     colored_mesh.input = (3.2, )
     assert colored_mesh.input == (3.2, )

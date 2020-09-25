@@ -469,6 +469,9 @@ class Effect(Block):
 
         # Input as a tuple
         if isinstance(value, (tuple, list)):
+            if self.input_dim == 1 and len(value) == 2:
+                return self._validate_input_component(value)
+
             if len(value) != self.input_dim:
                 raise TraitError('input is of dimension {} but expected input dimension is {}'.format(len(value), self.input_dim))
 
