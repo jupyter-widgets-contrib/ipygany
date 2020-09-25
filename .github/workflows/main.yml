@@ -32,6 +32,9 @@ jobs:
     - name: Conda install dependencies
       run: conda install python=${{ matrix.python-version }} pip nodejs=13 ipywidgets jupyter jupyterlab vtk flake8 pytest ipydatawidgets
 
+    - name: Test flake8
+      run: flake8 ipygany --ignore=E501
+
     - name: Install ipygany
       run: pip install -e .
 
@@ -42,5 +45,10 @@ jobs:
     - name: Run Python tests
       run: pytest tests
 
-    - name: Test flake8
-      run: flake8 ipygany --ignore=E501
+    - name: Build docs (Only on MacOS for build speed)
+      if: matrix.os == 'macos-latest'
+      run: |
+           conda install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
+           cd docs/source/
+           sphinx-build . _build/html
+           cd ../..
