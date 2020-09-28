@@ -17,7 +17,7 @@ If you have under-water meshes on which you want to cast caustics, you need to c
 
 Then you'll need to pass those under-water meshes to the water effect:
 
-.. code::
+.. code:: Python
 
     underwater_mesh1 = UnderWater(mesh1, input='underwater')
     underwater_mesh2 = UnderWater(mesh2, input='underwater')
