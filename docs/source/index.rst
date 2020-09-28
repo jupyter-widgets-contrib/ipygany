@@ -26,6 +26,7 @@ ipygany: Scientific visualization in the Jupyter notebook
 
     api_reference/isocolor
     api_reference/warp
+    api_reference/warpbyscalar
     api_reference/threshold
 
 .. toctree::
