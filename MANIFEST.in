@@ -8,7 +8,6 @@ include .coverage.rc
 include tsconfig.json
 include package.json
 include webpack.config.js
-include ipygany/labextension/*.tgz
 
 # Documentation
 graft docs
@@ -26,6 +25,7 @@ prune tests/build
 
 # Javascript files
 graft ipygany/nbextension
+graft ipygany/labextension
 graft src
 graft css
 prune **/node_modules

@@ -8,39 +8,55 @@ on:
     branches:
     - master
 
-jobs:
+defaults:
   run:
+    shell: bash -l {0}
+
+jobs:
+  tests:
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.6, 3.7, 3.8]
+        os: [ubuntu-latest, macos-latest]
+        python-version: [3.9]
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
     - name: Setup conda
-      uses: s-weigand/setup-conda@v1
+      uses: conda-incubator/setup-miniconda@v2
       with:
-        auto-update-conda: true
-        update-conda: true
-        conda-channels: conda-forge
+        activate-environment: ipygany-dev
+        environment-file: dev_environment.yml
+        python-version: ${{ matrix.python-version }}
+        mamba-version: "*"
+        auto-activate-base: false
+        channels: conda-forge
 
-    - name: Conda install dependencies
-      run: conda install python=${{ matrix.python-version }} pip nodejs=13 ipywidgets jupyter jupyterlab vtk flake8 pytest ipydatawidgets
+    - name: Workaround pytest issue
+      run: pip install pytest_tornasync
 
     - name: Test flake8
       run: flake8 ipygany --ignore=E501
 
     - name: Install ipygany
-      run: pip install -e .
+      run: pip install .
 
-    - name: Install labextension (Only on Ubuntu for build speed)
-      if: matrix.os == 'ubuntu-latest'
-      run: jupyter labextension install .
+    - name: Check installation files
+      run: |
+        test -d $CONDA_PREFIX/share/jupyter/nbextensions/ipygany
+        test -f $CONDA_PREFIX/share/jupyter/nbextensions/ipygany/extension.js
+        test -f $CONDA_PREFIX/share/jupyter/nbextensions/ipygany/index.js
+        test -d $CONDA_PREFIX/share/jupyter/labextensions/ipygany
+        test -f $CONDA_PREFIX/share/jupyter/labextensions/ipygany/package.json
+
+    - name: Check nbextension and labextension
+      run: |
+        jupyter nbextension list 2>&1 | grep -ie "ipygany/extension.*enabled" -
+        jupyter labextension list 2>&1 | grep -ie "ipygany.*enabled.*ok" -
 
     - name: Run Python tests
       run: pytest tests
@@ -48,7 +64,91 @@ jobs:
     - name: Build docs (Only on MacOS for build speed)
       if: matrix.os == 'macos-latest'
       run: |
-           conda install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
-           cd docs/source/
-           sphinx-build . _build/html
-           cd ../..
+        mamba install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
+        cd docs/source/
+        sphinx-build . _build/html
+        cd ../..
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup conda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: ipygany-dev
+        environment-file: dev_environment.yml
+        python-version: ${{ matrix.python-version }}
+        mamba-version: "*"
+        auto-activate-base: false
+        channels: conda-forge
+
+    - name: Build packages
+      run: |
+        python setup.py sdist bdist_wheel
+        cd dist
+        sha256sum * | tee SHA256SUMS
+
+    - name: Upload builds
+      uses: actions/upload-artifact@v2
+      with:
+        name: dist ${{ github.run_number }}
+        path: ./dist
+
+  install:
+    runs-on: ${{ matrix.os }}-latest
+    needs: [build]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos, windows]
+        python: ['3.6', '3.9']
+        include:
+          - python: '3.6'
+            dist: 'ipygany*.tar.gz'
+          - python: '3.9'
+            dist: 'ipygany*.whl'
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: ipygany-dev
+          environment-file: dev_environment.yml
+          python-version: ${{ matrix.python-version }}
+          mamba-version: "*"
+          auto-activate-base: false
+          channels: conda-forge
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist ${{ github.run_number }}
+          path: ./dist
+
+      - name: Install the package
+        run: |
+          cd dist
+          pip install -vv ${{ matrix.dist }}
+
+      - name: Test installation files
+        run: |
+          test -d $CONDA_PREFIX/share/jupyter/nbextensions/ipygany
+          test -f $CONDA_PREFIX/share/jupyter/nbextensions/ipygany/extension.js
+          test -f $CONDA_PREFIX/share/jupyter/nbextensions/ipygany/index.js
+          test -d $CONDA_PREFIX/share/jupyter/labextensions/ipygany
+          test -f $CONDA_PREFIX/share/jupyter/labextensions/ipygany/package.json
+          test -d $CONDA_PREFIX/share/jupyter/labextensions/ipygany/static
+
+      - name: Validate the nbextension
+        run: jupyter nbextension list 2>&1 | grep "ipygany/extension"
+
+      - name: Validate the labextension
+        run: jupyter labextension list 2>&1 | grep ipygany

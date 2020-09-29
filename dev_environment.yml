@@ -1,0 +1,13 @@
+name: ipygany-dev
+channels:
+    - conda-forge
+dependencies:
+    - pip
+    - yarn
+    - jupyter-packaging
+    - jupyterlab=3
+    - ipywidgets>=7.6
+    - vtk
+    - flake8
+    - pytest
+    - ipydatawidgets

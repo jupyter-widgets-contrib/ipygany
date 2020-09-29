@@ -4,16 +4,12 @@
 import * as THREE from 'three';
 
 import {
-  WidgetModel, DOMWidgetModel, DOMWidgetView, ISerializers, unpack_models
+  WidgetModel, DOMWidgetModel, DOMWidgetView, ISerializers, unpack_models, WidgetView
 } from '@jupyter-widgets/base';
 
 import {
-  ImageView
-} from '@jupyter-widgets/controls';
-
-import {
   Message
-} from '@phosphor/messaging';
+} from '@lumino/messaging';
 
 import {
   MODULE_NAME, MODULE_VERSION
@@ -705,7 +701,7 @@ class UnderWaterModel extends EffectModel {
       return;
     }
 
-    this.widget_manager.create_view(image, {}).then((imageView: ImageView) => {
+    this.widget_manager.create_view(image, {}).then((imageView: WidgetView) => {
       const textureLoader = new THREE.TextureLoader();
 
       textureLoader.load(imageView.el.src, (texture: THREE.Texture) => {

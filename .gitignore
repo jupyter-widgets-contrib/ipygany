@@ -146,7 +146,7 @@ $RECYCLE.BIN/
 
 **/node_modules/
 ipygany/nbextension/static/index.*
-ipygany/labextension/*.tgz
+ipygany/labextension/*
 
 # Coverage data
 # -------------
