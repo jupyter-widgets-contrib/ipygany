@@ -6,4 +6,4 @@ dependencies:
   - pyvista
   - pythreejs
   - nodejs
-  - ipygany=0.3.3
+  - ipygany=0.4.0
