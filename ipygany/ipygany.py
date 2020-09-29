@@ -650,6 +650,10 @@ class Scene(_GanyDOMWidgetBase):
     background_color = Color('white').tag(sync=True)
     background_opacity = CFloat(1.).tag(sync=True)
 
+    camera_position = Union((Tuple(trait=CFloat, minlen=3, maxlen=3), ), allow_none=True, default_value=None).tag(sync=True)
+    camera_target = Union((Tuple(trait=CFloat, minlen=3, maxlen=3), ), allow_none=True, default_value=None).tag(sync=True)
+    camera_up = Tuple(trait=CFloat, minlen=3, maxlen=3, default_value=(0, 1, 0)).tag(sync=True)
+
     def __init__(self, children=[], **kwargs):
         """Construct a Scene."""
         super(Scene, self).__init__(children=children, **kwargs)
