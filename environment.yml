@@ -3,6 +3,7 @@ channels:
 dependencies:
   - vtk
   - h5py
+  - pyvista
   - pythreejs
   - nodejs
   - ipygany=0.3.3
