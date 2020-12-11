@@ -586,6 +586,7 @@ class ThresholdModel extends EffectModel {
       _model_name: ThresholdModel.model_name,
       min: 0.,
       max: 0.,
+      range: [0., 0.],
       dynamic: false,
       inclusive: true,
     };
@@ -597,6 +598,10 @@ class ThresholdModel extends EffectModel {
 
   get max () {
     return this.get('max');
+  }
+
+  get range () {
+    return this.get('range');
   }
 
   get dynamic () {
@@ -625,6 +630,10 @@ class ThresholdModel extends EffectModel {
 
     this.on('change:min', () => { this.block.min = this.min });
     this.on('change:max', () => { this.block.max = this.max });
+    this.on('change:range', () => {
+        this.block.min = this.range[0];
+        this.block.max = this.range[1];
+    });
     this.on('change:inclusive', () => { this.block.inclusive = this.inclusive });
   }
 

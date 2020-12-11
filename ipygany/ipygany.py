@@ -603,6 +603,7 @@ class Threshold(Effect):
 
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
+    range = Tuple(CFloat(0.), CFloat(0.)).tag(sync=True)
     dynamic = Bool(False).tag(sync=True)
     inclusive = Bool(True).tag(sync=True)
 
