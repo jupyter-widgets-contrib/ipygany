@@ -612,6 +612,10 @@ class ThresholdModel extends EffectModel {
     return this.get('range');
   }
 
+  set range (value: [number, number]) {
+    this.set('range', value)
+  }
+
   get dynamic () {
     return this.get('dynamic');
   }
@@ -636,11 +640,17 @@ class ThresholdModel extends EffectModel {
   initEventListeners () : void {
     super.initEventListeners();
 
-    this.on('change:min', () => { this.block.min = this.min });
-    this.on('change:max', () => { this.block.max = this.max });
+    this.on('change:min', () => {
+      this.block.min = this.min;
+      this.range = [this.min, this.max];
+    });
+    this.on('change:max', () => {
+      this.block.max = this.max;
+      this.range = [this.min, this.max];
+    });
     this.on('change:range', () => {
-        this.min = this.range[0];
-        this.max = this.range[1];
+      this.min = this.range[0];
+      this.max = this.range[1];
     });
     this.on('change:inclusive', () => { this.block.inclusive = this.inclusive });
   }
