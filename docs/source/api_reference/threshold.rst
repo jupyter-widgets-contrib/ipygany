@@ -24,7 +24,7 @@ Examples
 .. jupyter-execute::
 
     import numpy as np
-    from ipywidgets import FloatSlider, VBox, jslink
+    from ipywidgets import FloatSlider, FloatRangeSlider, VBox, jslink
     from ipygany import Scene, Threshold, PolyMesh, Component
 
 
