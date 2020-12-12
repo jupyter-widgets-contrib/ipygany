@@ -607,6 +607,10 @@ class Threshold(Effect):
     dynamic = Bool(False).tag(sync=True)
     inclusive = Bool(True).tag(sync=True)
 
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.range = (self.min, self.max)
+
     @property
     def input_dim(self):
         """Input dimension."""

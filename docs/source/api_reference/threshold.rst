@@ -71,7 +71,7 @@ Examples
     height_max = np.max(z)
 
     # Hide parts of the mesh
-    threshold_mesh = Threshold(mesh, input='height', min=height_min, max=height_max, range=(height_min, height_max))
+    threshold_mesh = Threshold(mesh, input='height', min=height_min, max=height_max)
 
     # Create a slider that will dynamically change the boundaries of the threshold
     threshold_slider_min = FloatSlider(value=height_min, min=-0.3, max=1., step=0.006)
