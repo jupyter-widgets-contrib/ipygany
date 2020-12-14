@@ -24,7 +24,7 @@ Examples
 .. jupyter-execute::
 
     import numpy as np
-    from ipywidgets import FloatSlider, VBox, jslink
+    from ipywidgets import FloatSlider, FloatRangeSlider, VBox, jslink
     from ipygany import Scene, Threshold, PolyMesh, Component
 
 
@@ -76,8 +76,10 @@ Examples
     # Create a slider that will dynamically change the boundaries of the threshold
     threshold_slider_min = FloatSlider(value=height_min, min=-0.3, max=1., step=0.006)
     threshold_slider_max = FloatSlider(value=height_max, min=-0.3, max=1., step=0.006)
+    threshold_slider_range = FloatRangeSlider(value=[height_min, height_max], min=-0.3, max=1.0, step=0.006)
 
     jslink((threshold_mesh, 'min'), (threshold_slider_min, 'value'))
     jslink((threshold_mesh, 'max'), (threshold_slider_max, 'value'))
+    jslink((threshold_mesh, 'range'), (threshold_slider_range, 'value'))
 
-    VBox((Scene([threshold_mesh]), threshold_slider_min, threshold_slider_max))
+    VBox((Scene([threshold_mesh]), threshold_slider_min, threshold_slider_max, threshold_slider_range))
