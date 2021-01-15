@@ -13,7 +13,8 @@ const externals = ['@jupyter-widgets/base'];
 
 const resolve = {
   // Add '.ts' and '.tsx' as resolvable extensions.
-  extensions: [".webpack.js", ".web.js", ".ts", ".js"]
+  extensions: [".webpack.js", ".web.js", ".ts", ".js"],
+  fallback: { "util": require.resolve("util/") }
 };
 
 module.exports = [
@@ -28,7 +29,8 @@ module.exports = [
     output: {
       filename: 'index.js',
       path: path.resolve(__dirname, 'ipygany', 'nbextension', 'static'),
-      libraryTarget: 'amd'
+      libraryTarget: 'amd',
+      publicPath: ''
     },
     module: {
       rules: rules

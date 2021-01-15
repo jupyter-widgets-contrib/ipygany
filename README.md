@@ -68,8 +68,8 @@ If you want to load vtk files in `ipygany`, you also need to install vtk, you ca
 conda install -c conda-forge vtk
 ```
 
-For JupyterLab
---------------
+For JupyterLab <= 2
+-------------------
 
 You need to install the labextension for **ipygany**:
 
