@@ -1,10 +1,6 @@
 include LICENSE.txt
 include README.md
 
-include setupbase.py
-include pytest.ini
-include .coverage.rc
-
 include tsconfig.json
 include package.json
 include webpack.config.js
