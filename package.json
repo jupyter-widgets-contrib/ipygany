@@ -49,6 +49,7 @@
     "@jupyter-widgets/controls": "^2.0.0",
     "binary-search-tree": "^0.2.6",
     "ganyjs": "^0.6.3",
+    "process": "^0.11.10",
     "three": "^0.118.0",
     "util": "^0.12.3",
     "uuid": "^3.3.3"

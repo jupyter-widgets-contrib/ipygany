@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const path = require('path');
 const version = require('./package.json').version;
 
@@ -14,7 +15,10 @@ const externals = ['@jupyter-widgets/base'];
 const resolve = {
   // Add '.ts' and '.tsx' as resolvable extensions.
   extensions: [".webpack.js", ".web.js", ".ts", ".js"],
-  fallback: { "util": require.resolve("util/") }
+  fallback: {
+    "util": require.resolve("util/"),
+    "process": require.resolve("process/browser")
+  }
 };
 
 module.exports = [
