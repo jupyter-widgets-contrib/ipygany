@@ -29,9 +29,10 @@
     "url": "https://github.com/QuantStack/ipygany"
   },
   "scripts": {
-    "build": "yarn run build:lib && yarn run build:nbextension && yarn run build:labextension",
+    "build": "yarn run build:lib && yarn run build:nbextension",
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:extensions": "yarn run build && yarn run build:labextension",
     "build:lib": "tsc",
     "build:nbextension": "webpack",
     "clean": "yarn run clean:lib && yarn run clean:nbextension && yarn run clean:labextension",
@@ -46,10 +47,8 @@
   },
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10 || ^2 || ^3 || ^4.0.0",
-    "@jupyter-widgets/controls": "^2.0.0",
     "binary-search-tree": "^0.2.6",
     "ganyjs": "^0.6.3",
-    "process": "^0.11.10",
     "three": "^0.118.0",
     "util": "^0.12.3",
     "uuid": "^3.3.3"

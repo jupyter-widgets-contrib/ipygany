@@ -16,10 +16,16 @@ const resolve = {
   // Add '.ts' and '.tsx' as resolvable extensions.
   extensions: [".webpack.js", ".web.js", ".ts", ".js"],
   fallback: {
-    "util": require.resolve("util/"),
-    "process": require.resolve("process/browser")
+    "util": require.resolve("util/")
   }
 };
+
+const plugins = [
+  new webpack.DefinePlugin({
+    'process.env.NODE_DEBUG': JSON.stringify(false)
+  })
+];
+
 
 module.exports = [
   /**
@@ -42,6 +48,7 @@ module.exports = [
     devtool: 'source-map',
     externals,
     resolve,
+    plugins
   },
 
   /**
@@ -69,6 +76,7 @@ module.exports = [
     },
     externals,
     resolve,
+    plugins
   }
 
 ];
