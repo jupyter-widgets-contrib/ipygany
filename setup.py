@@ -46,8 +46,7 @@ package_data_spec = {
 }
 
 data_files_spec = [
-    ('share/jupyter/nbextensions/ipygany',
-        nb_path, '*.*'),
+    ('share/jupyter/nbextensions/ipygany', nb_path, '**'),
     ("share/jupyter/labextensions/ipygany", lab_path, "**"),
     ('etc/jupyter/nbconfig/notebook.d', HERE, 'ipygany.json')
 ]
@@ -55,7 +54,7 @@ data_files_spec = [
 
 cmdclass = create_cmdclass('jsdeps', package_data_spec=package_data_spec, data_files_spec=data_files_spec)
 js_command = combine_commands(
-    install_npm(HERE, build_cmd='build'),
+    install_npm(HERE, npm=["yarn"], build_cmd='build:extensions'),
     ensure_targets(jstargets),
 )
 
