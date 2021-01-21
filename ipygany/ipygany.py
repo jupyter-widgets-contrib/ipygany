@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
+    Bool, Dict, Enum, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
 )
 from traittypes import Array
 from ipywidgets import (
@@ -17,6 +17,8 @@ from ipywidgets import (
 from .serialization import array_serialization, data_array_serialization
 
 from ._frontend import module_version, module_name
+
+from .colormaps import colormaps
 
 FLOAT32 = 'f'
 UINT32 = 'I'
@@ -575,6 +577,8 @@ class IsoColor(Effect):
 
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
+
+    colormap = Enum(list(colormaps.keys()), allow_none=False, default_value=colormaps.Black_Body_Radiation).tag(sync=True)
 
     @property
     def input_dim(self):
