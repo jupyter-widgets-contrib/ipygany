@@ -575,6 +575,11 @@ class IsoColor(Effect):
 
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
+    range = Tuple((0., 0.)).tag(sync=True)
+
+    def __init__(self, parent, **kwargs):
+        super().__init__(parent, **kwargs)
+        self.range = (self.min, self.max)
 
     @property
     def input_dim(self):

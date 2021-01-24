@@ -497,6 +497,7 @@ class IsoColorModel extends EffectModel {
       _model_name: IsoColorModel.model_name,
       min: 0.,
       max: 0.,
+      range: [0., 0.],
     };
   }
 
@@ -504,8 +505,24 @@ class IsoColorModel extends EffectModel {
     return this.get('min');
   }
 
+  set min (value: number) {
+    this.set('min', value)
+  }
+
   get max () {
     return this.get('max');
+  }
+
+  set max (value: number) {
+    this.set('max', value)
+  }
+
+  get range () {
+    return this.get('range');
+  }
+
+  set range (value: [number, number]) {
+    this.set('range', value)
   }
 
   get input () {
@@ -521,8 +538,18 @@ class IsoColorModel extends EffectModel {
   initEventListeners () : void {
     super.initEventListeners();
 
-    this.on('change:min', () => { this.block.min = this.min; });
-    this.on('change:max', () => { this.block.max = this.max; });
+    this.on('change:min', () => {
+          this.block.min = this.min;
+          this.range = [this.min, this.range[1]];
+        });
+        this.on('change:max', () => {
+          this.block.max = this.max;
+          this.range = [this.range[0], this.max];
+        });
+        this.on('change:range', () => {
+          this.min = this.range[0];
+          this.max = this.range[1];
+        });
   }
 
   block: IsoColor;
