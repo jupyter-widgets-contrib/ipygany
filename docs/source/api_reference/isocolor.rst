@@ -6,7 +6,7 @@ The ``IsoColor`` widget colorize your mesh given.
 .. note::
     Currently, you can only use the default Viridis colormap, we'd like to support all paraview colormaps
 
-The ``input`` attribute should be the name of the ``Component`` you want to use for colorizing the mesh. You also need to pass the ``min`` and ``max`` of the component array.
+The ``input`` attribute should be the name of the ``Component`` you want to use for colorizing the mesh. You also need to pass the ``min`` and ``max`` (or ``range`` as a min/max tuple) of the component array.
 
 For example, if you have a 1-D ``Data`` named ``"height"``, you can simply pass its name as input:
 
@@ -27,8 +27,8 @@ Examples
 .. jupyter-execute::
 
     import numpy as np
-    from ipywidgets import FloatSlider, FloatRangeSlider, VBox, jslink
-    from ipygany import Scene, IsoColor, PolyMesh, Component
+    from ipywidgets import FloatSlider, FloatRangeSlider, Dropdown, Select, VBox, AppLayout, jslink
+    from ipygany import Scene, IsoColor, PolyMesh, Component, ColorBar, colormaps
 
 
     # Create triangle indices
@@ -77,12 +77,24 @@ Examples
     colored_mesh = IsoColor(mesh, input='height', min=height_min, max=height_max)
 
     # Create a slider that will dynamically change the boundaries of the colormap
-    colormap_slider_min = FloatSlider(value=height_min, min=0., max=height_max)
-    colormap_slider_max = FloatSlider(value=height_max, min=0., max=height_max)
-    colormap_slider_range = FloatRangeSlider(value=[height_min, height_max], min=0., max=1.0, step=0.1)
+    colormap_slider_range = FloatRangeSlider(value=[height_min, height_max], min=height_min, max=height_max, step=(height_max - height_min) / 100.)
 
-    jslink((colored_mesh, 'min'), (colormap_slider_min, 'value'))
-    jslink((colored_mesh, 'max'), (colormap_slider_max, 'value'))
     jslink((colored_mesh, 'range'), (colormap_slider_range, 'value'))
 
-    VBox((Scene([colored_mesh]), colormap_slider_min, colormap_slider_max, colormap_slider_range))
+    # Create a colorbar widget
+    colorbar = ColorBar(colored_mesh)
+
+    # Colormap choice widget
+    colormap = Dropdown(
+        options=colormaps,
+        description='colormap:'
+    )
+
+    jslink((colored_mesh, 'colormap'), (colormap, 'index'))
+
+
+    AppLayout(
+        left_sidebar=Scene([colored_mesh]),
+        right_sidebar=VBox((colormap_slider_range, colormap, colorbar)),
+        pane_widths=[2, 0, 1]
+    )

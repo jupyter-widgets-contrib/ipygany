@@ -27,6 +27,14 @@ import {
   Water, UnderWater,
 } from 'ganyjs';
 
+const colormaps: string[] = [
+  'BrBG', 'PRGn', 'PiYG', 'PuOr', 'RdBu', 'RdGy', 'RdYlBu', 'RdYlGn',
+  'Spectral', 'BuGn', 'BuPu', 'GnBu', 'OrRd', 'PuBuGn', 'PuBu', 'PuRd', 'RdPu',
+  'YlGnBu', 'YlGn', 'YlOrBr', 'YlOrRd', 'Blues', 'Greens', 'Greys', 'Purples', 'Reds',
+  'Oranges',  'Cividis',  'CubehelixDefault',  'Rainbow',  'Warm',  'Cool',  'Sinebow',  'Turbo',
+  'Viridis', 'Magma', 'Inferno', 'Plasma'
+]
+
 
 function deserialize_float32array (data: any, manager: any) {
     return new Float32Array(data.data.buffer);
@@ -498,7 +506,7 @@ class IsoColorModel extends EffectModel {
       min: 0.,
       max: 0.,
       range: [0., 0.],
-      colormap: 'Viridis',
+      colormap: 34,
       type: 'linear',
     };
   }
@@ -528,7 +536,7 @@ class IsoColorModel extends EffectModel {
   }
 
   get colormap () : string {
-    return this.get('colormap');
+    return colormaps[this.get('colormap')];
   }
 
   get type () {
