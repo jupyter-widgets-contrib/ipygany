@@ -3,7 +3,7 @@ Threshold
 
 The ``Threshold`` widget hides part of your mesh for which the does not fit in a given range.
 
-The ``input`` attribute should be the name of the ``Component`` you want to use for hiding the mesh. You also need to pass the ``min`` and ``max`` of that the component should respect.
+The ``input`` attribute should be the name of the ``Component`` you want to use for hiding the mesh. You also need to pass the ``min`` and ``max`` (or ``range`` as a min/max tuple) of that the component should respect.
 
 For example, if you have a 1-D ``Data`` named ``"height"``, you can simply pass its name as input:
 
@@ -74,12 +74,8 @@ Examples
     threshold_mesh = Threshold(mesh, input='height', min=height_min, max=height_max)
 
     # Create a slider that will dynamically change the boundaries of the threshold
-    threshold_slider_min = FloatSlider(value=height_min, min=-0.3, max=1., step=0.006)
-    threshold_slider_max = FloatSlider(value=height_max, min=-0.3, max=1., step=0.006)
-    threshold_slider_range = FloatRangeSlider(value=[height_min, height_max], min=-0.3, max=1.0, step=0.006)
+    threshold_slider_range = FloatRangeSlider(value=[height_min, height_max], min=height_min, max=height_max, step=(height_max - height_min) / 100.)
 
-    jslink((threshold_mesh, 'min'), (threshold_slider_min, 'value'))
-    jslink((threshold_mesh, 'max'), (threshold_slider_max, 'value'))
     jslink((threshold_mesh, 'range'), (threshold_slider_range, 'value'))
 
-    VBox((Scene([threshold_mesh]), threshold_slider_min, threshold_slider_max, threshold_slider_range))
+    VBox((Scene([threshold_mesh]), threshold_slider_range))
