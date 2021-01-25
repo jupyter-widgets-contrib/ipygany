@@ -48,7 +48,7 @@
   "dependencies": {
     "@jupyter-widgets/base": "^1.1.10 || ^2 || ^3 || ^4.0.0",
     "binary-search-tree": "^0.2.6",
-    "ganyjs": "^0.7.0",
+    "ganyjs": "^0.7.1",
     "three": "^0.118.0",
     "util": "^0.12.3",
     "uuid": "^3.3.3"

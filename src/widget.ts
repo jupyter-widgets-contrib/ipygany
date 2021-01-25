@@ -938,9 +938,7 @@ class SceneModel extends _GanyDOMWidgetModel {
       background_color: 'white',
       background_opacity: 1.,
       children: [],
-      camera_position: null,
-      camera_up: [0, 1, 0],
-      camera_target: null,
+      camera: null,
     };
   }
 
@@ -951,9 +949,7 @@ class SceneModel extends _GanyDOMWidgetModel {
 
     this.updateChildren();
     this.on('change:children', this.updateChildren.bind(this));
-    this.on('change:camera_position', this.updateCamera.bind(this));
-    this.on('change:camera_target', this.updateCamera.bind(this));
-    this.on('change:camera_up', this.updateCamera.bind(this));
+    this.on('change:camera', this.updateCamera.bind(this));
   }
 
   get backgroundColor () : string {
@@ -964,29 +960,12 @@ class SceneModel extends _GanyDOMWidgetModel {
     return this.get('background_opacity')
   }
 
-  get modelCameraPosition () : THREE.Vector3 | null {
-    const position = this.get('camera_position');
-
-    if (position === null) {
-      return null;
-    }
-
-    return new THREE.Vector3(position[0], position[1], position[2]);
+  get camera () : any {
+    return this.get('camera');
   }
 
-  get modelCameraUp () : THREE.Vector3 {
-    const position = this.get('camera_up');
-    return new THREE.Vector3(position[0], position[1], position[2]);
-  }
-
-  get modelCameraTarget () : THREE.Vector3 | null {
-    const target = this.get('camera_target');
-
-    if (target === null) {
-      return null;
-    }
-
-    return new THREE.Vector3(target[0], target[1], target[2]);
+  set camera (value: any) {
+    this.set('camera', value);
   }
 
   updateCamera () {
@@ -1000,31 +979,33 @@ class SceneModel extends _GanyDOMWidgetModel {
     const radius = blocks[0].boundingSphere.radius;
     const center = blocks[0].boundingSphere.center;
 
-    const modelCameraPosition = this.modelCameraPosition;
-    const modelCameraUp = this.modelCameraUp;
-    const modelCameraTarget = this.modelCameraTarget;
+    const modelCameraPosition = this.camera ? this.camera['position'] || null : null;
+    const modelCameraRotation = this.camera ? this.camera['rotation'] || null : null;
+    const modelCameraTarget = this.camera ? this.camera['target'] || null : null;
+    const modelCameraUp = this.camera ? this.camera['up'] || null : null;
 
-    if (modelCameraPosition === null) {
+    if (modelCameraPosition) {
+      this.cameraPosition = new THREE.Vector3(modelCameraPosition[0], modelCameraPosition[1], modelCameraPosition[2]);
+    } else {
       this.cameraPosition = new THREE.Vector3(center.x, center.y, center.z + 2.5 * radius);
-    } else {
-      this.cameraPosition = modelCameraPosition;
     }
 
-    if (modelCameraUp === null) {
-      this.cameraUp = new THREE.Vector3(0., 1., 0.);
-    } else {
-      this.cameraUp = modelCameraUp;
+    if (modelCameraRotation) {
+      this.cameraRotation = new THREE.Quaternion(modelCameraRotation[0], modelCameraRotation[1], modelCameraRotation[2], modelCameraRotation[3]);
     }
 
-    if (modelCameraTarget === null) {
+    if (modelCameraTarget) {
+      this.cameraTarget = new THREE.Vector3(modelCameraTarget[0], modelCameraTarget[1], modelCameraTarget[2]);
+    } else {
       this.cameraTarget = new THREE.Vector3(center.x, center.y, center.z);
-    } else {
-      this.cameraTarget = modelCameraTarget;
+    }
+
+    if (modelCameraUp) {
+      this.cameraUp = new THREE.Vector3(modelCameraUp[0], modelCameraUp[1], modelCameraUp[2]);
     }
 
     this.cameraNear = radius / 3.;
     this.cameraFar = radius * 10.;
-    console.log(this.cameraNear, this.cameraFar);
 
     this.trigger('update_camera');
   }
@@ -1048,8 +1029,9 @@ class SceneModel extends _GanyDOMWidgetModel {
   scene: Scene;
 
   cameraPosition: THREE.Vector3;
-  cameraUp: THREE.Vector3;
+  cameraRotation: THREE.Quaternion;
   cameraTarget: THREE.Vector3;
+  cameraUp: THREE.Vector3;
   cameraNear: number = 0.01;
   cameraFar: number = 99999;
 
@@ -1090,14 +1072,34 @@ class SceneView extends DOMWidgetView {
     this.model.on('change:background_opacity', () => { this.renderer.backgroundOpacity = this.model.backgroundOpacity; });
 
     this.model.on('update_camera', this.updateCamera.bind(this));
+
+    this.renderer.controls.addEventListener('change', this.handleCameraMove.bind(this));
   }
 
   updateCamera () {
-    this.renderer.cameraPosition = this.model.cameraPosition;
-    this.renderer.cameraTarget = this.model.cameraTarget;
-    this.renderer.cameraUp = this.model.cameraUp;
+    if (this.model.cameraPosition && !this.model.cameraPosition.equals(this.renderer.cameraPosition)) {
+      this.renderer.cameraPosition = this.model.cameraPosition;
+    }
+    if (this.model.cameraRotation && !this.model.cameraRotation.equals(this.renderer.cameraRotation)) {
+      this.renderer.cameraRotation = this.model.cameraRotation;
+    }
+    if (this.model.cameraTarget && !this.model.cameraTarget.equals(this.renderer.cameraTarget)) {
+      this.renderer.cameraTarget = this.model.cameraTarget;
+    }
+    if (this.model.cameraUp && !this.model.cameraUp.equals(this.renderer.cameraUp)) {
+      this.renderer.cameraUp = this.model.cameraUp;
+    }
     this.renderer.camera.near = this.model.cameraNear;
     this.renderer.camera.far = this.model.cameraFar;
+  }
+
+  handleCameraMove() {
+    this.model.camera = {
+      position: this.renderer.cameraPosition.toArray(),
+      rotation: this.renderer.cameraRotation.toArray(),
+      target: this.renderer.cameraTarget.toArray(),
+      up: this.renderer.cameraUp.toArray(),
+    };
   }
 
   processPhosphorMessage (msg: Message) {

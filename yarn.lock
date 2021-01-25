@@ -1391,10 +1391,10 @@ function-bind@^1.1.1:
   resolved "https://registry.yarnpkg.com/function-bind/-/function-bind-1.1.1.tgz#a56899d3ea3c9bab874bb9773b7c5ede92f4895d"
   integrity sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==
 
-ganyjs@^0.7.0:
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/ganyjs/-/ganyjs-0.7.0.tgz#607ade18567b9e67eac797b980c49d0e062ab1d7"
-  integrity sha512-snZYW29kAZHVqsBH/+svrScqmJ78+z3KM0vRCjOVe51Rlr8K41kScNhCsdwn4jtMqvz7EFYaPm5GBe1UZlsFRA==
+ganyjs@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/ganyjs/-/ganyjs-0.7.1.tgz#bffe9b74a4a8fe1b17a6a9cde79dfc403b7f91f8"
+  integrity sha512-ZsIgJ5xeS8hkMZN6qr2RpqaTdghA22LXwbNPoJk/DZxbU1aTc0P5RtiXwN29dFq4uKDKnj5NKIWT7djZC5LyxQ==
   dependencies:
     backbone "^1.4.0"
     binary-search-tree "^0.2.6"
