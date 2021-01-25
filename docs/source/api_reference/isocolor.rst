@@ -27,7 +27,7 @@ Examples
 .. jupyter-execute::
 
     import numpy as np
-    from ipywidgets import FloatSlider, VBox, jslink
+    from ipywidgets import FloatSlider, FloatRangeSlider, VBox, jslink
     from ipygany import Scene, IsoColor, PolyMesh, Component
 
 
@@ -77,8 +77,12 @@ Examples
     colored_mesh = IsoColor(mesh, input='height', min=height_min, max=height_max)
 
     # Create a slider that will dynamically change the boundaries of the colormap
-    colormap_slider = FloatSlider(value=height_max, min=0., max=height_max)
+    colormap_slider_min = FloatSlider(value=height_min, min=0., max=height_max)
+    colormap_slider_max = FloatSlider(value=height_max, min=0., max=height_max)
+    colormap_slider_range = FloatRangeSlider(value=[height_min, height_max], min=0., max=1.0, step=0.1)
 
-    jslink((colored_mesh, 'max'), (colormap_slider, 'value'))
+    jslink((colored_mesh, 'min'), (colormap_slider_min, 'value'))
+    jslink((colored_mesh, 'max'), (colormap_slider_max, 'value'))
+    jslink((colored_mesh, 'range'), (colormap_slider_range, 'value'))
 
-    VBox((Scene([colored_mesh]), colormap_slider))
+    VBox((Scene([colored_mesh]), colormap_slider_min, colormap_slider_max, colormap_slider_range))
