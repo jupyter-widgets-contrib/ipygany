@@ -4,7 +4,7 @@
 import * as THREE from 'three';
 
 import {
-  WidgetModel, DOMWidgetModel, DOMWidgetView, ISerializers, unpack_models, WidgetView
+  WidgetModel, DOMWidgetModel, DOMWidgetView, ISerializers, unpack_models, WidgetView, Dict
 } from '@jupyter-widgets/base';
 
 import {
@@ -498,6 +498,8 @@ class IsoColorModel extends EffectModel {
       min: 0.,
       max: 0.,
       range: [0., 0.],
+      colormap: 'Viridis',
+      type: 'linear',
     };
   }
 
@@ -525,6 +527,14 @@ class IsoColorModel extends EffectModel {
     this.set('range', value)
   }
 
+  get colormap () : string {
+    return this.get('colormap');
+  }
+
+  get type () {
+    return this.get('type');
+  }
+
   get input () {
     const input = this.get('input');
 
@@ -532,29 +542,121 @@ class IsoColorModel extends EffectModel {
   }
 
   createBlock () {
-    return new IsoColor(this.parent.block, this.input, this.min, this.max);
+    return new IsoColor(this.parent.block, this.input, this.min, this.max, this.colormap, this.type);
   }
 
   initEventListeners () : void {
     super.initEventListeners();
 
     this.on('change:min', () => {
-          this.block.min = this.min;
-          this.range = [this.min, this.range[1]];
-        });
-        this.on('change:max', () => {
-          this.block.max = this.max;
-          this.range = [this.range[0], this.max];
-        });
-        this.on('change:range', () => {
-          this.min = this.range[0];
-          this.max = this.range[1];
-        });
+      this.block.min = this.min;
+      this.range = [this.min, this.range[1]];
+    });
+    this.on('change:max', () => {
+      this.block.max = this.max;
+      this.range = [this.range[0], this.max];
+    });
+    this.on('change:range', () => {
+      this.min = this.range[0];
+      this.max = this.range[1];
+    });
+    this.on('change:colormap', () => { this.block.colorMap = this.colormap; });
+    this.on('change:type', () => { this.block.type = this.type; });
   }
 
   block: IsoColor;
 
   static model_name = 'IsoColorModel';
+
+}
+
+
+export
+class ColorBarModel extends _GanyDOMWidgetModel {
+
+  defaults() {
+    return {...super.defaults(),
+      _model_name: ColorBarModel.model_name,
+      _view_name: ColorBarModel.view_name,
+      parent: null,
+    };
+  }
+
+  initialize (attributes: any, options: any) {
+    super.initialize(attributes, options);
+
+    this.colorBar = this.parent.block.colorBar;
+    this.parent.block.on('change:colorbar', this.redraw.bind(this));
+    this.redraw();
+
+    this.on('change:parent', this.updateColorBar.bind(this));
+  }
+
+  get parent () : IsoColorModel {
+    return this.get('parent')
+  }
+
+  private updateColorBar () {
+    // TODO Turn off events on old parent
+    this.colorBar = this.parent.block.colorBar;
+    this.parent.block.on('change:colorbar', this.redraw.bind(this));
+    this.redraw();
+  }
+
+  private redraw () {
+    for (const view_id in this.views) {
+      this.views[view_id].then((view: ColorBarView) => {
+        view.draw();
+      });
+    }
+  }
+
+  static serializers: ISerializers = {
+    ..._GanyDOMWidgetModel.serializers,
+    parent: { deserialize: (unpack_models as any) },
+  }
+
+  static model_name = 'ColorBarModel';
+  static view_name = 'ColorBarView';
+
+  colorBar: HTMLCanvasElement;
+
+  views: Dict<Promise<ColorBarView>>;
+
+}
+
+
+export
+class ColorBarView extends DOMWidgetView {
+
+  render () {
+    const ctx = this.el.getContext('2d');
+    this.el.classList.add('gany-colorbar');
+
+    if (ctx === null) {
+      throw 'Failed to create canvas context for ColorBarView';
+    }
+
+    this.ctx = ctx;
+
+    this.draw();
+  }
+
+  draw () {
+    this.el.width = this.model.colorBar.width;
+    this.el.height = this.model.colorBar.height;
+    this.ctx.drawImage(this.model.colorBar, 0, 0);
+  }
+
+  // @ts-ignore
+  get tagName(): string {
+    return 'canvas';
+  }
+
+  el: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+
+  model: ColorBarModel;
 
 }
 

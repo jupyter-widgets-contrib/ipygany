@@ -4,11 +4,13 @@
 # Copyright (c) Martin Renou.
 # Distributed under the terms of the Modified BSD License.
 
+from .colormaps import colormaps  # noqa
 from .ipygany import (  # noqa
     PolyMesh, TetraMesh, PointCloud,
     Scene,
     Data, Component,
-    Alpha, RGB, IsoColor, Threshold, IsoSurface,
+    Alpha, RGB, IsoColor, ColorBar,
+    Threshold, IsoSurface,
     Warp, WarpByScalar,
     Water, UnderWater
 )

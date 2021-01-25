@@ -1,3 +1,8 @@
 .gany-scene {
   height: 500px;
 }
+
+.gany-colorbar {
+  width: 100%;
+  height: auto;
+}

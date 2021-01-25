@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Bool, Dict, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
+    Bool, Dict, Enum, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
 )
 from traittypes import Array
 from ipywidgets import (
@@ -17,6 +17,8 @@ from ipywidgets import (
 from .serialization import array_serialization, data_array_serialization
 
 from ._frontend import module_version, module_name
+
+from .colormaps import colormaps
 
 FLOAT32 = 'f'
 UINT32 = 'I'
@@ -576,6 +578,8 @@ class IsoColor(Effect):
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
     range = Tuple((0., 0.)).tag(sync=True)
+    colormap = Enum(list(colormaps.values()), allow_none=False, default_value=colormaps.Viridis).tag(sync=True)
+    type = Enum(['linear', 'log'], default_value='linear').tag(sync=True)
 
     def __init__(self, parent, **kwargs):
         super().__init__(parent, **kwargs)
@@ -585,6 +589,18 @@ class IsoColor(Effect):
     def input_dim(self):
         """Input dimension."""
         return 1
+
+
+class ColorBar(_GanyDOMWidgetBase):
+    """A ColorBar widget."""
+
+    _view_name = Unicode('ColorBarView').tag(sync=True)
+    _model_name = Unicode('ColorBarModel').tag(sync=True)
+
+    parent = Instance(IsoColor, allow_none=False).tag(sync=True, **widget_serialization)
+
+    def __init__(self, parent, **kwargs):
+        super(ColorBar, self).__init__(parent=parent, **kwargs)
 
 
 class IsoSurface(Effect):
