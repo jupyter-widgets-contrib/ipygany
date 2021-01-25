@@ -847,12 +847,11 @@ class SceneModel extends _GanyDOMWidgetModel {
 
     this.scene = new Scene();
 
-    this._scale = new THREE.Vector3(1., 1., 1.);
-    this._translation = new THREE.Vector3(0., 0., 0.);
-    this.updateMatrix();
-
     this.updateChildren();
     this.on('change:children', this.updateChildren.bind(this));
+    this.on('change:camera_position', this.updateCamera.bind(this));
+    this.on('change:camera_target', this.updateCamera.bind(this));
+    this.on('change:camera_up', this.updateCamera.bind(this));
   }
 
   get backgroundColor () : string {
@@ -863,40 +862,69 @@ class SceneModel extends _GanyDOMWidgetModel {
     return this.get('background_opacity')
   }
 
-  get cameraPosition () : THREE.Vector3 | null {
+  get modelCameraPosition () : THREE.Vector3 | null {
     const position = this.get('camera_position');
 
     if (position === null) {
       return null;
     }
 
-    return this.scale(new THREE.Vector3(position[0], position[1], position[2]));
+    return new THREE.Vector3(position[0], position[1], position[2]);
   }
 
-  get cameraUp () : THREE.Vector3 {
+  get modelCameraUp () : THREE.Vector3 {
     const position = this.get('camera_up');
     return new THREE.Vector3(position[0], position[1], position[2]);
   }
 
-  get cameraTarget () : THREE.Vector3 | null {
+  get modelCameraTarget () : THREE.Vector3 | null {
     const target = this.get('camera_target');
 
     if (target === null) {
       return null;
     }
 
-    return this.scale(new THREE.Vector3(target[0], target[1], target[2]));
+    return new THREE.Vector3(target[0], target[1], target[2]);
   }
 
-  private scale (vector: THREE.Vector3) {
-    return new THREE.Vector3().copy(vector).applyMatrix4(this._matrix);
-  }
+  updateCamera () {
+    const blocks: Block[] = this.get('children').map((child: BlockModel) => child.block);
 
-  private updateMatrix () {
-    const scaleMatrix = new THREE.Matrix4().makeScale(this._scale.x, this._scale.y, this._scale.z);
-    const positionMatrix = new THREE.Matrix4().makeTranslation(this._translation.x, this._translation.y, this._translation.z);
+    if (blocks.length == 0) {
+      return;
+    }
 
-    this._matrix = new THREE.Matrix4().multiplyMatrices(scaleMatrix, positionMatrix);
+    // TODO Compute mean radius and mean center of all the blocks
+    const radius = blocks[0].boundingSphere.radius;
+    const center = blocks[0].boundingSphere.center;
+
+    const modelCameraPosition = this.modelCameraPosition;
+    const modelCameraUp = this.modelCameraUp;
+    const modelCameraTarget = this.modelCameraTarget;
+
+    if (modelCameraPosition === null) {
+      this.cameraPosition = new THREE.Vector3(center.x, center.y, center.z + 2.5 * radius);
+    } else {
+      this.cameraPosition = modelCameraPosition;
+    }
+
+    if (modelCameraUp === null) {
+      this.cameraUp = new THREE.Vector3(0., 1., 0.);
+    } else {
+      this.cameraUp = modelCameraUp;
+    }
+
+    if (modelCameraTarget === null) {
+      this.cameraTarget = new THREE.Vector3(center.x, center.y, center.z);
+    } else {
+      this.cameraTarget = modelCameraTarget;
+    }
+
+    this.cameraNear = radius / 3.;
+    this.cameraFar = radius * 10.;
+    console.log(this.cameraNear, this.cameraFar);
+
+    this.trigger('update_camera');
   }
 
   private updateChildren () {
@@ -908,32 +936,20 @@ class SceneModel extends _GanyDOMWidgetModel {
       return;
     }
 
-    const boundingSphereRadius = Math.max(...blocks.map((block: Block) => block.boundingSphere.radius));
-
-    const scale = 1 / boundingSphereRadius;
-    this._scale.x = scale;
-    this._scale.y = scale;
-    this._scale.z = scale;
-
-    const position = blocks[0].boundingSphere.center;
-
-    this._translation = new THREE.Vector3(-position.x, -position.y, -position.z);
-
-    this.updateMatrix();
-
     for (const block of blocks) {
-      block.scale = this._scale;
-      block.position = this._translation;
-
       this.scene.addBlock(block);
     }
+
+    this.updateCamera();
   }
 
   scene: Scene;
 
-  private _scale: THREE.Vector3;
-  private _translation: THREE.Vector3;
-  private _matrix: THREE.Matrix4;
+  cameraPosition: THREE.Vector3;
+  cameraUp: THREE.Vector3;
+  cameraTarget: THREE.Vector3;
+  cameraNear: number = 0.01;
+  cameraFar: number = 99999;
 
   static serializers: ISerializers = {
     ..._GanyDOMWidgetModel.serializers,
@@ -959,9 +975,7 @@ class SceneView extends DOMWidgetView {
       this.renderer.backgroundColor = this.model.backgroundColor
       this.renderer.backgroundOpacity = this.model.backgroundOpacity;
 
-      this.updateCameraUp();
-      this.updateCameraPosition();
-      this.updateCameraTarget();
+      this.updateCamera();
 
       this.initEventListeners();
     });
@@ -973,33 +987,15 @@ class SceneView extends DOMWidgetView {
     this.model.on('change:background_color', () => { this.renderer.backgroundColor = this.model.backgroundColor; });
     this.model.on('change:background_opacity', () => { this.renderer.backgroundOpacity = this.model.backgroundOpacity; });
 
-    this.model.on('change:camera_position', this.updateCameraPosition.bind(this));
-    this.model.on('change:camera_target', this.updateCameraTarget.bind(this));
-    this.model.on('change:camera_up', this.updateCameraUp.bind(this));
+    this.model.on('update_camera', this.updateCamera.bind(this));
   }
 
-  updateCameraPosition () {
-    const newPosition = this.model.cameraPosition;
-
-    if (newPosition === null) {
-      return;
-    }
-
-    this.renderer.cameraPosition = newPosition;
-  }
-
-  updateCameraTarget () {
-    const newTarget = this.model.cameraTarget;
-
-    if (newTarget === null) {
-      return;
-    }
-
-    this.renderer.cameraTarget = newTarget;
-  }
-
-  updateCameraUp () {
+  updateCamera () {
+    this.renderer.cameraPosition = this.model.cameraPosition;
+    this.renderer.cameraTarget = this.model.cameraTarget;
     this.renderer.cameraUp = this.model.cameraUp;
+    this.renderer.camera.near = this.model.cameraNear;
+    this.renderer.camera.far = this.model.cameraFar;
   }
 
   processPhosphorMessage (msg: Message) {
