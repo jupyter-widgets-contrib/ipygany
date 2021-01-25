@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import sphinx_rtd_theme
 
+
+def setup(app):
+    app.add_css_file("main_stylesheet.css")
+
+
 extensions = [
     'jupyter_sphinx',
 ]
