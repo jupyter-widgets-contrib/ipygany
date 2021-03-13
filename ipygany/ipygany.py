@@ -311,7 +311,6 @@ class PolyMesh(Block):
             data=_grid_data_to_data_widget(get_ugrid_data(trimesh))
         )
 
-
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True):
         """Reload a vtk file, entirely or partially."""
         from .vtk_loader import (
