@@ -298,9 +298,9 @@ class PolyMesh(Block):
 
         # convert to an all-triangular surface
         if surf.is_all_triangles():
-            trimesh = surf.triangulate()
-        else:
             trimesh = surf
+        else:
+            trimesh = surf.triangulate()
 
         # finally, pass the triangle vertices to PolyMesh
         triangle_indices = trimesh.faces.reshape(-1, 4)[:, 1:]
