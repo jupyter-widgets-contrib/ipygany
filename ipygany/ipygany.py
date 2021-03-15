@@ -242,6 +242,75 @@ class PolyMesh(Block):
             **kwargs
         )
 
+    def from_pyvista(obj, **kwargs):
+        """Import a mesh from ``pyvista`` or ``vtk``.
+
+        Parameters
+        ----------
+        obj : pyvista compatible object
+            Any object compatible with pyvista.  Includes most ``vtk``
+            objects.
+
+        Returns
+        -------
+        PolyMesh
+            ``ipygany.PolyMesh`` object
+
+        Examples
+        --------
+
+        Convert a pyvista mesh to a PolyMesh
+
+        >>> import pyvista as pv
+        >>> from ipygany import PolyMesh
+        >>> pv_mesh = pv.Sphere()
+        >>> mesh = PolyMesh.from_pyvista(pv_mesh)
+        >>> mesh
+        PolyMesh(data=[Data(components=[Component(array=array([-6.1232343e-17,
+        6.1232343e-17, -1.0811902e-01, -2.1497…
+
+        """
+        try:
+            import pyvista as pv
+        except ImportError:
+            raise ImportError('Please install ``pyvista`` to use this feature')
+
+        from .vtk_loader import get_ugrid_data
+
+        # attempt to wrap non-pyvista objects
+        if not pv.is_pyvista_dataset(obj):
+            mesh = pv.wrap(obj)
+            if not pv.is_pyvista_dataset(mesh):
+                raise TypeError(f'Object type ({type(mesh)}) cannot be converted to '
+                                'a pyvista dataset')
+        else:
+            mesh = obj
+
+        # PolyMesh requires vertices and triangles, so we need to
+        # convert the mesh to an all triangle polydata
+        if not isinstance(obj, pv.PolyData):
+            # unlikely case that mesh does not have extract_surface
+            if not hasattr(mesh, 'extract_surface'):
+                mesh = mesh.cast_to_unstructured_grid()
+            surf = mesh.extract_surface()
+        else:
+            surf = mesh
+
+        # convert to an all-triangular surface
+        if surf.is_all_triangles():
+            trimesh = surf
+        else:
+            trimesh = surf.triangulate()
+
+        # finally, pass the triangle vertices to PolyMesh
+        triangle_indices = trimesh.faces.reshape(-1, 4)[:, 1:]
+
+        return PolyMesh(
+            vertices=trimesh.points,
+            triangle_indices=triangle_indices,
+            data=_grid_data_to_data_widget(get_ugrid_data(trimesh))
+        )
+
     def reload(self, path, reload_vertices=False, reload_triangles=False, reload_data=True):
         """Reload a vtk file, entirely or partially."""
         from .vtk_loader import (
