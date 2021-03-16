@@ -651,8 +651,22 @@ class IsoColor(Effect):
     type = Enum(['linear', 'log'], default_value='linear').tag(sync=True)
 
     def __init__(self, parent, **kwargs):
+        colormap = kwargs.pop('colormap', None)
         super().__init__(parent, **kwargs)
         self.range = (self.min, self.max)
+
+        # set colormap
+        if isinstance(colormap, str):
+            if colormap not in colormaps:
+                allowed = ', '.join([f"'{clmp}'" for clmp in colormaps.keys()])
+                raise ValueError('``cmap`` "{cmap} is not supported by ``ipygany``\n'
+                                 'Pick from one of the following:\n'
+                                 + allowed)
+            self.colormap = colormaps[colormap]
+        elif isinstance(colormap, int):
+            self.colormap = colormap
+        elif colormap is not None:
+            raise TypeError(f'Invalid colormap type {type(colormap)}')
 
     @property
     def input_dim(self):
