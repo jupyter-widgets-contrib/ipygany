@@ -660,8 +660,7 @@ class IsoColor(Effect):
             if colormap not in colormaps:
                 allowed = ', '.join([f"'{clmp}'" for clmp in colormaps.keys()])
                 raise ValueError('``cmap`` "{cmap} is not supported by ``ipygany``\n'
-                                 'Pick from one of the following:\n'
-                                 + allowed)
+                                 'Pick from one of the following:\n' + allowed)
             self.colormap = colormaps[colormap]
         elif isinstance(colormap, int):
             self.colormap = colormap
