@@ -5,7 +5,7 @@ from array import array
 import numpy as np
 
 from traitlets import (
-    Bool, Dict, Enum, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate
+    Bool, Dict, Enum, Unicode, List, Instance, CFloat, Tuple, TraitError, Union, default, validate, Any,
 )
 from traittypes import Array
 from ipywidgets import (
@@ -647,7 +647,7 @@ class IsoColor(Effect):
     min = CFloat(0.).tag(sync=True)
     max = CFloat(0.).tag(sync=True)
     range = Tuple((0., 0.)).tag(sync=True)
-    colormap = Enum(list(colormaps.values()), allow_none=False, default_value=colormaps.Viridis).tag(sync=True)
+    colormap = Any(allow_none=False, default_value=colormaps.Viridis).tag(sync=True)
     type = Enum(['linear', 'log'], default_value='linear').tag(sync=True)
 
     def __init__(self, parent, **kwargs):
@@ -658,6 +658,31 @@ class IsoColor(Effect):
     def input_dim(self):
         """Input dimension."""
         return 1
+
+    @validate('colormap')
+    def _valid_colormap(self, proposal):
+        """Validate colormap. """
+        # Logic is here to allow setting ``colormap`` using strings
+        # and ints.  See:
+        # https://github.com/QuantStack/ipygany/pull/99
+        value = proposal['value']
+
+        # set colormap
+        if isinstance(value, str):
+            if value not in colormaps:
+                allowed = ', '.join([f"'{key}'" for key in colormaps.keys()])
+                raise ValueError(f'``colormap`` "{value} is not supported by ``ipygany``\n'
+                                 'Pick from one of the following:\n' + allowed)
+            colormap = colormaps[value]
+        elif isinstance(value, int):
+            if value not in colormaps.values():
+                raise ValueError(f'Invalid colormap {value}.  Expected one of'
+                                 f'the following: {colormaps.values()}')
+            colormap = value
+        elif value is not None:
+            raise TypeError(f'Invalid colormap type {type(value)}.  Should be '
+                            'a valid colormap ``str`` or ``int``')
+        return colormap
 
 
 class ColorBar(_GanyDOMWidgetBase):

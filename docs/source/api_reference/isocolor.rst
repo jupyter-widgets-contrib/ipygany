@@ -3,9 +3,6 @@ IsoColor
 
 The ``IsoColor`` widget colorize your mesh given.
 
-.. note::
-    Currently, you can only use the default Viridis colormap, we'd like to support all paraview colormaps
-
 The ``input`` attribute should be the name of the ``Component`` you want to use for colorizing the mesh. You also need to pass the ``min`` and ``max`` (or ``range`` as a min/max tuple) of the component array.
 
 For example, if you have a 1-D ``Data`` named ``"height"``, you can simply pass its name as input:
@@ -73,8 +70,8 @@ Examples
     height_min = np.min(z)
     height_max = np.max(z)
 
-    # Colorize by height
-    colored_mesh = IsoColor(mesh, input='height', min=height_min, max=height_max)
+    # Colorize by height and set the colormap to "Turbo"
+    colored_mesh = IsoColor(mesh, input='height', min=height_min, max=height_max, colormap='Turbo')
 
     # Create a slider that will dynamically change the boundaries of the colormap
     colormap_slider_range = FloatRangeSlider(value=[height_min, height_max], min=height_min, max=height_max, step=(height_max - height_min) / 100.)
