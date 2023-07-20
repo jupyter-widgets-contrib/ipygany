@@ -664,7 +664,7 @@ class IsoColor(Effect):
         """Validate colormap. """
         # Logic is here to allow setting ``colormap`` using strings
         # and ints.  See:
-        # https://github.com/QuantStack/ipygany/pull/99
+        # https://github.com/jupyter-widgets-contrib/ipygany/pull/99
         value = proposal['value']
 
         # set colormap

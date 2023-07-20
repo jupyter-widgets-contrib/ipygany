@@ -17,7 +17,7 @@ source_suffix = '.rst'
 
 # General information about the project.
 project = 'ipygany'
-author = 'QuantStack'
+author = 'jupyter-widgets-contrib'
 
 exclude_patterns = []
 highlight_language = 'python'

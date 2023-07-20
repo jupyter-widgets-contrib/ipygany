@@ -13,9 +13,9 @@
     "dist/*.js",
     "css/*.css"
   ],
-  "homepage": "https://github.com/QuantStack/ipygany",
+  "homepage": "https://github.com/jupyter-widgets-contrib/ipygany",
   "bugs": {
-    "url": "https://github.com/QuantStack/ipygany/issues"
+    "url": "https://github.com/jupyter-widgets-contrib/ipygany/issues"
   },
   "license": "BSD-3-Clause",
   "author": {
@@ -26,7 +26,7 @@
   "types": "./lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/QuantStack/ipygany"
+    "url": "https://github.com/jupyter-widgets-contrib/ipygany"
   },
   "scripts": {
     "build": "yarn run build:lib && yarn run build:nbextension",
