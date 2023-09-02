@@ -1,5 +1,5 @@
 ipygany
-pygments==2.6.1
+pygments==2.7.4
 jupyter-sphinx
 vtk
 meshpy
