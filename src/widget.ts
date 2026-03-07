@@ -1012,7 +1012,7 @@ class SceneModel extends _GanyDOMWidgetModel {
       this.cameraUp = new THREE.Vector3(modelCameraUp[0], modelCameraUp[1], modelCameraUp[2]);
     }
 
-    this.cameraNear = radius / 3.;
+    this.cameraNear = radius / 100.;
     this.cameraFar = radius * 10.;
 
     this.trigger('update_camera');

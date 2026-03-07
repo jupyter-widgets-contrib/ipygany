@@ -24,15 +24,15 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup conda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
+        miniconda-version: "latest"
         activate-environment: ipygany-dev
         environment-file: dev_environment.yml
         python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
         auto-activate-base: false
         channels: conda-forge
 
@@ -64,7 +64,7 @@ jobs:
     - name: Build docs (Only on MacOS for build speed)
       if: matrix.os == 'macos-latest'
       run: |
-        mamba install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
+        conda install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
         cd docs/source/
         sphinx-build . _build/html
         cd ../..
@@ -74,15 +74,15 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Setup conda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
+        miniconda-version: "latest"
         activate-environment: ipygany-dev
         environment-file: dev_environment.yml
         python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
         auto-activate-base: false
         channels: conda-forge
 
@@ -93,9 +93,9 @@ jobs:
         sha256sum * | tee SHA256SUMS
 
     - name: Upload builds
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: dist ${{ github.run_number }}
+        name: dist-${{ github.run_number }}
         path: ./dist
 
   install:
@@ -116,21 +116,21 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
+          miniconda-version: "latest"
           activate-environment: ipygany-dev
           environment-file: dev_environment.yml
           python-version: ${{ matrix.python-version }}
-          mamba-version: "*"
           auto-activate-base: false
           channels: conda-forge
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         with:
-          name: dist ${{ github.run_number }}
+          name: dist-${{ github.run_number }}
           path: ./dist
 
       - name: Install the package
