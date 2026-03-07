@@ -29,6 +29,7 @@ jobs:
     - name: Setup conda
       uses: conda-incubator/setup-miniconda@v3
       with:
+        miniconda-version: "latest"
         activate-environment: ipygany-dev
         environment-file: dev_environment.yml
         python-version: ${{ matrix.python-version }}
@@ -79,6 +80,7 @@ jobs:
     - name: Setup conda
       uses: conda-incubator/setup-miniconda@v3
       with:
+        miniconda-version: "latest"
         activate-environment: ipygany-dev
         environment-file: dev_environment.yml
         python-version: ${{ matrix.python-version }}
@@ -121,6 +123,7 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
+          miniconda-version: "latest"
           activate-environment: ipygany-dev
           environment-file: dev_environment.yml
           python-version: ${{ matrix.python-version }}
