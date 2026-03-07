@@ -33,7 +33,6 @@ jobs:
         activate-environment: ipygany-dev
         environment-file: dev_environment.yml
         python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
         auto-activate-base: false
         channels: conda-forge
 
@@ -65,7 +64,7 @@ jobs:
     - name: Build docs (Only on MacOS for build speed)
       if: matrix.os == 'macos-latest'
       run: |
-        mamba install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
+        conda install sphinx sphinx_rtd_theme pygments==2.6.1 jupyter-sphinx meshpy pyvista
         cd docs/source/
         sphinx-build . _build/html
         cd ../..
@@ -84,7 +83,6 @@ jobs:
         activate-environment: ipygany-dev
         environment-file: dev_environment.yml
         python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
         auto-activate-base: false
         channels: conda-forge
 
@@ -127,7 +125,6 @@ jobs:
           activate-environment: ipygany-dev
           environment-file: dev_environment.yml
           python-version: ${{ matrix.python-version }}
-          mamba-version: "*"
           auto-activate-base: false
           channels: conda-forge
 
